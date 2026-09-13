@@ -1,584 +1,480 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Armada Play Indonesia (API) — Control Center</title>
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font & Ikon -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- Supabase JS CDN (official) -->
+  <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Font & style tambahan -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    /* Ornamen batik halus & nuansa Nusantara */
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(145deg, #fef7e9 0%, #f5e6d3 100%);
-      background-attachment: fixed;
-      position: relative;
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .nusantara-bg {
+      background: linear-gradient(145deg, #fdf6ec 0%, #f5e6d3 40%, #e8d5b8 100%);
     }
-    /* Ornamen batik/tenun lembut di latar */
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.08"><path d="M20 20 L30 10 L40 20 L50 10 L60 20 L70 10 L80 20 L90 10 L100 20 L90 30 L100 40 L90 50 L100 60 L90 70 L100 80 L90 90 L80 80 L70 90 L60 80 L50 90 L40 80 L30 90 L20 80 L10 90 L0 80 L10 70 L0 60 L10 50 L0 40 L10 30 L0 20 L10 10 Z" fill="%23b86b2c" /></svg>');
-      background-size: 120px 120px;
+    .ornament-header {
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0 L48 16 L64 16 L56 32 L64 48 L48 48 L40 64 L32 48 L16 48 L24 32 L16 16 L32 16 Z' fill='%23b98a5e' fill-opacity='0.08'/%3E%3C/svg%3E");
       background-repeat: repeat;
-      pointer-events: none;
-      z-index: 0;
     }
-    /* Gradasi header khas Nusantara: merah-putih-emas */
-    .nusantara-header {
-      background: linear-gradient(135deg, #9e2a2b 0%, #c44536 30%, #e6b17e 80%, #f8e3c2 100%);
-      border-bottom: 5px solid #b87c4b;
-      box-shadow: 0 8px 20px rgba(120, 60, 30, 0.2);
-      position: relative;
-      overflow: hidden;
+    .batik-accent {
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='8' fill='%23c9a87c' fill-opacity='0.12'/%3E%3Ccircle cx='0' cy='0' r='6' fill='%23c9a87c' fill-opacity='0.08'/%3E%3Ccircle cx='60' cy='0' r='6' fill='%23c9a87c' fill-opacity='0.08'/%3E%3Ccircle cx='0' cy='60' r='6' fill='%23c9a87c' fill-opacity='0.08'/%3E%3Ccircle cx='60' cy='60' r='6' fill='%23c9a87c' fill-opacity='0.08'/%3E%3C/svg%3E");
+      background-repeat: repeat;
     }
-    .nusantara-header::after {
-      content: "";
-      position: absolute;
-      top: -50%; left: -20%; width: 200%; height: 200%;
-      background: radial-gradient(circle, rgba(255,215,140,0.2) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    /* Kartu utama dengan sentuhan batik/ornamen */
-    .card-nusantara {
-      background: rgba(255, 245, 235, 0.9);
+    .card-soft {
+      background: rgba(255, 252, 245, 0.85);
       backdrop-filter: blur(8px);
-      border: 1px solid #e7cba5;
-      box-shadow: 0 10px 25px -5px rgba(140, 80, 40, 0.2), 0 0 0 1px rgba(230, 190, 140, 0.3) inset;
+      border: 1px solid #e7d8c4;
+    }
+    .btn-nusantara {
+      background: linear-gradient(135deg, #a47148, #7a5230);
       transition: all 0.2s ease;
     }
-    .card-nusantara:hover {
-      box-shadow: 0 18px 30px -8px rgba(140, 80, 40, 0.3);
+    .btn-nusantara:hover {
+      background: linear-gradient(135deg, #8b5e3c, #5e3e24);
+      transform: scale(1.02);
     }
-    /* Ornamen garis tepi bergaya ukir */
-    .border-ornamen {
-      border-image: repeating-linear-gradient(45deg, #b86b2c, #e6b17e 10px, #b86b2c 20px) 30;
-      border-width: 3px;
-      border-style: solid;
-    }
-    /* Tabel & elemen UI */
-    .table-nusantara th {
-      background: #8b4e2e;
-      color: #ffefdb;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-      border-bottom: 3px solid #d4a373;
-    }
-    .table-nusantara td {
-      border-bottom: 1px solid #edd9c0;
-      color: #3e2c1c;
-    }
-    .table-nusantara tr:last-child td {
-      border-bottom: none;
-    }
-    .table-nusantara tr:hover td {
-      background-color: #f7ede1;
-    }
-    .badge-success {
-      background: #2e7d32; color: #f1f8e9;
+    .table-row-hover:hover {
+      background-color: #fcf5eb;
     }
     .badge-pending {
-      background: #b76e2e; color: #fff3e0;
+      background: #fef3c7;
+      color: #92400e;
     }
-    .badge-failed {
-      background: #9e2a2b; color: #fff0f0;
-    }
-    /* Scrollbar halus */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #f0e0ce;
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #b87c4b;
-      border-radius: 10px;
+    .badge-completed {
+      background: #d1fae5;
+      color: #065f46;
     }
   </style>
 </head>
-<body class="min-h-screen relative z-10 p-4 md:p-6">
+<body class="nusantara-bg min-h-screen p-4 md:p-8">
 
-  <!-- ========== HEADER DENGAN NUANSA NUSANTARA ========== -->
-  <header class="nusantara-header rounded-3xl mb-8 p-6 md:p-8 text-white shadow-2xl relative z-20 max-w-7xl mx-auto">
-    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-4">
-        <div class="bg-white/20 p-3 rounded-2xl backdrop-blur-sm border border-white/30">
-          <i class="fas fa-gamepad text-3xl text-yellow-100"></i>
-        </div>
+  <!-- HEADER dengan ornamen Nusantara -->
+  <header class="relative max-w-7xl mx-auto mb-10">
+    <div class="ornament-header rounded-3xl shadow-lg border border-amber-200/60 bg-white/40 backdrop-blur-sm px-6 py-8 md:px-12 md:py-10">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
-          <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight drop-shadow-md">
-            <span class="text-amber-100">Armada Play</span> <span class="text-white">Indonesia</span>
-            <span class="text-sm font-light align-top ml-1 text-amber-100">(API)</span>
+          <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-amber-900 drop-shadow-sm">
+            <span class="text-amber-700">Armada Play</span> Indonesia
           </h1>
-          <p class="text-amber-100/90 text-sm md:text-base font-medium flex items-center gap-2 mt-1">
-            <i class="fas fa-crown text-amber-200"></i> Control Center · Nusantara Game Network
+          <p class="text-xl md:text-2xl font-semibold text-amber-800/80 mt-1">(API) — Control Center</p>
+          <p class="text-sm text-amber-700/70 mt-2 flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Connected to Supabase Cloud
           </p>
         </div>
-      </div>
-      <div class="flex items-center gap-3 bg-black/20 px-5 py-3 rounded-full backdrop-blur-sm border border-white/20">
-        <i class="fas fa-cloud-upload-alt text-amber-100"></i>
-        <span class="text-sm font-medium">Supabase Cloud</span>
-        <span class="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+        <div class="flex items-center gap-3 bg-white/60 px-5 py-3 rounded-2xl border border-amber-300/50 shadow-sm">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-600 to-amber-900 flex items-center justify-center text-white font-bold text-lg shadow">A</div>
+          <div>
+            <p class="text-xs font-semibold text-amber-800">Admin</p>
+            <p class="text-sm font-bold text-amber-950">Armada Play</p>
+          </div>
+        </div>
       </div>
     </div>
+    <!-- Garis aksen batik -->
+    <div class="batik-accent h-4 rounded-b-2xl mx-4 -mt-2"></div>
   </header>
 
-  <!-- ========== KONTEN UTAMA ========== -->
-  <main class="max-w-7xl mx-auto space-y-8 relative z-20">
+  <!-- MAIN CONTENT -->
+  <main class="max-w-7xl mx-auto space-y-8">
 
-    <!-- ========== KARTU STATISTIK RINGKASAN ========== -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Total Game -->
-      <div class="card-nusantara rounded-2xl p-5 flex items-center justify-between border-l-8 border-l-amber-600">
-        <div>
-          <p class="text-sm uppercase tracking-wider text-amber-800 font-semibold flex items-center gap-1">
-            <i class="fas fa-dice-d6"></i> Total Game Terdaftar
-          </p>
-          <p id="totalGames" class="text-4xl font-black text-amber-900 mt-2">0</p>
+    <!-- STATISTIK RINGKASAN -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- Total Game Aktif -->
+      <div class="card-soft rounded-2xl shadow-md p-6 border-l-4 border-l-amber-600 flex items-center gap-4">
+        <div class="bg-amber-100 p-3 rounded-xl">
+          <svg class="w-7 h-7 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
-        <div class="bg-amber-100 p-4 rounded-full text-amber-700 text-3xl">
-          <i class="fas fa-chess-board"></i>
+        <div>
+          <p class="text-sm font-medium text-amber-700">Total Game Aktif</p>
+          <p id="statTotalGames" class="text-2xl font-bold text-amber-950">—</p>
         </div>
       </div>
       <!-- Total Pemain -->
-      <div class="card-nusantara rounded-2xl p-5 flex items-center justify-between border-l-8 border-l-red-700">
-        <div>
-          <p class="text-sm uppercase tracking-wider text-amber-800 font-semibold flex items-center gap-1">
-            <i class="fas fa-users"></i> Total Pemain Terdaftar
-          </p>
-          <p id="totalUsers" class="text-4xl font-black text-amber-900 mt-2">0</p>
+      <div class="card-soft rounded-2xl shadow-md p-6 border-l-4 border-l-emerald-600 flex items-center gap-4">
+        <div class="bg-emerald-100 p-3 rounded-xl">
+          <svg class="w-7 h-7 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
         </div>
-        <div class="bg-red-100 p-4 rounded-full text-red-700 text-3xl">
-          <i class="fas fa-user-friends"></i>
+        <div>
+          <p class="text-sm font-medium text-emerald-700">Total Pemain</p>
+          <p id="statTotalUsers" class="text-2xl font-bold text-emerald-950">—</p>
         </div>
       </div>
       <!-- Total Transaksi -->
-      <div class="card-nusantara rounded-2xl p-5 flex items-center justify-between border-l-8 border-l-yellow-700">
-        <div>
-          <p class="text-sm uppercase tracking-wider text-amber-800 font-semibold flex items-center gap-1">
-            <i class="fas fa-exchange-alt"></i> Total Transaksi
-          </p>
-          <p id="totalTransactions" class="text-4xl font-black text-amber-900 mt-2">0</p>
+      <div class="card-soft rounded-2xl shadow-md p-6 border-l-4 border-l-sky-600 flex items-center gap-4">
+        <div class="bg-sky-100 p-3 rounded-xl">
+          <svg class="w-7 h-7 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
         </div>
-        <div class="bg-yellow-100 p-4 rounded-full text-yellow-800 text-3xl">
-          <i class="fas fa-credit-card"></i>
+        <div>
+          <p class="text-sm font-medium text-sky-700">Total Transaksi</p>
+          <p id="statTotalTransactions" class="text-2xl font-bold text-sky-950">—</p>
         </div>
       </div>
     </section>
 
-    <!-- ========== FITUR TAMBAH GAME (FORM INSERT) ========== -->
-    <section class="card-nusantara rounded-2xl p-6 border-t-4 border-amber-700 shadow-lg">
+    <!-- TAMBAH GAME BARU -->
+    <section class="card-soft rounded-2xl shadow-md p-6 md:p-8">
       <h2 class="text-xl font-bold text-amber-900 flex items-center gap-2 mb-4">
-        <i class="fas fa-plus-circle text-amber-700"></i> Tambah Game Baru ke Dermaga
+        <span class="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
+        Tambah Game Baru
       </h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-        <div>
-          <label class="block text-sm font-medium text-amber-800 mb-1">Game ID <span class="text-xs text-amber-600">(tanpa spasi)</span></label>
-          <input type="text" id="gameIdInput" placeholder="contoh: game_puzzle_01" 
-                 class="w-full px-4 py-3 rounded-xl border border-amber-300 bg-white/80 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition">
+      <form id="formTambahGame" class="flex flex-col sm:flex-row gap-4 items-end">
+        <div class="flex-1 w-full">
+          <label class="block text-sm font-semibold text-amber-800 mb-1">Game ID</label>
+          <input type="text" id="inputGameId" placeholder="cth: GAME001" required
+                 class="w-full px-4 py-3 rounded-xl border border-amber-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-amber-400 text-amber-950 placeholder-amber-400/60" />
         </div>
-        <div>
-          <label class="block text-sm font-medium text-amber-800 mb-1">Nama Game</label>
-          <input type="text" id="gameNameInput" placeholder="contoh: Puzzle Nusantara" 
-                 class="w-full px-4 py-3 rounded-xl border border-amber-300 bg-white/80 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition">
+        <div class="flex-1 w-full">
+          <label class="block text-sm font-semibold text-amber-800 mb-1">Nama Game</label>
+          <input type="text" id="inputGameName" placeholder="cth: Petualangan Nusantara" required
+                 class="w-full px-4 py-3 rounded-xl border border-amber-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-amber-400 text-amber-950 placeholder-amber-400/60" />
         </div>
-        <div>
-          <button id="addGameBtn" 
-                  class="w-full bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-800 hover:to-amber-950 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
-            <i class="fas fa-save"></i> Tambah Game Baru
-          </button>
-        </div>
-      </div>
-      <p id="addGameMessage" class="text-sm mt-3 text-amber-700 hidden"></p>
+        <button type="submit"
+                class="btn-nusantara text-white font-bold px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 whitespace-nowrap">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+          Daftarkan Game
+        </button>
+      </form>
+      <p id="gameMessage" class="mt-3 text-sm font-medium"></p>
     </section>
 
-    <!-- ========== TABEL DAFTAR GAME (DERMAGA) ========== -->
-    <section class="card-nusantara rounded-2xl overflow-hidden shadow-xl">
-      <div class="px-6 py-4 bg-amber-800/10 border-b border-amber-300 flex items-center gap-2">
-        <i class="fas fa-anchor text-amber-800"></i>
-        <h2 class="text-lg font-bold text-amber-900">Dermaga Game — Terhubung Realtime</h2>
-        <span class="ml-auto text-xs bg-amber-200 text-amber-900 px-2 py-1 rounded-full font-mono">tabel: games</span>
-      </div>
-      <div class="overflow-x-auto p-1">
-        <table class="w-full table-nusantara">
+    <!-- TABEL PEMAIN & SALDO -->
+    <section class="card-soft rounded-2xl shadow-md p-6 md:p-8 overflow-hidden">
+      <h2 class="text-xl font-bold text-amber-900 flex items-center gap-2 mb-4">
+        <span class="w-1.5 h-6 bg-emerald-600 rounded-full inline-block"></span>
+        Daftar Pemain & Saldo Koin
+      </h2>
+      <div class="overflow-x-auto -mx-2">
+        <table class="w-full min-w-[500px] text-left border-collapse">
           <thead>
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Game ID</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Nama Game</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Dibuat</th>
+            <tr class="border-b-2 border-amber-200 text-amber-800 text-sm font-semibold">
+              <th class="py-3 px-3">ID</th>
+              <th class="py-3 px-3">Nama Pemain</th>
+              <th class="py-3 px-3 text-right">Saldo Koin</th>
             </tr>
           </thead>
-          <tbody id="gamesTableBody">
-            <tr><td colspan="3" class="px-6 py-8 text-center text-amber-700">Memuat data game...</td></tr>
+          <tbody id="tableUsersBody" class="text-amber-950 text-sm divide-y divide-amber-100">
+            <tr><td colspan="3" class="py-6 text-center text-amber-600/60">Memuat data pemain...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- ========== DUA KOLOM: PEMAIN & TRANSAKSI ========== -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Tabel Pemain & Saldo -->
-      <section class="card-nusantara rounded-2xl overflow-hidden shadow-xl">
-        <div class="px-6 py-4 bg-red-800/10 border-b border-red-300 flex items-center gap-2">
-          <i class="fas fa-user-astronaut text-red-800"></i>
-          <h2 class="text-lg font-bold text-amber-900">Pemain & Saldo Koin</h2>
-          <span class="ml-auto text-xs bg-red-200 text-red-900 px-2 py-1 rounded-full font-mono">tabel: users</span>
-        </div>
-        <div class="overflow-x-auto p-1">
-          <table class="w-full table-nusantara">
-            <thead>
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Username</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Saldo Koin</th>
-              </tr>
-            </thead>
-            <tbody id="usersTableBody">
-              <tr><td colspan="2" class="px-6 py-8 text-center text-amber-700">Memuat data pemain...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Tabel Transaksi / Withdraw -->
-      <section class="card-nusantara rounded-2xl overflow-hidden shadow-xl">
-        <div class="px-6 py-4 bg-yellow-800/10 border-b border-yellow-300 flex items-center gap-2">
-          <i class="fas fa-receipt text-yellow-800"></i>
-          <h2 class="text-lg font-bold text-amber-900">Riwayat Transaksi / Withdraw</h2>
-          <span class="ml-auto text-xs bg-yellow-200 text-yellow-900 px-2 py-1 rounded-full font-mono">tabel: transactions</span>
-        </div>
-        <div class="overflow-x-auto p-1">
-          <table class="w-full table-nusantara">
-            <thead>
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">ID</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">User</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Jumlah</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
-              </tr>
-            </thead>
-            <tbody id="transactionsTableBody">
-              <tr><td colspan="4" class="px-6 py-8 text-center text-amber-700">Memuat data transaksi...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-
-    <!-- ========== FOOTNOTE (CATATAN KAKI) ========== -->
-    <footer class="mt-12 border-t-2 border-amber-300 pt-6 pb-8 text-sm text-amber-800/90 max-w-7xl mx-auto">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="flex items-start gap-3">
-          <i class="fas fa-satellite-dish text-amber-600 mt-1"></i>
-          <div>
-            <p class="font-semibold text-amber-900">Status Sistem</p>
-            <p>Armada Play Indonesia (API) Control Center • Connected to Supabase Cloud • Built for Autonomous Game Network.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-3">
-          <i class="fas fa-copyright text-amber-600 mt-1"></i>
-          <div>
-            <p class="font-semibold text-amber-900">Hak Cipta</p>
-            <p>© 2026 Armada Play Indonesia (API). All rights reserved.</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-3">
-          <i class="fas fa-lightbulb text-amber-600 mt-1"></i>
-          <div>
-            <p class="font-semibold text-amber-900">Cheat Sheet / Tips</p>
-            <p>Tip: Gunakan Game ID tanpa spasi (contoh: game_puzzle_01) agar sinkron dengan sistem database.</p>
-          </div>
-        </div>
+    <!-- MANAJEMEN WITHDRAW (WD) -->
+    <section class="card-soft rounded-2xl shadow-md p-6 md:p-8 overflow-hidden">
+      <h2 class="text-xl font-bold text-amber-900 flex items-center gap-2 mb-4">
+        <span class="w-1.5 h-6 bg-sky-600 rounded-full inline-block"></span>
+        Manajemen Withdraw (WD)
+      </h2>
+      <div class="overflow-x-auto -mx-2">
+        <table class="w-full min-w-[800px] text-left border-collapse">
+          <thead>
+            <tr class="border-b-2 border-amber-200 text-amber-800 text-xs md:text-sm font-semibold uppercase tracking-wider">
+              <th class="py-3 px-3">Nama User</th>
+              <th class="py-3 px-3">E-Wallet</th>
+              <th class="py-3 px-3">Nomor Tujuan</th>
+              <th class="py-3 px-3 text-right">Jumlah</th>
+              <th class="py-3 px-3 text-center">Status</th>
+              <th class="py-3 px-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tableWithdrawBody" class="text-amber-950 text-sm divide-y divide-amber-100">
+            <tr><td colspan="6" class="py-6 text-center text-amber-600/60">Memuat data withdraw...</td></tr>
+          </tbody>
+        </table>
       </div>
-      <div class="text-center text-xs text-amber-600 mt-8 opacity-80">
-        <i class="fas fa-ornament"></i> · Warisan Nusantara dalam Game · 
-        <i class="fas fa-ornament"></i>
-      </div>
-    </footer>
+    </section>
+
   </main>
 
-  <!-- ========== JAVASCRIPT (SUPABASE & LOGIKA) ========== -->
+  <!-- FOOTER -->
+  <footer class="max-w-7xl mx-auto mt-12 pt-6 pb-4 border-t border-amber-300/50 text-center space-y-2">
+    <p class="text-sm font-semibold text-amber-800">
+      Armada Play Indonesia (API) Control Center • Connected to Supabase Cloud • Built for Autonomous Game Network.
+    </p>
+    <p class="text-xs text-amber-700/80">
+      © 2026 Armada Play Indonesia (API). All rights reserved.
+    </p>
+    <p class="text-xs text-amber-600/70 italic bg-amber-100/60 inline-block px-4 py-1.5 rounded-full">
+      Tip: Pastikan transfer manual e-wallet sudah berhasil sebelum mengklik tombol 'Selesai' di dashboard.
+    </p>
+  </footer>
+
+  <!-- ============================================= -->
+  <!-- SCRIPT SUPABASE & LOGIKA DASHBOARD -->
+  <!-- ============================================= -->
   <script>
-    (function() {
-      // ---- INISIALISASI SUPABASE ----
-      const SUPABASE_URL = 'https://wzuzxmgffvknjufyexdv.supabase.co';
-      const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2cMa6V8qtI4Wv_RfcrWdCg_cPyfjMQA';
-      
-      // Pastikan Supabase client tersedia
-      if (typeof supabase === 'undefined') {
-        console.error('Supabase library tidak termuat.');
-        alert('Gagal memuat pustaka Supabase. Periksa koneksi internet.');
+    // === KONFIGURASI SUPABASE ===
+    const SUPABASE_URL = 'https://wzuzxmgffvknjufyexdv.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_2cMa6V8qtI4Wv_RfcrWdCg_cPyfjMQA';
+
+    // Inisialisasi client Supabase
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // === ELEMEN DOM ===
+    const statTotalGames = document.getElementById('statTotalGames');
+    const statTotalUsers = document.getElementById('statTotalUsers');
+    const statTotalTransactions = document.getElementById('statTotalTransactions');
+    const formTambahGame = document.getElementById('formTambahGame');
+    const inputGameId = document.getElementById('inputGameId');
+    const inputGameName = document.getElementById('inputGameName');
+    const gameMessage = document.getElementById('gameMessage');
+    const tableUsersBody = document.getElementById('tableUsersBody');
+    const tableWithdrawBody = document.getElementById('tableWithdrawBody');
+
+    // === FUNGSI BANTUAN ===
+    function formatRupiah(amount) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+    }
+
+    function showMessage(el, text, type = 'success') {
+      el.textContent = text;
+      el.className = `mt-3 text-sm font-medium ${type === 'success' ? 'text-emerald-700' : 'text-red-600'}`;
+      setTimeout(() => { el.textContent = ''; }, 4000);
+    }
+
+    // === 1. MUAT STATISTIK RINGKASAN ===
+    async function loadStats() {
+      try {
+        // Total Game
+        const { count: gamesCount, error: errGames } = await supabaseClient
+          .from('games')
+          .select('*', { count: 'exact', head: true });
+        if (errGames) throw errGames;
+        statTotalGames.textContent = gamesCount ?? 0;
+
+        // Total Pemain
+        const { count: usersCount, error: errUsers } = await supabaseClient
+          .from('users')
+          .select('*', { count: 'exact', head: true });
+        if (errUsers) throw errUsers;
+        statTotalUsers.textContent = usersCount ?? 0;
+
+        // Total Transaksi (dari tabel transactions)
+        const { count: transCount, error: errTrans } = await supabaseClient
+          .from('transactions')
+          .select('*', { count: 'exact', head: true });
+        if (errTrans) throw errTrans;
+        statTotalTransactions.textContent = transCount ?? 0;
+
+      } catch (err) {
+        console.error('Gagal memuat statistik:', err.message);
+        statTotalGames.textContent = '—';
+        statTotalUsers.textContent = '—';
+        statTotalTransactions.textContent = '—';
+      }
+    }
+
+    // === 2. MUAT TABEL PEMAIN (USERS) ===
+    async function loadUsers() {
+      try {
+        const { data: users, error } = await supabaseClient
+          .from('users')
+          .select('id, username, coin_balance')
+          .order('id', { ascending: true });
+        if (error) throw error;
+
+        if (!users || users.length === 0) {
+          tableUsersBody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-amber-600/60">Belum ada pemain terdaftar.</td></tr>`;
+          return;
+        }
+
+        tableUsersBody.innerHTML = users.map(user => `
+          <tr class="table-row-hover transition-colors">
+            <td class="py-3 px-3 font-mono text-xs text-amber-700">${user.id}</td>
+            <td class="py-3 px-3 font-medium">${user.username || 'Tanpa Nama'}</td>
+            <td class="py-3 px-3 text-right font-bold text-amber-800">${formatRupiah(user.coin_balance || 0)}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('Gagal memuat users:', err.message);
+        tableUsersBody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-red-500">Gagal memuat data pemain: ${err.message}</td></tr>`;
+      }
+    }
+
+    // === 3. MUAT TABEL WITHDRAW ===
+    async function loadWithdrawals() {
+      try {
+        // Ambil dari tabel 'transactions' dengan tipe 'withdraw'
+        // Sesuaikan nama kolom dengan skema umum: id, user_id, amount, status, ewallet, ewallet_number
+        const { data: withdrawals, error } = await supabaseClient
+          .from('transactions')
+          .select('id, user_id, amount, status, ewallet, ewallet_number')
+          .eq('type', 'withdraw')       // filter tipe withdraw
+          .order('id', { ascending: false });
+
+        if (error) throw error;
+
+        if (!withdrawals || withdrawals.length === 0) {
+          tableWithdrawBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-amber-600/60">Tidak ada permintaan withdraw.</td></tr>`;
+          return;
+        }
+
+        // Ambil data user untuk mapping nama
+        const userIds = [...new Set(withdrawals.map(w => w.user_id))];
+        let userMap = {};
+        if (userIds.length > 0) {
+          const { data: usersData } = await supabaseClient
+            .from('users')
+            .select('id, username')
+            .in('id', userIds);
+          if (usersData) {
+            usersData.forEach(u => { userMap[u.id] = u.username || `User#${u.id}`; });
+          }
+        }
+
+        tableWithdrawBody.innerHTML = withdrawals.map(w => {
+          const isPending = w.status === 'pending';
+          const statusBadge = isPending
+            ? `<span class="badge-pending text-xs font-bold px-3 py-1 rounded-full">Pending</span>`
+            : `<span class="badge-completed text-xs font-bold px-3 py-1 rounded-full">Completed</span>`;
+
+          const actionButton = isPending
+            ? `<button data-id="${w.id}" data-userid="${w.user_id}" data-amount="${w.amount}" 
+                       class="btn-selesai btn-nusantara text-white text-xs font-bold px-4 py-2 rounded-lg shadow hover:shadow-md transition-all whitespace-nowrap">
+                 Selesai / Transfer
+               </button>`
+            : `<span class="text-xs text-emerald-600 font-semibold">✓ Selesai</span>`;
+
+          return `
+            <tr class="table-row-hover transition-colors">
+              <td class="py-3 px-3 font-medium">${userMap[w.user_id] || `User#${w.user_id}`}</td>
+              <td class="py-3 px-3 uppercase font-semibold text-amber-800">${w.ewallet || '-'}</td>
+              <td class="py-3 px-3 font-mono text-sm">${w.ewallet_number || '-'}</td>
+              <td class="py-3 px-3 text-right font-bold text-amber-900">${formatRupiah(w.amount || 0)}</td>
+              <td class="py-3 px-3 text-center">${statusBadge}</td>
+              <td class="py-3 px-3 text-center">${actionButton}</td>
+            </tr>
+          `;
+        }).join('');
+
+        // Pasang event listener untuk tombol "Selesai / Transfer"
+        document.querySelectorAll('.btn-selesai').forEach(btn => {
+          btn.addEventListener('click', handleSelesaiWithdraw);
+        });
+
+      } catch (err) {
+        console.error('Gagal memuat withdraw:', err.message);
+        tableWithdrawBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-red-500">Gagal memuat data withdraw: ${err.message}</td></tr>`;
+      }
+    }
+
+    // === 4. HANDLE SELESAI WITHDRAW (UPDATE STATUS + POTONG SALDO) ===
+    async function handleSelesaiWithdraw(e) {
+      const btn = e.currentTarget;
+      const transactionId = btn.dataset.id;
+      const userId = btn.dataset.userid;
+      const amount = parseFloat(btn.dataset.amount);
+
+      if (!transactionId || !userId || isNaN(amount)) {
+        alert('Data transaksi tidak valid.');
         return;
       }
 
-      const { createClient } = supabase;
-      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+      if (!confirm(`Konfirmasi: Transfer sebesar ${formatRupiah(amount)} sudah berhasil? Saldo user akan dipotong.`)) return;
 
-      // ---- ELEMEN DOM ----
-      const totalGamesEl = document.getElementById('totalGames');
-      const totalUsersEl = document.getElementById('totalUsers');
-      const totalTransactionsEl = document.getElementById('totalTransactions');
-      const gamesTableBody = document.getElementById('gamesTableBody');
-      const usersTableBody = document.getElementById('usersTableBody');
-      const transactionsTableBody = document.getElementById('transactionsTableBody');
-      const addGameBtn = document.getElementById('addGameBtn');
-      const gameIdInput = document.getElementById('gameIdInput');
-      const gameNameInput = document.getElementById('gameNameInput');
-      const addGameMessage = document.getElementById('addGameMessage');
+      // Nonaktifkan tombol sementara
+      btn.disabled = true;
+      btn.innerHTML = 'Memproses...';
+      btn.classList.add('opacity-70', 'cursor-wait');
 
-      // ---- FUNGSI BANTU: TAMPILKAN PESAN ----
-      function showMessage(text, isError = false) {
-        addGameMessage.textContent = text;
-        addGameMessage.classList.remove('hidden', 'text-green-700', 'text-red-700');
-        addGameMessage.classList.add(isError ? 'text-red-700' : 'text-green-700');
-        setTimeout(() => {
-          addGameMessage.classList.add('hidden');
-        }, 4000);
-      }
-
-      // ---- 1. AMBIL TOTAL GAMES ----
-      async function fetchTotalGames() {
-        try {
-          const { count, error } = await supabaseClient
-            .from('games')
-            .select('*', { count: 'exact', head: true });
-          if (error) throw error;
-          totalGamesEl.textContent = count ?? 0;
-        } catch (err) {
-          console.error('Error total games:', err);
-          totalGamesEl.textContent = '?';
-        }
-      }
-
-      // ---- 2. AMBIL TOTAL USERS ----
-      async function fetchTotalUsers() {
-        try {
-          const { count, error } = await supabaseClient
-            .from('users')
-            .select('*', { count: 'exact', head: true });
-          if (error) throw error;
-          totalUsersEl.textContent = count ?? 0;
-        } catch (err) {
-          console.error('Error total users:', err);
-          totalUsersEl.textContent = '?';
-        }
-      }
-
-      // ---- 3. AMBIL TOTAL TRANSACTIONS ----
-      async function fetchTotalTransactions() {
-        try {
-          const { count, error } = await supabaseClient
-            .from('transactions')
-            .select('*', { count: 'exact', head: true });
-          if (error) throw error;
-          totalTransactionsEl.textContent = count ?? 0;
-        } catch (err) {
-          console.error('Error total transactions:', err);
-          totalTransactionsEl.textContent = '?';
-        }
-      }
-
-      // ---- 4. RENDER TABEL GAMES ----
-      async function loadGames() {
-        try {
-          const { data, error } = await supabaseClient
-            .from('games')
-            .select('*')
-            .order('id', { ascending: false }); // asumsi ada kolom id atau created_at
-          if (error) throw error;
-
-          if (!data || data.length === 0) {
-            gamesTableBody.innerHTML = `<tr><td colspan="3" class="px-6 py-8 text-center text-amber-700">Belum ada game terdaftar. Tambahkan game baru.</td></tr>`;
-            return;
-          }
-
-          // Sesuaikan dengan struktur tabel: mungkin game_id, name, created_at
-          const rows = data.map(game => {
-            // fleksibel: cari properti game_id / id, name / title, created_at
-            const gameId = game.game_id ?? game.id ?? '-';
-            const gameName = game.name ?? game.title ?? '-';
-            const createdAt = game.created_at ? new Date(game.created_at).toLocaleDateString('id-ID') : '-';
-            return `<tr>
-              <td class="px-6 py-3 font-mono text-sm text-amber-950">${gameId}</td>
-              <td class="px-6 py-3 font-medium">${gameName}</td>
-              <td class="px-6 py-3 text-sm text-amber-700">${createdAt}</td>
-            </tr>`;
-          }).join('');
-          gamesTableBody.innerHTML = rows;
-        } catch (err) {
-          console.error('Error load games:', err);
-          gamesTableBody.innerHTML = `<tr><td colspan="3" class="px-6 py-8 text-center text-red-700">Gagal memuat data game: ${err.message}</td></tr>`;
-        }
-      }
-
-      // ---- 5. RENDER TABEL USERS ----
-      async function loadUsers() {
-        try {
-          const { data, error } = await supabaseClient
-            .from('users')
-            .select('*')
-            .order('id', { ascending: false });
-          if (error) throw error;
-
-          if (!data || data.length === 0) {
-            usersTableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-8 text-center text-amber-700">Belum ada pemain terdaftar.</td></tr>`;
-            return;
-          }
-
-          const rows = data.map(user => {
-            const username = user.username ?? user.name ?? user.email ?? 'unknown';
-            const coins = user.coins ?? user.balance ?? 0;
-            return `<tr>
-              <td class="px-6 py-3 font-medium text-amber-950">${username}</td>
-              <td class="px-6 py-3 font-bold text-amber-800">${coins} 🪙</td>
-            </tr>`;
-          }).join('');
-          usersTableBody.innerHTML = rows;
-        } catch (err) {
-          console.error('Error load users:', err);
-          usersTableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-8 text-center text-red-700">Gagal memuat data pemain: ${err.message}</td></tr>`;
-        }
-      }
-
-      // ---- 6. RENDER TABEL TRANSACTIONS ----
-      async function loadTransactions() {
-        try {
-          const { data, error } = await supabaseClient
-            .from('transactions')
-            .select('*')
-            .order('id', { ascending: false });
-          if (error) throw error;
-
-          if (!data || data.length === 0) {
-            transactionsTableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-amber-700">Belum ada transaksi.</td></tr>`;
-            return;
-          }
-
-          const rows = data.map(tx => {
-            const id = tx.id ?? '-';
-            const userId = tx.user_id ?? tx.username ?? '-';
-            const amount = tx.amount ?? tx.jumlah ?? 0;
-            const status = tx.status ?? 'pending';
-            let badgeClass = 'badge-pending';
-            if (status.toLowerCase() === 'success' || status.toLowerCase() === 'completed' || status.toLowerCase() === 'sukses') badgeClass = 'badge-success';
-            else if (status.toLowerCase() === 'failed' || status.toLowerCase() === 'gagal') badgeClass = 'badge-failed';
-            return `<tr>
-              <td class="px-6 py-3 font-mono text-xs">${id}</td>
-              <td class="px-6 py-3">${userId}</td>
-              <td class="px-6 py-3 font-bold text-amber-800">${amount} 🪙</td>
-              <td class="px-6 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}">${status}</span></td>
-            </tr>`;
-          }).join('');
-          transactionsTableBody.innerHTML = rows;
-        } catch (err) {
-          console.error('Error load transactions:', err);
-          transactionsTableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-red-700">Gagal memuat transaksi: ${err.message}</td></tr>`;
-        }
-      }
-
-      // ---- 7. FUNGSI TAMBAH GAME (INSERT) ----
-      async function addGame() {
-        const gameId = gameIdInput.value.trim();
-        const gameName = gameNameInput.value.trim();
-
-        if (!gameId || !gameName) {
-          showMessage('Harap isi Game ID dan Nama Game.', true);
-          return;
-        }
-        if (gameId.includes(' ')) {
-          showMessage('Game ID tidak boleh mengandung spasi. Gunakan underscore (_).', true);
-          return;
-        }
-
-        try {
-          // Coba insert dengan kolom game_id dan name (sesuaikan dengan skema umum)
-          const { error } = await supabaseClient
-            .from('games')
-            .insert([{ game_id: gameId, name: gameName }]);
-          
-          if (error) throw error;
-
-          // Reset form
-          gameIdInput.value = '';
-          gameNameInput.value = '';
-          showMessage('Game berhasil ditambahkan!', false);
-
-          // Refresh semua data terkait (total games + tabel games)
-          await Promise.all([fetchTotalGames(), loadGames()]);
-        } catch (err) {
-          console.error('Error insert game:', err);
-          showMessage('Gagal menambahkan game: ' + err.message, true);
-        }
-      }
-
-      // ---- 8. INISIALISASI & EVENT LISTENER ----
-      async function refreshAllStats() {
-        await Promise.all([
-          fetchTotalGames(),
-          fetchTotalUsers(),
-          fetchTotalTransactions()
-        ]);
-      }
-
-      async function refreshAllTables() {
-        await Promise.all([
-          loadGames(),
-          loadUsers(),
-          loadTransactions()
-        ]);
-      }
-
-      // Setup event listener tombol tambah game
-      addGameBtn.addEventListener('click', addGame);
-      // Enter key pada input
-      gameIdInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addGame(); });
-      gameNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addGame(); });
-
-      // Muat data awal
-      (async function init() {
-        await refreshAllStats();
-        await refreshAllTables();
-      })();
-
-      // ---- REAL-TIME (opsional dengan polling ringan, atau subscription) ----
-      // Gunakan polling setiap 30 detik untuk update ringan, atau realtime subscription.
-      // Kita gunakan realtime subscription untuk tabel games, users, transactions.
-      // Namun karena ini single-file, kita setup channel realtime agar dinamis.
       try {
-        supabaseClient
-          .channel('schema-db-changes')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'games' }, () => {
-            loadGames();
-            fetchTotalGames();
-          })
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => {
-            loadUsers();
-            fetchTotalUsers();
-          })
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
-            loadTransactions();
-            fetchTotalTransactions();
-          })
-          .subscribe();
+        // 1. Update status transaksi menjadi 'completed'
+        const { error: updateError } = await supabaseClient
+          .from('transactions')
+          .update({ status: 'completed' })
+          .eq('id', transactionId);
+        if (updateError) throw updateError;
+
+        // 2. Ambil saldo user saat ini
+        const { data: userData, error: fetchError } = await supabaseClient
+          .from('users')
+          .select('coin_balance')
+          .eq('id', userId)
+          .single();
+        if (fetchError) throw fetchError;
+
+        const currentBalance = userData.coin_balance || 0;
+        const newBalance = Math.max(0, currentBalance - amount); // hindari minus
+
+        // 3. Update saldo user
+        const { error: updateBalanceError } = await supabaseClient
+          .from('users')
+          .update({ coin_balance: newBalance })
+          .eq('id', userId);
+        if (updateBalanceError) throw updateBalanceError;
+
+        // 4. Refresh tampilan
+        await loadUsers();
+        await loadWithdrawals();
+        await loadStats();
+
+        alert(`Berhasil! Status transaksi #${transactionId} menjadi 'completed' dan saldo user telah dipotong ${formatRupiah(amount)}.`);
+
       } catch (err) {
-        console.warn('Realtime subscription tidak tersedia, menggunakan polling.', err);
-        // Fallback polling setiap 20 detik
-        setInterval(() => {
-          refreshAllStats();
-          refreshAllTables();
-        }, 20000);
+        console.error('Gagal memproses withdraw:', err.message);
+        alert('Gagal memproses: ' + err.message);
+        // Kembalikan tombol
+        btn.disabled = false;
+        btn.innerHTML = 'Selesai / Transfer';
+        btn.classList.remove('opacity-70', 'cursor-wait');
+      }
+    }
+
+    // === 5. TAMBAH GAME BARU ===
+    formTambahGame.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const gameId = inputGameId.value.trim();
+      const gameName = inputGameName.value.trim();
+
+      if (!gameId || !gameName) {
+        showMessage(gameMessage, 'Game ID dan Nama Game wajib diisi.', 'error');
+        return;
       }
 
-      // Tambahan: refresh manual jika diperlukan (bisa ditambahkan tombol, tidak wajib)
-      console.log('Armada Play Indonesia Control Center siap.');
-    })();
+      const submitBtn = formTambahGame.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Menyimpan...';
+
+      try {
+        const { error } = await supabaseClient
+          .from('games')
+          .insert([{ id: gameId, name: gameName }]);
+        if (error) throw error;
+
+        showMessage(gameMessage, `Game "${gameName}" (${gameId}) berhasil didaftarkan!`, 'success');
+        inputGameId.value = '';
+        inputGameName.value = '';
+        await loadStats(); // refresh total game
+      } catch (err) {
+        console.error('Gagal menambah game:', err.message);
+        showMessage(gameMessage, `Gagal menambah game: ${err.message}`, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> Daftarkan Game`;
+      }
+    });
+
+    // === 6. INISIALISASI DASHBOARD ===
+    async function initDashboard() {
+      await loadStats();
+      await loadUsers();
+      await loadWithdrawals();
+    }
+
+    // Jalankan saat halaman siap
+    window.addEventListener('DOMContentLoaded', initDashboard);
+
+    // Opsional: refresh data setiap 30 detik (real-time feel)
+    setInterval(() => {
+      loadStats();
+      loadUsers();
+      loadWithdrawals();
+    }, 30000);
   </script>
 </body>
 </html>
