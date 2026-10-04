@@ -1,1084 +1,1370 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Steam MP 7000 — Dashboard Admin</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Steam MP 7000 - Dashboard</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
 
-    body {
-      background-color: #f3f4f6;
-      padding-bottom: 80px;
-      -webkit-tap-highlight-color: transparent;
-    }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: #f3f4f6;
+    color: #1f2937;
+    font-size: 15px;
+    line-height: 1.5;
+  }
 
-    /* ===== HEADER ===== */
-    .header {
-      background-color: #dc2626;
-      color: white;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
-    }
-    .header h1 {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-    .header .badge {
-      background-color: rgba(255,255,255,0.25);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
+  body {
+    padding-bottom: 80px;
+    min-height: 100vh;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
 
-    /* ===== KARTU ===== */
-    .card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      padding: 16px;
-      margin: 12px 16px;
-    }
+  /* ===== HEADER ===== */
+  .app-header {
+    background: #dc2626;
+    color: #ffffff;
+    padding: 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+  }
 
-    /* ===== LOGIN ===== */
-    .login-wrapper {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 24px;
-      background: white;
-    }
-    .login-logo {
-      font-size: 28px;
-      font-weight: 800;
-      color: #dc2626;
-      margin-bottom: 8px;
-      text-align: center;
-      line-height: 1.2;
-    }
-    .login-logo span {
-      color: #b91c1c;
-    }
-    .login-sub {
-      font-size: 14px;
-      color: #6b7280;
-      margin-bottom: 32px;
-    }
-    .login-box {
-      width: 100%;
-      max-width: 360px;
-    }
-    .login-box label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 6px;
-    }
-    .input-field {
-      width: 100%;
-      padding: 14px 16px;
-      border: 2px solid #e5e7eb;
-      border-radius: 10px;
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.2s;
-      background: #fff;
-      color: #111;
-    }
-    .input-field:focus {
-      border-color: #dc2626;
-    }
-    .input-field::placeholder {
-      color: #9ca3af;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 14px 24px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-    .btn:active {
-      transform: scale(0.98);
-    }
-    .btn-merah {
-      background-color: #dc2626;
-      color: white;
-    }
-    .btn-merah:hover {
-      background-color: #b91c1c;
-    }
-    .btn-hijau {
-      background-color: #25D366;
-      color: white;
-    }
-    .btn-hijau:hover {
-      background-color: #1da851;
-    }
-    .btn-kuning {
-      background-color: #eab308;
-      color: #111;
-    }
-    .btn-kuning:hover {
-      background-color: #ca8a04;
-    }
-    .btn-abu {
-      background-color: #6b7280;
-      color: white;
-    }
-    .btn-abu:hover {
-      background-color: #4b5563;
-    }
-    .btn-sm {
-      width: auto;
-      padding: 8px 16px;
-      font-size: 13px;
-      border-radius: 8px;
-    }
+  .app-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
 
-    .error-msg {
-      background: #fef2f2;
-      color: #b91c1c;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      margin-top: 12px;
-      border: 1px solid #fecaca;
-      display: none;
-    }
-    .error-msg.show {
-      display: block;
-    }
+  .app-header .sub {
+    font-size: 12px;
+    opacity: 0.9;
+    margin-top: 2px;
+    font-weight: 400;
+  }
 
-    /* ===== PAGE ===== */
-    .page {
-      display: none;
-    }
-    .page.active {
-      display: block;
-    }
+  /* ===== KONTAINER ===== */
+  .container {
+    padding: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
 
-    /* ===== FORM ===== */
-    .form-group {
-      margin-bottom: 16px;
-    }
-    .form-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 6px;
-    }
-    .form-group select {
-      width: 100%;
-      padding: 14px 16px;
-      border: 2px solid #e5e7eb;
-      border-radius: 10px;
-      font-size: 16px;
-      outline: none;
-      background: #fff;
-      color: #111;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 16px center;
-      background-size: 12px;
-    }
-    .form-group select:focus {
-      border-color: #dc2626;
-    }
+  /* ===== KARTU ===== */
+  .card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
 
-    /* ===== HASIL KUNJUNGAN ===== */
-    .result-card {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 16px;
-    }
-    .result-card .nama {
-      font-size: 18px;
-      font-weight: 800;
-      color: #111;
-      margin-bottom: 4px;
-    }
-    .result-card .detail {
-      font-size: 14px;
-      color: #374151;
-      margin-bottom: 2px;
-    }
-    .result-card .status-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      margin-top: 8px;
-    }
-    .status-proses { background: #dbeafe; color: #1e40af; }
-    .status-siap { background: #fef3c7; color: #92400e; }
-    .status-gratis { background: #d1fae5; color: #065f46; }
-    .pesan-semangat {
-      font-style: italic;
-      color: #6b7280;
-      font-size: 13px;
-      margin-top: 8px;
-      border-top: 1px dashed #d1d5db;
-      padding-top: 8px;
-    }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 12px;
+  }
 
-    /* ===== DAFTAR PELANGGAN ===== */
-    .pelanggan-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      border-bottom: 1px solid #f3f4f6;
-      transition: background 0.2s;
-    }
-    .pelanggan-item:last-child {
-      border-bottom: none;
-    }
-    .pelanggan-item.siap-gratis {
-      background-color: #fef3c7;
-      border-left: 4px solid #eab308;
-    }
-    .pelanggan-item .info {
-      flex: 1;
-      min-width: 0;
-    }
-    .pelanggan-item .info .nama {
-      font-weight: 700;
-      font-size: 15px;
-      color: #111;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .pelanggan-item .info .wa {
-      font-size: 13px;
-      color: #6b7280;
-    }
-    .pelanggan-item .info .kunjungan {
-      font-size: 13px;
-      color: #374151;
-      margin-top: 2px;
-    }
-    .pelanggan-item .info .status {
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 2px;
-    }
-    .pelanggan-item .aksi {
-      flex-shrink: 0;
-      margin-left: 12px;
-    }
+  /* ===== FORM ===== */
+  .form-group {
+    margin-bottom: 14px;
+  }
 
-    /* ===== LAPORAN ===== */
-    .laporan-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin: 12px 16px;
-    }
-    .laporan-item {
-      background: white;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      text-align: center;
-    }
-    .laporan-item .angka {
-      font-size: 24px;
-      font-weight: 800;
-      color: #dc2626;
-    }
-    .laporan-item .label {
-      font-size: 12px;
-      color: #6b7280;
-      margin-top: 4px;
-      font-weight: 500;
-    }
-    .laporan-item.full {
-      grid-column: 1 / -1;
-    }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+  }
 
-    /* ===== PROFIL ===== */
-    .profil-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #f3f4f6;
-      font-size: 15px;
-    }
-    .profil-row:last-child {
-      border-bottom: none;
-    }
-    .profil-row .label {
-      color: #6b7280;
-      font-weight: 500;
-    }
-    .profil-row .value {
-      font-weight: 700;
-      color: #111;
-    }
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    background: #ffffff;
+    color: #1f2937;
+    outline: none;
+    transition: border-color 0.2s;
+  }
 
-    /* ===== BOTTOM NAV ===== */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: white;
-      border-top: 1px solid #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      z-index: 999;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
-    }
-    .bottom-nav .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      flex: 1;
-      height: 100%;
-      cursor: pointer;
-      color: #6b7280;
-      font-size: 11px;
-      font-weight: 600;
-      transition: color 0.15s;
-      -webkit-user-select: none;
-      user-select: none;
-      border: none;
-      background: none;
-      padding: 0;
-    }
-    .bottom-nav .nav-item .icon {
-      font-size: 20px;
-      line-height: 1;
-    }
-    .bottom-nav .nav-item.active {
-      color: #dc2626;
-    }
-    .bottom-nav .nav-item:active {
-      opacity: 0.7;
-    }
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
 
-    /* ===== UTIL ===== */
-    .mt-8 { margin-top: 8px; }
-    .mt-16 { margin-top: 16px; }
-    .mb-8 { margin-bottom: 8px; }
-    .text-center { text-align: center; }
-    .text-abu { color: #6b7280; }
-    .text-merah { color: #dc2626; }
-    .font-bold { font-weight: 700; }
-    .hidden { display: none !important; }
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 0.6s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-    .loading-overlay .spinner {
-      width: 40px;
-      height: 40px;
-      border-width: 4px;
-      border-top-color: #dc2626;
-    }
+  .form-group input::placeholder {
+    color: #9ca3af;
+  }
 
-    /* ===== RESPONSIVE ===== */
-    @media (min-width: 480px) {
-      .card, .laporan-grid, .pelanggan-list {
-        max-width: 480px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-      .laporan-grid {
-        padding: 0 16px;
-      }
-    }
-  </style>
+  /* ===== TOMBOL ===== */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 13px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: center;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  .btn-primary {
+    background: #dc2626;
+    color: #ffffff;
+  }
+
+  .btn-primary:hover {
+    background: #b91c1c;
+  }
+
+  .btn-wa {
+    background: #25D366;
+    color: #ffffff;
+  }
+
+  .btn-wa:hover {
+    background: #1da851;
+  }
+
+  .btn-gray {
+    background: #6b7280;
+    color: #ffffff;
+  }
+
+  .btn-gray:hover {
+    background: #4b5563;
+  }
+
+  .btn-yellow {
+    background: #eab308;
+    color: #000000;
+  }
+
+  .btn-yellow:hover {
+    background: #ca8a04;
+  }
+
+  .btn-sm {
+    width: auto;
+    padding: 8px 14px;
+    font-size: 13px;
+    border-radius: 6px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .btn-row .btn {
+    flex: 1;
+  }
+
+  /* ===== LOGIN ===== */
+  .login-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 400px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    padding: 32px 24px;
+    text-align: center;
+  }
+
+  .login-logo {
+    font-size: 26px;
+    font-weight: 800;
+    color: #dc2626;
+    margin-bottom: 4px;
+  }
+
+  .login-sub {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 28px;
+  }
+
+  .login-box .form-group {
+    text-align: left;
+  }
+
+  /* ===== ERROR / INFO ===== */
+  .alert {
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  .alert.show {
+    display: block;
+  }
+
+  .alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+
+  .alert-success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+
+  .alert-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+  }
+
+  /* ===== HASIL KUNJUNGAN ===== */
+  .result-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    padding: 20px;
+    margin-bottom: 16px;
+    border-left: 4px solid #dc2626;
+  }
+
+  .result-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+  }
+
+  .result-visit {
+    font-size: 15px;
+    color: #dc2626;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .result-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .status-proses {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-siap {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-gratis {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .result-message {
+    font-size: 13px;
+    color: #6b7280;
+    font-style: italic;
+    margin-top: 8px;
+  }
+
+  /* ===== DAFTAR PELANGGAN ===== */
+  .cust-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: #ffffff;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    gap: 10px;
+  }
+
+  .cust-item.siap-gratis {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+  }
+
+  .cust-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .cust-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cust-wa {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .cust-visit {
+    font-size: 12px;
+    color: #dc2626;
+    font-weight: 600;
+  }
+
+  .cust-status {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 2px;
+  }
+
+  /* ===== LAPORAN ===== */
+  .report-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .report-item {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    text-align: center;
+  }
+
+  .report-item .label {
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+  }
+
+  .report-item .value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #dc2626;
+  }
+
+  .report-item .value.green {
+    color: #16a34a;
+  }
+
+  .report-item .value.yellow {
+    color: #ca8a04;
+  }
+
+  .report-item.full {
+    grid-column: 1 / -1;
+  }
+
+  /* ===== PROFIL ===== */
+  .profile-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 14px;
+  }
+
+  .profile-row:last-child {
+    border-bottom: none;
+  }
+
+  .profile-row .label {
+    color: #6b7280;
+    font-weight: 600;
+  }
+
+  .profile-row .value {
+    color: #1f2937;
+    font-weight: 700;
+  }
+
+  .role-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .role-owner {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .role-admin {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 200;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 60px;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 10px;
+    font-weight: 600;
+    gap: 2px;
+    transition: color 0.15s;
+    border: none;
+    background: none;
+    font-family: inherit;
+    padding: 0;
+  }
+
+  .nav-item .icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .nav-item.active {
+    color: #dc2626;
+  }
+
+  /* ===== LOADING ===== */
+  .loading {
+    text-align: center;
+    padding: 20px;
+    color: #6b7280;
+    font-size: 13px;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid #e5e7eb;
+    border-top-color: #dc2626;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-bottom: 8px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .empty {
+    text-align: center;
+    padding: 30px 16px;
+    color: #9ca3af;
+    font-size: 13px;
+  }
+
+  .empty .icon {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1f2937;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 300;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    max-width: 90%;
+    text-align: center;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.success { background: #16a34a; }
+  .toast.error { background: #dc2626; }
+
+  /* ===== UTIL ===== */
+  .hidden { display: none !important; }
+  .text-center { text-align: center; }
+  .mt-8 { margin-top: 8px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .mb-8 { margin-bottom: 8px; }
+</style>
 </head>
 <body>
 
-  <!-- ===== LOADING OVERLAY ===== -->
-  <div id="loadingOverlay" class="loading-overlay hidden">
-    <div class="spinner"></div>
+<!-- ==================== LOGIN ==================== -->
+<div id="loginPage" class="login-wrapper">
+  <div class="login-box">
+    <div class="login-logo">Steam MP 7000</div>
+    <div class="login-sub">Dashboard Admin</div>
+
+    <div id="loginAlert" class="alert alert-error"></div>
+
+    <div class="form-group">
+      <label for="loginWA">Nomor WhatsApp Admin</label>
+      <input type="tel" id="loginWA" placeholder="08123456789" inputmode="numeric" autocomplete="tel">
+    </div>
+
+    <button class="btn btn-primary" id="btnLogin">Masuk Dashboard</button>
+  </div>
+</div>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="dashboardPage" class="hidden">
+
+  <div class="app-header">
+    <h1 id="headerTitle">Steam MP 7000</h1>
+    <div class="sub" id="headerSub">Dashboard Admin</div>
   </div>
 
-  <!-- ===== LOGIN PAGE ===== -->
-  <div id="loginPage" class="login-wrapper">
-    <div class="login-logo">Steam MP 7000<br><span>Dashboard</span></div>
-    <div class="login-sub">Masuk sebagai admin / owner</div>
-    <div class="login-box">
-      <label for="loginWA">Nomor WhatsApp</label>
-      <input type="tel" id="loginWA" class="input-field" placeholder="08123456789" inputmode="numeric" autocomplete="tel">
-      <div id="loginError" class="error-msg"></div>
-      <button id="loginBtn" class="btn btn-merah mt-16" onclick="handleLogin()">Masuk Dashboard</button>
-    </div>
-    <div class="text-center text-abu mt-16" style="font-size:12px;">
-      Hanya untuk admin & owner Steam MP 7000
-    </div>
-  </div>
+  <div class="container">
 
-  <!-- ===== DASHBOARD ===== -->
-  <div id="dashboardPage" class="page">
+    <!-- ===== PAGE: INPUT ===== -->
+    <div id="page-input" class="page">
+      <div id="inputAlert" class="alert"></div>
 
-    <!-- HEADER -->
-    <div class="header">
-      <h1>Steam MP 7000</h1>
-      <div class="badge" id="headerBadge">Admin</div>
-    </div>
+      <div id="inputFormCard" class="card">
+        <div class="card-title">➕ Input Kunjungan</div>
 
-    <!-- ===== PAGE: INPUT KUNJUNGAN ===== -->
-    <div id="pageInput" class="page active">
-      <div class="card">
-        <h2 style="font-size:16px; font-weight:700; color:#111; margin-bottom:16px;">➕ Input Kunjungan</h2>
         <div class="form-group">
-          <label for="inputWA">No WA Pelanggan</label>
-          <input type="tel" id="inputWA" class="input-field" placeholder="08123456789" inputmode="numeric">
+          <label for="inWA">No WA Pelanggan</label>
+          <input type="tel" id="inWA" placeholder="08123456789" inputmode="numeric" autocomplete="tel">
         </div>
+
         <div class="form-group">
-          <label for="inputPlat">Plat Nomor</label>
-          <input type="text" id="inputPlat" class="input-field" placeholder="B 1234 XX" style="text-transform:uppercase;">
+          <label for="inPlat">Plat Nomor</label>
+          <input type="text" id="inPlat" placeholder="B 1234 XX" autocomplete="off" style="text-transform:uppercase">
         </div>
+
         <div class="form-group">
-          <label for="inputJenis">Jenis Motor</label>
-          <select id="inputJenis">
+          <label for="inJenis">Jenis Motor</label>
+          <select id="inJenis">
             <option value="Besar">Besar</option>
             <option value="Kecil">Kecil</option>
           </select>
         </div>
-        <button id="simpanBtn" class="btn btn-merah" onclick="handleSimpanKunjungan()">Simpan Kunjungan</button>
-        <div id="hasilKunjungan" class="hidden"></div>
+
+        <button class="btn btn-primary" id="btnSimpan">Simpan Kunjungan</button>
+      </div>
+
+      <!-- Hasil -->
+      <div id="hasilContainer" class="hidden">
+        <div class="result-card" id="hasilCard">
+          <div class="result-name" id="hasilNama">-</div>
+          <div class="result-visit" id="hasilKunjungan">-</div>
+          <div id="hasilStatus" class="result-status status-proses">-</div>
+          <div class="result-message" id="hasilPesan">-</div>
+        </div>
+
+        <button class="btn btn-wa" id="btnKirimWA">📱 Kirim Notifikasi WA</button>
+        <div class="mt-8"></div>
+        <button class="btn btn-gray" id="btnInputLagi">Input Lagi</button>
       </div>
     </div>
 
     <!-- ===== PAGE: PELANGGAN ===== -->
-    <div id="pagePelanggan" class="page">
-      <div class="card" style="padding:0; overflow:hidden;">
-        <div style="padding:16px 16px 8px; font-size:16px; font-weight:700; color:#111;">👥 Daftar Pelanggan</div>
-        <div id="pelangganList" class="pelanggan-list">
-          <div class="text-center text-abu" style="padding:24px;">Memuat data...</div>
+    <div id="page-pelanggan" class="page hidden">
+      <div class="card">
+        <div class="card-title">👥 Daftar Pelanggan</div>
+        <div id="pelangganList">
+          <div class="loading"><div class="spinner"></div><div>Memuat data...</div></div>
         </div>
       </div>
     </div>
 
     <!-- ===== PAGE: KLAIM ===== -->
-    <div id="pageKlaim" class="page">
-      <div class="card" style="padding:0; overflow:hidden;">
-        <div style="padding:16px 16px 8px; font-size:16px; font-weight:700; color:#111;">🎁 Klaim Gratis</div>
-        <div id="klaimList" class="pelanggan-list">
-          <div class="text-center text-abu" style="padding:24px;">Memuat data...</div>
+    <div id="page-klaim" class="page hidden">
+      <div class="card">
+        <div class="card-title">🎁 Klaim Gratis</div>
+        <div class="text-center" style="font-size:13px;color:#6b7280;margin-bottom:12px;">
+          Pelanggan dengan status <b style="color:#ca8a04;">Siap Gratis</b> muncul di sini.
+        </div>
+        <div id="klaimList">
+          <div class="loading"><div class="spinner"></div><div>Memuat data...</div></div>
         </div>
       </div>
     </div>
 
     <!-- ===== PAGE: LAPORAN (OWNER) ===== -->
-    <div id="pageLaporan" class="page">
-      <div class="laporan-grid" id="laporanGrid">
-        <div class="text-center text-abu" style="grid-column:1/-1; padding:24px;">Memuat laporan...</div>
+    <div id="page-laporan" class="page hidden">
+      <div class="card">
+        <div class="card-title">📊 Laporan</div>
+        <div id="laporanContent">
+          <div class="loading"><div class="spinner"></div><div>Memuat laporan...</div></div>
+        </div>
       </div>
     </div>
 
     <!-- ===== PAGE: PROFIL ===== -->
-    <div id="pageProfil" class="page">
+    <div id="page-profil" class="page hidden">
       <div class="card">
-        <h2 style="font-size:16px; font-weight:700; color:#111; margin-bottom:16px;">👤 Profil Admin</h2>
-        <div class="profil-row">
+        <div class="card-title">👤 Profil Admin</div>
+        <div class="profile-row">
           <span class="label">Nama</span>
           <span class="value" id="profilNama">-</span>
         </div>
-        <div class="profil-row">
+        <div class="profile-row">
           <span class="label">No WA</span>
           <span class="value" id="profilWA">-</span>
         </div>
-        <div class="profil-row">
+        <div class="profile-row">
           <span class="label">Peran</span>
           <span class="value" id="profilPeran">-</span>
         </div>
-        <button class="btn btn-abu mt-16" onclick="handleLogout()">Logout</button>
+
+        <div class="mt-16"></div>
+        <button class="btn btn-gray" id="btnLogout">Logout</button>
       </div>
     </div>
 
   </div>
 
   <!-- ===== BOTTOM NAV ===== -->
-  <nav id="bottomNav" class="bottom-nav hidden">
-    <button class="nav-item active" data-page="input" onclick="switchPage('input')">
+  <div class="bottom-nav" id="bottomNav">
+    <button class="nav-item active" data-page="input">
       <span class="icon">➕</span>
       <span>Input</span>
     </button>
-    <button class="nav-item" data-page="pelanggan" onclick="switchPage('pelanggan')">
+    <button class="nav-item" data-page="pelanggan">
       <span class="icon">👥</span>
       <span>Pelanggan</span>
     </button>
-    <button class="nav-item" data-page="klaim" onclick="switchPage('klaim')">
+    <button class="nav-item" data-page="klaim">
       <span class="icon">🎁</span>
       <span>Klaim</span>
     </button>
-    <button class="nav-item" data-page="laporan" id="navLaporan" onclick="switchPage('laporan')">
+    <button class="nav-item hidden" data-page="laporan" id="navLaporan">
       <span class="icon">📊</span>
       <span>Laporan</span>
     </button>
-    <button class="nav-item" data-page="profil" onclick="switchPage('profil')">
+    <button class="nav-item" data-page="profil">
       <span class="icon">👤</span>
       <span>Profil</span>
     </button>
-  </nav>
+  </div>
 
-  <script>
-    // ============================================================
-    // KONFIGURASI
-    // ============================================================
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzdFrljxsArXVu77o-qe09iRcjPsflE198CatSS2k_yRhB5N4xfbRg9Kz-mAyAdHvRPQQ/exec';
+</div>
 
-    // ============================================================
-    // STATE
-    // ============================================================
-    let state = {
-      noWA: '',
-      peran: '',
-      nama: '',
-      currentPage: 'input',
-      pelangganData: [],
-      klaimData: []
-    };
+<!-- ===== TOAST ===== -->
+<div id="toast" class="toast"></div>
 
-    // ============================================================
-    // UTIL
-    // ============================================================
-    function showLoading(show) {
-      document.getElementById('loadingOverlay').classList.toggle('hidden', !show);
+<script>
+(function() {
+  'use strict';
+
+  // ==================== KONFIGURASI ====================
+  var URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzzhJ91S1KSjhBOdlT2uJETeytBsqRiu2fgiX76uULYu5u2Ab5SNUewQHcsBzjuZtNg/exec";
+  var TOKEN = "steammp7000-rahasia-2026";
+  var OWNER_WA = "083191125094";
+  var LOCAL_KEY = "steamMP7000_admin";
+
+  // ==================== STATE ====================
+  var currentAdmin = null; // { noWA, nama, peran }
+  var lastHasil = null;    // hasil kunjungan terakhir untuk tombol WA
+
+  // ==================== ELEMEN ====================
+  var $ = function(id) { return document.getElementById(id); };
+
+  var loginPage = $('loginPage');
+  var dashboardPage = $('dashboardPage');
+  var loginAlert = $('loginAlert');
+  var loginWA = $('loginWA');
+  var btnLogin = $('btnLogin');
+
+  var headerTitle = $('headerTitle');
+  var headerSub = $('headerSub');
+
+  var inputAlert = $('inputAlert');
+  var inWA = $('inWA');
+  var inPlat = $('inPlat');
+  var inJenis = $('inJenis');
+  var btnSimpan = $('btnSimpan');
+  var inputFormCard = $('inputFormCard');
+  var hasilContainer = $('hasilContainer');
+  var hasilNama = $('hasilNama');
+  var hasilKunjungan = $('hasilKunjungan');
+  var hasilStatus = $('hasilStatus');
+  var hasilPesan = $('hasilPesan');
+  var btnKirimWA = $('btnKirimWA');
+  var btnInputLagi = $('btnInputLagi');
+
+  var pelangganList = $('pelangganList');
+  var klaimList = $('klaimList');
+  var laporanContent = $('laporanContent');
+
+  var profilNama = $('profilNama');
+  var profilWA = $('profilWA');
+  var profilPeran = $('profilPeran');
+  var btnLogout = $('btnLogout');
+
+  var navLaporan = $('navLaporan');
+  var bottomNav = $('bottomNav');
+
+  var toastEl = $('toast');
+
+  // ==================== HELPER ====================
+  function showToast(msg, type) {
+    toastEl.textContent = msg;
+    toastEl.className = 'toast show' + (type ? ' ' + type : '');
+    clearTimeout(toastEl._timer);
+    toastEl._timer = setTimeout(function() {
+      toastEl.className = 'toast';
+    }, 2500);
+  }
+
+  function showAlert(el, msg, type) {
+    el.textContent = msg;
+    el.className = 'alert alert-' + (type || 'error') + ' show';
+  }
+
+  function hideAlert(el) {
+    el.className = 'alert';
+    el.textContent = '';
+  }
+
+  function validasiWA(wa) {
+    wa = String(wa || '').trim();
+    if (!/^0\d{9,12}$/.test(wa)) return false;
+    return true;
+  }
+
+  // Fetch wrapper sesuai aturan: POST, text/plain, JSON.parse(res.text())
+  function apiCall(action, extra) {
+    var body = { token: TOKEN, action: action };
+    if (extra) {
+      for (var k in extra) {
+        if (Object.prototype.hasOwnProperty.call(extra, k)) {
+          body[k] = extra[k];
+        }
+      }
     }
-
-    function validasiNoWA(no) {
-      if (!no) return false;
-      if (!no.startsWith('0')) return false;
-      if (no.length < 10 || no.length > 13) return false;
-      if (!/^\d+$/.test(no)) return false;
-      return true;
-    }
-
-    async function apiCall(action, params = {}) {
-      const body = { action, ...params };
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const text = await res.text();
+    return fetch(URL_APPS_SCRIPT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(body)
+    })
+    .then(function(res) { return res.text(); })
+    .then(function(text) {
       try {
         return JSON.parse(text);
       } catch (e) {
-        console.error('Response bukan JSON:', text);
-        throw new Error('Format response tidak valid');
+        throw new Error('Response bukan JSON: ' + text.substring(0, 200));
       }
+    });
+  }
+
+  // ==================== LOGIN ====================
+  function doLogin() {
+    var wa = String(loginWA.value || '').trim();
+    hideAlert(loginAlert);
+
+    if (!validasiWA(wa)) {
+      showAlert(loginAlert, 'Nomor WA tidak valid. Wajib diawali 0, 10-13 digit.', 'error');
+      return;
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/[&<>"]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        if (m === '"') return '&quot;';
-        return m;
-      });
-    }
+    btnLogin.disabled = true;
+    btnLogin.textContent = 'Memproses...';
 
-    // ============================================================
-    // LOGIN
-    // ============================================================
-    async function handleLogin() {
-      const noWA = document.getElementById('loginWA').value.trim();
-      const errorEl = document.getElementById('loginError');
-      errorEl.classList.remove('show');
-
-      if (!validasiNoWA(noWA)) {
-        errorEl.textContent = 'Nomor WA tidak valid. Harus diawali 0, 10-13 digit.';
-        errorEl.classList.add('show');
-        return;
-      }
-
-      showLoading(true);
-      try {
-        const res = await apiCall('getDaftarPelanggan', { petugas: noWA });
-
-        // Cek apakah response sukses dan noWA terdaftar sebagai admin
-        // Backend mengembalikan { success: true, data: [...], admin: { nama, peran } }
-        // atau { success: false, message: "..." }
-        if (res && res.success === true) {
-          // Cek apakah noWA ada di daftar admin (dikirim backend)
-          // Kita asumsikan backend mengembalikan field 'admin' jika noWA terdaftar
-          let peran = 'admin';
-          let nama = 'Admin';
-
-          if (res.admin) {
-            peran = res.admin.peran || 'admin';
-            nama = res.admin.nama || 'Admin';
-          } else {
-            // Fallback: jika tidak ada field admin, cek apakah noWA = owner
-            if (noWA === '083191125094') {
-              peran = 'owner';
-              nama = 'Owner';
-            } else {
-              // Coba cek dari data pelanggan? Tidak, ini admin.
-              // Jika backend tidak mengirim info admin, kita tolak.
-              errorEl.textContent = 'Akses ditolak. Nomor ini bukan admin.';
-              errorEl.classList.add('show');
-              showLoading(false);
-              return;
-            }
-          }
-
-          // Simpan ke state & localStorage
-          state.noWA = noWA;
-          state.peran = peran;
-          state.nama = nama;
-
-          localStorage.setItem('steam_admin', JSON.stringify({
-            noWA: noWA,
-            peran: peran,
-            nama: nama
-          }));
-
-          // Tampilkan dashboard
-          showDashboard();
-        } else {
-          errorEl.textContent = 'Akses ditolak. Nomor ini bukan admin.';
-          errorEl.classList.add('show');
+    apiCall('getDaftarPelanggan', { petugas: wa })
+      .then(function(res) {
+        // Sukses jika backend tidak mengembalikan error
+        // Kita anggap sukses jika res tidak memiliki flag error yang jelas
+        // dan/atau memiliki data. Karena backend bisa berbagai bentuk,
+        // kita cek: kalau ada res.error atau res.success === false => gagal
+        if (res && (res.error || res.success === false)) {
+          throw new Error(res.error || res.message || 'Akses ditolak');
         }
-      } catch (e) {
-        console.error(e);
-        errorEl.textContent = 'Gagal terhubung ke server. Coba lagi.';
-        errorEl.classList.add('show');
-      } finally {
-        showLoading(false);
-      }
+
+        // Cek apakah noWA terdaftar sebagai admin.
+        // Backend diharapkan mengembalikan info peran. Kita coba beberapa kemungkinan field.
+        var peran = 'admin';
+        var nama = 'Admin';
+
+        // Cari di res.admin, res.user, res.data, atau res sendiri
+        var sumber = res.admin || res.user || res.data || res;
+
+        if (sumber) {
+          if (sumber.peran) peran = String(sumber.peran).toLowerCase();
+          if (sumber.role) peran = String(sumber.role).toLowerCase();
+          if (sumber.nama) nama = sumber.nama;
+          if (sumber.name) nama = sumber.name;
+        }
+
+        // Fallback: kalau noWA === OWNER_WA, paksa owner
+        if (wa === OWNER_WA) {
+          peran = 'owner';
+        }
+
+        // Kalau peran bukan admin/owner, tolak
+        if (peran !== 'admin' && peran !== 'owner') {
+          throw new Error('Akses ditolak. Nomor ini bukan admin.');
+        }
+
+        // Simpan
+        currentAdmin = { noWA: wa, nama: nama, peran: peran };
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(currentAdmin));
+
+        masukDashboard();
+        showToast('Selamat datang, ' + nama, 'success');
+      })
+      .catch(function(err) {
+        showAlert(loginAlert, 'Akses ditolak. Nomor ini bukan admin.', 'error');
+        console.error('Login error:', err);
+      })
+      .finally(function() {
+        btnLogin.disabled = false;
+        btnLogin.textContent = 'Masuk Dashboard';
+      });
+  }
+
+  // ==================== MASUK DASHBOARD ====================
+  function masukDashboard() {
+    loginPage.classList.add('hidden');
+    dashboardPage.classList.remove('hidden');
+
+    // Set header
+    headerTitle.textContent = 'Steam MP 7000';
+    headerSub.textContent = 'Dashboard ' + (currentAdmin.peran === 'owner' ? 'Owner' : 'Admin');
+
+    // Set profil
+    profilNama.textContent = currentAdmin.nama || '-';
+    profilWA.textContent = currentAdmin.noWA;
+    profilPeran.innerHTML = '<span class="role-badge role-' + currentAdmin.peran + '">' +
+      (currentAdmin.peran === 'owner' ? 'Owner' : 'Admin') + '</span>';
+
+    // Tampilkan/sembunyikan menu Laporan
+    if (currentAdmin.peran === 'owner') {
+      navLaporan.classList.remove('hidden');
+    } else {
+      navLaporan.classList.add('hidden');
     }
 
-    // ============================================================
-    // DASHBOARD
-    // ============================================================
-    function showDashboard() {
-      document.getElementById('loginPage').style.display = 'none';
-      document.getElementById('dashboardPage').style.display = 'block';
-      document.getElementById('bottomNav').classList.remove('hidden');
+    // Reset ke halaman input
+    switchPage('input');
+  }
 
-      // Update header badge
-      document.getElementById('headerBadge').textContent = state.peran === 'owner' ? 'Owner' : 'Admin';
+  // ==================== NAVIGASI ====================
+  function switchPage(page) {
+    // Sembunyikan semua page
+    var pages = document.querySelectorAll('.page');
+    for (var i = 0; i < pages.length; i++) {
+      pages[i].classList.add('hidden');
+    }
 
-      // Update profil
-      document.getElementById('profilNama').textContent = state.nama;
-      document.getElementById('profilWA').textContent = state.noWA;
-      document.getElementById('profilPeran').textContent = state.peran === 'owner' ? 'Owner' : 'Admin';
+    // Tampilkan page yang dipilih
+    var target = $('page-' + page);
+    if (target) target.classList.remove('hidden');
 
-      // Sembunyikan menu laporan jika bukan owner
-      const navLaporan = document.getElementById('navLaporan');
-      if (state.peran !== 'owner') {
-        navLaporan.classList.add('hidden');
+    // Update nav active
+    var navItems = bottomNav.querySelectorAll('.nav-item');
+    for (var j = 0; j < navItems.length; j++) {
+      var item = navItems[j];
+      if (item.getAttribute('data-page') === page) {
+        item.classList.add('active');
       } else {
-        navLaporan.classList.remove('hidden');
+        item.classList.remove('active');
       }
-
-      // Tampilkan halaman default
-      switchPage('input');
     }
 
-    function handleLogout() {
-      localStorage.removeItem('steam_admin');
-      state.noWA = '';
-      state.peran = '';
-      state.nama = '';
-      document.getElementById('dashboardPage').style.display = 'none';
-      document.getElementById('bottomNav').classList.add('hidden');
-      document.getElementById('loginPage').style.display = 'flex';
-      document.getElementById('loginWA').value = '';
-      document.getElementById('loginError').classList.remove('show');
+    // Load data sesuai halaman
+    if (page === 'pelanggan') {
+      loadPelanggan();
+    } else if (page === 'klaim') {
+      loadKlaim();
+    } else if (page === 'laporan') {
+      loadLaporan();
     }
 
-    // ============================================================
-    // NAVIGASI
-    // ============================================================
-    function switchPage(page) {
-      state.currentPage = page;
+    // Scroll ke atas
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
-      // Update konten halaman
-      document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-      const target = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
-      if (target) target.classList.add('active');
+  // ==================== INPUT KUNJUNGAN ====================
+  function simpanKunjungan() {
+    hideAlert(inputAlert);
 
-      // Update nav active
-      document.querySelectorAll('.bottom-nav .nav-item').forEach(el => {
-        el.classList.toggle('active', el.dataset.page === page);
-      });
+    var noWA = String(inWA.value || '').trim();
+    var plat = String(inPlat.value || '').trim();
+    var jenis = inJenis.value;
 
-      // Load data sesuai halaman
-      if (page === 'pelanggan') loadPelanggan();
-      if (page === 'klaim') loadKlaim();
-      if (page === 'laporan') loadLaporan();
+    if (!validasiWA(noWA)) {
+      showAlert(inputAlert, 'No WA pelanggan tidak valid. Wajib diawali 0, 10-13 digit.', 'error');
+      return;
+    }
+    if (!plat) {
+      showAlert(inputAlert, 'Plat nomor wajib diisi.', 'error');
+      return;
     }
 
-    // ============================================================
-    // INPUT KUNJUNGAN
-    // ============================================================
-    async function handleSimpanKunjungan() {
-      const noWA = document.getElementById('inputWA').value.trim();
-      const plat = document.getElementById('inputPlat').value.trim();
-      const jenis = document.getElementById('inputJenis').value;
+    btnSimpan.disabled = true;
+    btnSimpan.textContent = 'Menyimpan...';
 
-      if (!validasiNoWA(noWA)) {
-        alert('Nomor WA tidak valid. Harus diawali 0, 10-13 digit.');
-        return;
-      }
-      if (!plat) {
-        alert('Plat nomor wajib diisi.');
-        return;
+    apiCall('inputKunjungan', {
+      noWA: noWA,
+      plat: plat.toUpperCase(),
+      jenis: jenis,
+      petugas: currentAdmin.noWA
+    })
+    .then(function(res) {
+      if (res && (res.error || res.success === false)) {
+        throw new Error(res.error || res.message || 'Gagal menyimpan');
       }
 
-      showLoading(true);
-      try {
-        const res = await apiCall('inputKunjungan', {
-          noWA: noWA,
-          plat: plat,
-          jenis: jenis,
-          petugas: state.noWA
+      // Normalisasi data hasil
+      var data = res.data || res.hasil || res.result || res;
+
+      var nama = data.nama || data.name || 'Pelanggan';
+      var kunjungan = data.kunjungan || data.visit || data.totalKunjungan || 1;
+      var status = data.status || 'Proses';
+      var pesan = data.pesan || data.message || data.msg || 'Terima kasih sudah cuci di Steam MP 7000!';
+
+      // Batasi kunjungan ke 10 untuk tampilan (karena siklus 10)
+      var kunjunganTampil = kunjungan;
+      if (kunjunganTampil > 10) kunjunganTampil = 10;
+
+      lastHasil = {
+        noWA: noWA,
+        nama: nama,
+        kunjungan: kunjunganTampil,
+        status: status,
+        pesan: pesan
+      };
+
+      // Tampilkan hasil
+      hasilNama.textContent = nama;
+      hasilKunjungan.textContent = 'Kunjungan ke-' + kunjunganTampil + ' dari 10';
+
+      var statusClass = 'status-proses';
+      var statusText = status;
+      if (status === 'Gratis' || status === 'gratis') {
+        statusClass = 'status-gratis';
+        statusText = 'GRATIS';
+      } else if (status === 'Siap Gratis' || status === 'siap gratis' || status === 'SiapGratis') {
+        statusClass = 'status-siap';
+        statusText = 'SIAP GRATIS';
+      } else {
+        statusText = 'PROSES';
+      }
+      hasilStatus.className = 'result-status ' + statusClass;
+      hasilStatus.textContent = statusText;
+
+      hasilPesan.textContent = pesan;
+
+      // Sembunyikan form, tampilkan hasil
+      inputFormCard.classList.add('hidden');
+      hasilContainer.classList.remove('hidden');
+
+      showToast('Kunjungan berhasil disimpan', 'success');
+    })
+    .catch(function(err) {
+      showAlert(inputAlert, err.message || 'Gagal menyimpan kunjungan.', 'error');
+      console.error('Simpan error:', err);
+    })
+    .finally(function() {
+      btnSimpan.disabled = false;
+      btnSimpan.textContent = 'Simpan Kunjungan';
+    });
+  }
+
+  function resetInput() {
+    inWA.value = '';
+    inPlat.value = '';
+    inJenis.value = 'Besar';
+    lastHasil = null;
+    hideAlert(inputAlert);
+    hasilContainer.classList.add('hidden');
+    inputFormCard.classList.remove('hidden');
+    inWA.focus();
+  }
+
+  function kirimNotifikasiWA() {
+    if (!lastHasil) return;
+    var wa = lastHasil.noWA;
+    // Konversi 0 ke 62
+    var wa62 = '62' + wa.substring(1);
+
+    var pesan = 'Halo ' + lastHasil.nama + '! 👋\n\n' +
+      'Terima kasih sudah cuci motor di *Steam MP 7000*.\n\n' +
+      '📊 Kunjungan Anda: *ke-' + lastHasil.kunjungan + ' dari 10*\n' +
+      '📌 Status: *' + lastHasil.status + '*\n\n' +
+      lastHasil.pesan + '\n\n' +
+      '💰 Harga cuci: Rp7.000\n' +
+      '🎁 Setiap 10x cuci, gratis 1x!\n\n' +
+      'Salam,\nSteam MP 7000';
+
+    var url = 'https://wa.me/' + wa62 + '?text=' + encodeURIComponent(pesan);
+    window.open(url, '_blank');
+  }
+
+  // ==================== DAFTAR PELANGGAN ====================
+  function loadPelanggan() {
+    pelangganList.innerHTML = '<div class="loading"><div class="spinner"></div><div>Memuat data...</div></div>';
+
+    apiCall('getDaftarPelanggan', { petugas: currentAdmin.noWA })
+      .then(function(res) {
+        if (res && (res.error || res.success === false)) {
+          throw new Error(res.error || res.message || 'Gagal memuat');
+        }
+
+        var list = res.data || res.pelanggan || res.customers || res.list || [];
+        if (!Array.isArray(list)) list = [];
+
+        // Normalisasi dan urutkan
+        var items = list.map(function(item) {
+          return {
+            nama: item.nama || item.name || 'Pelanggan',
+            noWA: item.noWA || item.wa || item.whatsapp || '-',
+            kunjungan: parseInt(item.kunjungan || item.visit || item.totalKunjungan || 0, 10),
+            status: item.status || 'Proses',
+            plat: item.plat || item.platNomor || '-'
+          };
         });
 
-        if (res && res.success === true) {
-          tampilkanHasil(res.data || res);
-        } else {
-          alert(res.message || 'Gagal menyimpan kunjungan.');
+        // Urutkan: Siap Gratis di atas, lalu kunjungan terbanyak
+        items.sort(function(a, b) {
+          var aSiap = (a.status === 'Siap Gratis' || a.status === 'siap gratis' || a.status === 'SiapGratis') ? 1 : 0;
+          var bSiap = (b.status === 'Siap Gratis' || b.status === 'siap gratis' || b.status === 'SiapGratis') ? 1 : 0;
+          if (aSiap !== bSiap) return bSiap - aSiap;
+          return b.kunjungan - a.kunjungan;
+        });
+
+        if (items.length === 0) {
+          pelangganList.innerHTML = '<div class="empty"><span class="icon">👥</span>Belum ada pelanggan.</div>';
+          return;
         }
-      } catch (e) {
-        console.error(e);
-        alert('Gagal terhubung ke server.');
-      } finally {
-        showLoading(false);
-      }
-    }
 
-    function tampilkanHasil(data) {
-      const container = document.getElementById('hasilKunjungan');
-      const nama = data.nama || 'Pelanggan';
-      const kunjunganKe = data.kunjunganKe || data.kunjungan || 0;
-      const status = data.status || 'Proses';
-      const pesan = data.pesan || '';
+        var html = '';
+        items.forEach(function(item) {
+          var isSiap = (item.status === 'Siap Gratis' || item.status === 'siap gratis' || item.status === 'SiapGratis');
+          var statusClass = isSiap ? 'status-siap' : (item.status === 'Gratis' ? 'status-gratis' : 'status-proses');
+          var statusText = isSiap ? 'SIAP GRATIS' : (item.status === 'Gratis' ? 'GRATIS' : 'PROSES');
 
-      let statusClass = 'status-proses';
-      if (status === 'Siap Gratis') statusClass = 'status-siap';
-      if (status === 'Gratis') statusClass = 'status-gratis';
+          html += '<div class="cust-item' + (isSiap ? ' siap-gratis' : '') + '">';
+          html += '  <div class="cust-info">';
+          html += '    <div class="cust-name">' + escapeHtml(item.nama) + '</div>';
+          html += '    <div class="cust-wa">' + escapeHtml(item.noWA) + '</div>';
+          html += '    <div class="cust-visit">Kunjungan ke-' + item.kunjungan + ' dari 10</div>';
+          html += '    <span class="cust-status ' + statusClass + '">' + statusText + '</span>';
+          html += '  </div>';
+          html += '</div>';
+        });
 
-      const noWA = data.noWA || document.getElementById('inputWA').value.trim();
-      const waLink = buatLinkWA(noWA, nama, kunjunganKe, status, pesan);
+        pelangganList.innerHTML = html;
+      })
+      .catch(function(err) {
+        pelangganList.innerHTML = '<div class="empty">Gagal memuat: ' + escapeHtml(err.message) + '</div>';
+        console.error('Load pelanggan error:', err);
+      });
+  }
 
-      container.innerHTML = `
-        <div class="result-card">
-          <div class="nama">${escapeHtml(nama)}</div>
-          <div class="detail">No WA: ${escapeHtml(noWA)}</div>
-          <div class="detail">Kunjungan ke-${kunjunganKe} dari 10</div>
-          <div class="status-badge ${statusClass}">${escapeHtml(status)}</div>
-          ${pesan ? `<div class="pesan-semangat">"${escapeHtml(pesan)}"</div>` : ''}
-          <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap;">
-            <a href="${waLink}" target="_blank" rel="noopener" class="btn btn-hijau btn-sm" style="text-decoration:none; flex:1;">📱 Kirim Notifikasi WA</a>
-            <button class="btn btn-abu btn-sm" style="flex:1;" onclick="resetFormInput()">Input Lagi</button>
-          </div>
-        </div>
-      `;
-      container.classList.remove('hidden');
-    }
+  // ==================== KLAIM ====================
+  function loadKlaim() {
+    klaimList.innerHTML = '<div class="loading"><div class="spinner"></div><div>Memuat data...</div></div>';
 
-    function buatLinkWA(noWA, nama, kunjunganKe, status, pesan) {
-      let noBersih = noWA.replace(/^0/, '');
-      let teks = `Halo ${nama}, terima kasih telah mencuci motor di Steam MP 7000! 🏍️\n\n`;
-      teks += `Kunjungan Anda: ke-${kunjunganKe} dari 10\n`;
-      teks += `Status: ${status}\n`;
-      if (pesan) teks += `\n${pesan}\n`;
-      teks += `\nHarga cuci: Rp7.000\n`;
-      teks += `Setiap 10x cuci, gratis 1x!\n`;
-      teks += `\nSteam MP 7000 — Bersih, Cepat, Terpercaya.`;
-
-      return `https://wa.me/62${noBersih}?text=${encodeURIComponent(teks)}`;
-    }
-
-    function resetFormInput() {
-      document.getElementById('inputWA').value = '';
-      document.getElementById('inputPlat').value = '';
-      document.getElementById('inputJenis').value = 'Besar';
-      document.getElementById('hasilKunjungan').classList.add('hidden');
-    }
-
-    // ============================================================
-    // PELANGGAN
-    // ============================================================
-    async function loadPelanggan() {
-      const container = document.getElementById('pelangganList');
-      container.innerHTML = '<div class="text-center text-abu" style="padding:24px;">Memuat data...</div>';
-
-      try {
-        const res = await apiCall('getDaftarPelanggan', { petugas: state.noWA });
-        if (res && res.success === true) {
-          const data = res.data || [];
-          state.pelangganData = data;
-          renderPelanggan(data, container);
-        } else {
-          container.innerHTML = '<div class="text-center text-abu" style="padding:24px;">Gagal memuat data.</div>';
+    apiCall('getDaftarPelanggan', { petugas: currentAdmin.noWA })
+      .then(function(res) {
+        if (res && (res.error || res.success === false)) {
+          throw new Error(res.error || res.message || 'Gagal memuat');
         }
-      } catch (e) {
-        console.error(e);
-        container.innerHTML = '<div class="text-center text-abu" style="padding:24px;">Gagal terhubung ke server.</div>';
-      }
-    }
 
-    function renderPelanggan(data, container) {
-      if (!data || data.length === 0) {
-        container.innerHTML = '<div class="text-center text-abu" style="padding:24px;">Belum ada pelanggan.</div>';
-        return;
-      }
+        var list = res.data || res.pelanggan || res.customers || res.list || [];
+        if (!Array.isArray(list)) list = [];
 
-      // Urutkan: Siap Gratis paling atas, lalu Total Kunjungan terbanyak
-      const sorted = [...data].sort((a, b) => {
-        const aSiap = (a.status === 'Siap Gratis') ? 1 : 0;
-        const bSiap = (b.status === 'Siap Gratis') ? 1 : 0;
-        if (aSiap !== bSiap) return bSiap - aSiap;
-        return (b.totalKunjungan || 0) - (a.totalKunjungan || 0);
-      });
+        // Filter hanya yang Siap Gratis
+        var siap = list.filter(function(item) {
+          var st = String(item.status || '').toLowerCase();
+          return st === 'siap gratis' || st === 'siapgratis';
+        }).map(function(item) {
+          return {
+            nama: item.nama || item.name || 'Pelanggan',
+            noWA: item.noWA || item.wa || '-',
+            kunjungan: parseInt(item.kunjungan || item.visit || 0, 10),
+            status: item.status
+          };
+        });
 
-      let html = '';
-      sorted.forEach(p => {
-        const isSiap = p.status === 'Siap Gratis';
-        const nama = p.nama || 'Tanpa Nama';
-        const noWA = p.noWA || '-';
-        const kunjunganKe = p.kunjunganKe || p.kunjungan || 0;
-        const status = p.status || 'Proses';
+        if (siap.length === 0) {
+          klaimList.innerHTML = '<div class="empty"><span class="icon">🎁</span>Tidak ada pelanggan yang siap klaim gratis.</div>';
+          return;
+        }
 
-        let statusColor = '#6b7280';
-        if (status === 'Siap Gratis') statusColor = '#eab308';
-        if (status === 'Gratis') statusColor = '#25D366';
+        var html = '';
+        siap.forEach(function(item) {
+          html += '<div class="cust-item siap-gratis">';
+          html += '  <div class="cust-info">';
+          html += '    <div class="cust-name">' + escapeHtml(item.nama) + '</div>';
+          html += '    <div class="cust-wa">' + escapeHtml(item.noWA) + ' • Kunjungan ke-' + item.kunjungan + '</div>';
+          html += '    <span class="cust-status status-siap">SIAP GRATIS</span>';
+          html += '  </div>';
+          html += '  <button class="btn btn-yellow btn-sm" data-klaim="' + escapeHtml(item.noWA) + '" data-nama="' + escapeHtml(item.nama) + '">Klaim</button>';
+          html += '</div>';
+        });
 
-        html += `
-          <div class="pelanggan-item ${isSiap ? 'siap-gratis' : ''}">
-            <div class="info">
-              <div class="nama">${escapeHtml(nama)}</div>
-              <div class="wa">${escapeHtml(noWA)}</div>
-              <div class="kunjungan">Kunjungan ke-${kunjunganKe} dari 10</div>
-              <div class="status" style="color:${statusColor};">${escapeHtml(status)}</div>
-            </div>
-            ${isSiap ? `<div class="aksi"><button class="btn btn-kuning btn-sm" onclick="handleKlaim('${escapeHtml(noWA)}', '${escapeHtml(nama)}')">Klaim Gratis</button></div>` : ''}
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    }
+        klaimList.innerHTML = html;
 
-    // ============================================================
-    // KLAIM
-    // ============================================================
-    async function loadKlaim() {
-      const container = document.getElementById('klaimList');
-      container.innerHTML = '<div class="text-center text-abu" style="padding:24px;">Memuat data...</div>';
-
-      try {
-        const res = await apiCall('getDaftarPelanggan', { petugas: state.noWA });
-        if (res && res.success === true) {
-          const data = res.data || [];
-          state.klaimData = data.filter(p => p.status === 'Siap Gratis');
-
-          if (state.klaimData.length === 0) {
-            container.innerHTML = '<div class="text-center text-abu" style="padding:24px;">Tidak ada pelanggan yang siap klaim gratis.</div>';
-            return;
-          }
-
-          let html = '';
-          state.klaimData.forEach(p => {
-            const nama = p.nama || 'Tanpa Nama';
-            const noWA = p.noWA || '-';
-            const kunjunganKe = p.kunjunganKe || p.kunjungan || 0;
-
-            html += `
-              <div class="pelanggan-item siap-gratis">
-                <div class="info">
-                  <div class="nama">${escapeHtml(nama)}</div>
-                  <div class="wa">${escapeHtml(noWA)}</div>
-                  <div class="kunjungan">Kunjungan ke-${kunjunganKe} dari 10</div>
-                  <div class="status" style="color:#eab308;">Siap Gratis</div>
-                </div>
-                <div class="aksi">
-                  <button class="btn btn-kuning btn-sm" onclick="handleKlaim('${escapeHtml(noWA)}', '${escapeHtml(nama)}')">Klaim Gratis</button>
-                </div>
-              </div>
-            `;
+        // Pasang event listener
+        klaimList.querySelectorAll('[data-klaim]').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var noWA = btn.getAttribute('data-klaim');
+            var nama = btn.getAttribute('data-nama');
+            if (confirm('Yakin klaim gratis untuk ' + nama + '?')) {
+              klaimGratis(noWA);
+            }
           });
-          container.innerHTML = html;
-        } else {
-          container.innerHTML = '<div class="text-center text-abu" style="padding:24px;">Gagal memuat data.</div>';
-        }
-      } catch (e) {
-        console.error(e);
-        container.innerHTML = '<div class="text-center text-abu" style="padding:24px;">Gagal terhubung ke server.</div>';
-      }
-    }
-
-    async function handleKlaim(noWA, nama) {
-      if (!confirm(`Yakin klaim gratis untuk ${nama}?`)) return;
-
-      showLoading(true);
-      try {
-        const res = await apiCall('klaimGratis', {
-          noWA: noWA,
-          petugas: state.noWA
         });
+      })
+      .catch(function(err) {
+        klaimList.innerHTML = '<div class="empty">Gagal memuat: ' + escapeHtml(err.message) + '</div>';
+        console.error('Load klaim error:', err);
+      });
+  }
 
-        if (res && res.success === true) {
-          alert(res.message || 'Klaim gratis berhasil!');
-          // Refresh halaman yang sedang aktif
-          if (state.currentPage === 'klaim') loadKlaim();
-          if (state.currentPage === 'pelanggan') loadPelanggan();
-        } else {
-          alert(res.message || 'Gagal klaim gratis.');
+  function klaimGratis(noWA) {
+    apiCall('klaimGratis', {
+      noWA: noWA,
+      petugas: currentAdmin.noWA
+    })
+    .then(function(res) {
+      if (res && (res.error || res.success === false)) {
+        throw new Error(res.error || res.message || 'Gagal klaim');
+      }
+      showToast('Klaim gratis berhasil!', 'success');
+      loadKlaim();
+    })
+    .catch(function(err) {
+      showToast(err.message || 'Gagal klaim gratis', 'error');
+      console.error('Klaim error:', err);
+    });
+  }
+
+  // ==================== LAPORAN (OWNER) ====================
+  function loadLaporan() {
+    laporanContent.innerHTML = '<div class="loading"><div class="spinner"></div><div>Memuat laporan...</div></div>';
+
+    apiCall('getLaporan', { petugas: currentAdmin.noWA })
+      .then(function(res) {
+        if (res && (res.error || res.success === false)) {
+          throw new Error(res.error || res.message || 'Gagal memuat laporan');
         }
-      } catch (e) {
-        console.error(e);
-        alert('Gagal terhubung ke server.');
-      } finally {
-        showLoading(false);
-      }
+
+        var d = res.data || res.laporan || res.report || res;
+
+        var hariIni = d.kunjunganHariIni || d.hariIni || d.today || 0;
+        var mingguIni = d.kunjunganMingguIni || d.mingguIni || d.week || 0;
+        var bulanIni = d.kunjunganBulanIni || d.bulanIni || d.month || 0;
+        var pendapatan = d.pendapatanHariIni || d.pendapatan || d.revenue || 0;
+        var gratisBulanIni = d.gratisBulanIni || d.gratis || d.free || 0;
+
+        // Hitung pendapatan kalau tidak ada dari backend
+        if (!pendapatan && hariIni) {
+          pendapatan = hariIni * 7000; // asumsi semua berbayar, ini perkiraan
+        }
+
+        var html = '<div class="report-grid">';
+
+        html += '<div class="report-item">';
+        html += '  <div class="label">Kunjungan Hari Ini</div>';
+        html += '  <div class="value">' + hariIni + '</div>';
+        html += '</div>';
+
+        html += '<div class="report-item">';
+        html += '  <div class="label">Kunjungan Minggu Ini</div>';
+        html += '  <div class="value">' + mingguIni + '</div>';
+        html += '</div>';
+
+        html += '<div class="report-item">';
+        html += '  <div class="label">Kunjungan Bulan Ini</div>';
+        html += '  <div class="value">' + bulanIni + '</div>';
+        html += '</div>';
+
+        html += '<div class="report-item">';
+        html += '  <div class="label">Gratis Bulan Ini</div>';
+        html += '  <div class="value yellow">' + gratisBulanIni + '</div>';
+        html += '</div>';
+
+        html += '<div class="report-item full">';
+        html += '  <div class="label">Pendapatan Hari Ini</div>';
+        html += '  <div class="value green">Rp ' + formatRupiah(pendapatan) + '</div>';
+        html += '</div>';
+
+        html += '</div>';
+
+        laporanContent.innerHTML = html;
+      })
+      .catch(function(err) {
+        laporanContent.innerHTML = '<div class="empty">Gagal memuat laporan: ' + escapeHtml(err.message) + '</div>';
+        console.error('Load laporan error:', err);
+      });
+  }
+
+  // ==================== PROFIL / LOGOUT ====================
+  function logout() {
+    if (!confirm('Yakin ingin logout?')) return;
+    localStorage.removeItem(LOCAL_KEY);
+    currentAdmin = null;
+    lastHasil = null;
+    dashboardPage.classList.add('hidden');
+    loginPage.classList.remove('hidden');
+    loginWA.value = '';
+    hideAlert(loginAlert);
+    showToast('Berhasil logout', 'success');
+  }
+
+  // ==================== UTIL ====================
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function formatRupiah(angka) {
+    var num = parseInt(angka, 10) || 0;
+    return num.toLocaleString('id-ID');
+  }
+
+  // ==================== EVENT LISTENERS ====================
+  btnLogin.addEventListener('click', doLogin);
+  loginWA.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  btnSimpan.addEventListener('click', simpanKunjungan);
+  btnInputLagi.addEventListener('click', resetInput);
+  btnKirimWA.addEventListener('click', kirimNotifikasiWA);
+
+  btnLogout.addEventListener('click', logout);
+
+  // Bottom nav
+  bottomNav.addEventListener('click', function(e) {
+    var btn = e.target.closest('.nav-item');
+    if (!btn) return;
+    var page = btn.getAttribute('data-page');
+    if (!page) return;
+    // Cek akses laporan
+    if (page === 'laporan' && currentAdmin && currentAdmin.peran !== 'owner') {
+      showToast('Hanya owner yang bisa akses laporan', 'error');
+      return;
     }
+    switchPage(page);
+  });
 
-    // ============================================================
-    // LAPORAN (OWNER)
-    // ============================================================
-    async function loadLaporan() {
-      if (state.peran !== 'owner') {
-        document.getElementById('laporanGrid').innerHTML = '<div class="text-center text-abu" style="grid-column:1/-1; padding:24px;">Akses ditolak. Hanya owner.</div>';
-        return;
-      }
+  // Enter di form input
+  inWA.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') inPlat.focus();
+  });
+  inPlat.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') simpanKunjungan();
+  });
 
-      const grid = document.getElementById('laporanGrid');
-      grid.innerHTML = '<div class="text-center text-abu" style="grid-column:1/-1; padding:24px;">Memuat laporan...</div>';
-
+  // ==================== INISIALISASI ====================
+  function init() {
+    // Cek localStorage
+    var saved = localStorage.getItem(LOCAL_KEY);
+    if (saved) {
       try {
-        const res = await apiCall('getLaporan', { petugas: state.noWA });
-        if (res && res.success === true) {
-          const d = res.data || {};
-          const totalHariIni = d.totalHariIni || 0;
-          const totalMingguIni = d.totalMingguIni || 0;
-          const totalBulanIni = d.totalBulanIni || 0;
-          const pendapatanHariIni = d.pendapatanHariIni || 0;
-          const gratisBulanIni = d.gratisBulanIni || 0;
-
-          grid.innerHTML = `
-            <div class="laporan-item">
-              <div class="angka">${totalHariIni}</div>
-              <div class="label">Kunjungan Hari Ini</div>
-            </div>
-            <div class="laporan-item">
-              <div class="angka">${totalMingguIni}</div>
-              <div class="label">Kunjungan Minggu Ini</div>
-            </div>
-            <div class="laporan-item">
-              <div class="angka">${totalBulanIni}</div>
-              <div class="label">Kunjungan Bulan Ini</div>
-            </div>
-            <div class="laporan-item">
-              <div class="angka">Rp${pendapatanHariIni.toLocaleString('id-ID')}</div>
-              <div class="label">Pendapatan Hari Ini</div>
-            </div>
-            <div class="laporan-item full">
-              <div class="angka">${gratisBulanIni}</div>
-              <div class="label">Gratis Diberikan Bulan Ini</div>
-            </div>
-          `;
-        } else {
-          grid.innerHTML = '<div class="text-center text-abu" style="grid-column:1/-1; padding:24px;">Gagal memuat laporan.</div>';
+        var parsed = JSON.parse(saved);
+        if (parsed && parsed.noWA && parsed.peran) {
+          currentAdmin = parsed;
+          // Pastikan owner tetap owner
+          if (parsed.noWA === OWNER_WA) {
+            currentAdmin.peran = 'owner';
+          }
+          masukDashboard();
+          return;
         }
       } catch (e) {
-        console.error(e);
-        grid.innerHTML = '<div class="text-center text-abu" style="grid-column:1/-1; padding:24px;">Gagal terhubung ke server.</div>';
+        localStorage.removeItem(LOCAL_KEY);
       }
     }
+    // Tampilkan login
+    loginPage.classList.remove('hidden');
+    dashboardPage.classList.add('hidden');
+  }
 
-    // ============================================================
-    // INISIALISASI
-    // ============================================================
-    function init() {
-      // Cek localStorage
-      const saved = localStorage.getItem('steam_admin');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (parsed.noWA && parsed.peran) {
-            state.noWA = parsed.noWA;
-            state.peran = parsed.peran;
-            state.nama = parsed.nama || 'Admin';
-            showDashboard();
-            return;
-          }
-        } catch (e) {
-          localStorage.removeItem('steam_admin');
-        }
-      }
+  init();
 
-      // Tampilkan login
-      document.getElementById('loginPage').style.display = 'flex';
-    }
-
-    // Jalankan saat halaman siap
-    document.addEventListener('DOMContentLoaded', init);
-
-    // Enter key di login
-    document.getElementById('loginWA').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') handleLogin();
-    });
-
-    // Enter key di input kunjungan
-    document.getElementById('inputPlat').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') handleSimpanKunjungan();
-    });
-  </script>
+})();
+</script>
 </body>
 </html>
