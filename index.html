@@ -1,480 +1,995 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Armada Play Indonesia (API) — Control Center</title>
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Font & style tambahan -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .nusantara-bg {
-      background: linear-gradient(145deg, #fdf6ec 0%, #f5e6d3 40%, #e8d5b8 100%);
-    }
-    .ornament-header {
-      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0 L48 16 L64 16 L56 32 L64 48 L48 48 L40 64 L32 48 L16 48 L24 32 L16 16 L32 16 Z' fill='%23b98a5e' fill-opacity='0.08'/%3E%3C/svg%3E");
-      background-repeat: repeat;
-    }
-    .batik-accent {
-      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='8' fill='%23c9a87c' fill-opacity='0.12'/%3E%3Ccircle cx='0' cy='0' r='6' fill='%23c9a87c' fill-opacity='0.08'/%3E%3Ccircle cx='60' cy='0' r='6' fill='%23c9a87c' fill-opacity='0.08'/%3E%3Ccircle cx='0' cy='60' r='6' fill='%23c9a87c' fill-opacity='0.08'/%3E%3Ccircle cx='60' cy='60' r='6' fill='%23c9a87c' fill-opacity='0.08'/%3E%3C/svg%3E");
-      background-repeat: repeat;
-    }
-    .card-soft {
-      background: rgba(255, 252, 245, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid #e7d8c4;
-    }
-    .btn-nusantara {
-      background: linear-gradient(135deg, #a47148, #7a5230);
-      transition: all 0.2s ease;
-    }
-    .btn-nusantara:hover {
-      background: linear-gradient(135deg, #8b5e3c, #5e3e24);
-      transform: scale(1.02);
-    }
-    .table-row-hover:hover {
-      background-color: #fcf5eb;
-    }
-    .badge-pending {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .badge-completed {
-      background: #d1fae5;
-      color: #065f46;
-    }
-  </style>
-</head>
-<body class="nusantara-bg min-h-screen p-4 md:p-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Steam MP 7000 — Progres Pelanggan</title>
 
-  <!-- HEADER dengan ornamen Nusantara -->
-  <header class="relative max-w-7xl mx-auto mb-10">
-    <div class="ornament-header rounded-3xl shadow-lg border border-amber-200/60 bg-white/40 backdrop-blur-sm px-6 py-8 md:px-12 md:py-10">
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+<!-- Script Popunder Adsterra (hanya di index.html) -->
+<script type="text/javascript">
+  // Popunder Adsterra
+  (function(){
+    var s = document.createElement('script');
+    s.src = 'https://www.profitableratecpmnetwork.com/q9qnyhdf9c?key=56f60182ff2837aef7d8e65616a77746';
+    s.async = true;
+    document.head.appendChild(s);
+  })();
+</script>
+
+<style>
+  :root{
+    --hijau:#22c55e;
+    --hijau-gelap:#16a34a;
+    --putih:#ffffff;
+    --abu:#f3f4f6;
+    --abu-teks:#6b7280;
+    --teks:#111827;
+    --merah:#ef4444;
+    --border:#e5e7eb;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+  html, body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--abu);
+    color: var(--teks);
+    min-height: 100%;
+  }
+
+  /* PENTING: padding-bottom 80px supaya tidak tertutup bottom nav */
+  body{
+    padding-bottom: 80px;
+  }
+
+  .app{
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--abu);
+    position: relative;
+  }
+
+  /* ================= HEADER ================= */
+  .header{
+    background: var(--hijau);
+    color: #fff;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .header h1{
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: .2px;
+  }
+  .header .logo-sub{
+    font-size: 11px;
+    opacity: .9;
+    font-weight: 500;
+    display: block;
+    margin-top: 2px;
+  }
+  .logout-mini{
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .logout-mini:active{ background: rgba(255,255,255,0.35); }
+
+  /* ================= HALAMAN ================= */
+  .page{ display: none; padding: 16px; }
+  .page.active{ display: block; }
+
+  /* ================= LOGIN ================= */
+  .login-wrap{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(160deg, #ecfdf5 0%, #f3f4f6 60%);
+  }
+  .login-card{
+    background: #fff;
+    width: 100%;
+    max-width: 380px;
+    border-radius: 16px;
+    padding: 28px 22px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+  .login-logo{
+    width: 64px; height: 64px;
+    background: var(--hijau);
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    color: #fff;
+  }
+  .login-card h2{
+    font-size: 20px;
+    margin-bottom: 4px;
+    color: var(--teks);
+  }
+  .login-card p.sub{
+    font-size: 13px;
+    color: var(--abu-teks);
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+  .login-card label{
+    display: block;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--teks);
+  }
+  .login-card input{
+    width: 100%;
+    padding: 13px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    background: #fafafa;
+    letter-spacing: .5px;
+  }
+  .login-card input:focus{
+    border-color: var(--hijau);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+  }
+  .btn-primary{
+    width: 100%;
+    margin-top: 16px;
+    background: var(--hijau);
+    color: #fff;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s, transform .05s;
+  }
+  .btn-primary:active{ background: var(--hijau-gelap); transform: scale(.99); }
+  .btn-primary:disabled{ background: #9ca3af; cursor: not-allowed; }
+  .err{
+    color: var(--merah);
+    font-size: 13px;
+    margin-top: 10px;
+    min-height: 18px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .login-foot{
+    font-size: 11px;
+    color: var(--abu-teks);
+    margin-top: 18px;
+    line-height: 1.5;
+  }
+
+  /* ================= HOME ================= */
+  .greet{
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: var(--teks);
+  }
+  .card{
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    margin-bottom: 14px;
+  }
+  .card h3{
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--teks);
+  }
+
+  /* progress bar */
+  .prog-label{
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--abu-teks);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .prog-bar{
+    width: 100%;
+    height: 12px;
+    background: var(--abu);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .prog-fill{
+    height: 100%;
+    background: var(--hijau);
+    border-radius: 6px;
+    transition: width .4s ease;
+  }
+  .prog-count{
+    text-align: center;
+    font-size: 22px;
+    font-weight: 800;
+    margin-top: 12px;
+    color: var(--hijau-gelap);
+  }
+  .prog-msg{
+    text-align: center;
+    font-size: 13px;
+    color: var(--abu-teks);
+    margin-top: 6px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  /* iklan */
+  .ad-box{
+    background: #fff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .ad-box .ad-text{ flex:1; min-width:0; }
+  .ad-box .ad-title{
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--teks);
+    margin-bottom: 2px;
+  }
+  .ad-box .ad-sub{
+    font-size: 11px;
+    color: var(--abu-teks);
+    line-height: 1.4;
+  }
+  .ad-btn{
+    background: var(--hijau);
+    color: #fff;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .ad-btn:active{ background: var(--hijau-gelap); }
+
+  .info-last{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--teks);
+  }
+  .info-last .ico{
+    width: 34px; height: 34px;
+    background: #ecfdf5;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .info-last .lbl{ font-size: 11px; color: var(--abu-teks); }
+  .info-last .val{ font-weight: 700; }
+
+  /* ================= PRODUK ================= */
+  .prod-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .prod-card{
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+  }
+  .prod-img{
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(135deg,#dcfce7,#bbf7d0);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    color: var(--hijau-gelap);
+  }
+  .prod-body{
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .prod-name{
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .prod-price{
+    font-size: 13px;
+    color: var(--hijau-gelap);
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .prod-actions{ margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+  .prod-actions a{
+    text-align: center;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 8px 6px;
+    border-radius: 8px;
+    display: block;
+  }
+  .btn-toko{
+    background: var(--hijau);
+    color: #fff;
+  }
+  .btn-toko:active{ background: var(--hijau-gelap); }
+  .btn-online{
+    background: #fff;
+    color: var(--hijau-gelap);
+    border: 1.5px solid var(--hijau);
+  }
+  .btn-online:active{ background: #ecfdf5; }
+
+  /* ================= RIWAYAT ================= */
+  .riw-item{
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .riw-ico{
+    width: 38px; height: 38px;
+    background: #ecfdf5;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .riw-body{ flex: 1; min-width: 0; }
+  .riw-date{ font-size: 13px; font-weight: 700; }
+  .riw-detail{ font-size: 12px; color: var(--abu-teks); margin-top: 2px; }
+  .empty{
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--abu-teks);
+    font-size: 14px;
+  }
+  .empty .em-ico{ font-size: 40px; display: block; margin-bottom: 10px; }
+
+  /* ================= PROFIL ================= */
+  .prof-head{
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 16px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    margin-bottom: 14px;
+  }
+  .prof-avatar{
+    width: 68px; height: 68px;
+    background: var(--hijau);
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    color: #fff;
+  }
+  .prof-name{ font-size: 17px; font-weight: 800; }
+  .prof-wa{ font-size: 13px; color: var(--abu-teks); margin-top: 3px; }
+
+  .prof-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .prof-row:last-child{ border-bottom: none; }
+  .prof-row .k{ color: var(--abu-teks); font-weight: 500; }
+  .prof-row .v{ font-weight: 700; color: var(--teks); text-align: right; }
+
+  .badge{
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .badge-proses{ background: #fef3c7; color: #b45309; }
+  .badge-siap{ background: #dbeafe; color: #1d4ed8; }
+  .badge-gratis{ background: #dcfce7; color: #15803d; }
+
+  .btn-outline{
+    width: 100%;
+    background: #fff;
+    color: var(--hijau-gelap);
+    border: 1.5px solid var(--hijau);
+    padding: 13px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+  }
+  .btn-outline:active{ background: #ecfdf5; }
+
+  .btn-danger{
+    width: 100%;
+    background: #fff;
+    color: var(--merah);
+    border: 1.5px solid #fecaca;
+    padding: 13px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .btn-danger:active{ background: #fef2f2; }
+
+  /* ================= BOTTOM NAV ================= */
+  .bottom-nav{
+    position: fixed;      /* PENTING: fixed, bukan absolute */
+    left: 0; right: 0; bottom: 0;
+    height: 60px;
+    background: #fff;
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+  }
+  .bottom-nav .nav-inner{
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+  }
+  .nav-item{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 0;
+    transition: color .15s;
+  }
+  .nav-item .nav-ico{ font-size: 18px; line-height: 1; }
+  .nav-item.active{ color: var(--hijau); }
+  .nav-item:active{ color: var(--hijau-gelap); }
+
+  /* toast */
+  .toast{
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(17,24,39,0.95);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s, transform .25s;
+    z-index: 200;
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .spinner{
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginPage" class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">🚿</div>
+    <h2>Steam MP 7000</h2>
+    <p class="sub">Masukkan nomor WhatsApp kamu untuk lihat progres cuci motor.</p>
+
+    <label for="inputWA">Nomor WhatsApp</label>
+    <input id="inputWA" type="tel" inputmode="numeric" placeholder="08123456789" autocomplete="tel" />
+
+    <button id="btnLogin" class="btn-primary">Lihat Progres</button>
+    <div id="loginErr" class="err"></div>
+
+    <div class="login-foot">
+      Nomor wajib diawali <b>0</b>.<br/>
+      Contoh: 083191125094
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP (setelah login) ============ -->
+<div id="appPage" class="app" style="display:none;">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <h1>Steam MP 7000</h1>
+      <span class="logo-sub">Cuci Motor • Rp7.000</span>
+    </div>
+    <button class="logout-mini" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- ===== HOME ===== -->
+  <div id="page-home" class="page active">
+    <div class="greet" id="greetText">Halo! 👋</div>
+
+    <div class="card">
+      <h3>Progres Loyalitas</h3>
+      <div class="prog-label">
+        <span id="progLeft">Kunjungan ke-0 dari 10</span>
+        <span id="progRight">0/10</span>
+      </div>
+      <div class="prog-bar">
+        <div class="prog-fill" id="progFill" style="width:0%"></div>
+      </div>
+      <div class="prog-count" id="progCount">0 / 10</div>
+      <div class="prog-msg" id="progMsg">Ayo mulai cuci pertama kamu! 💨</div>
+    </div>
+
+    <!-- Iklan tipis -->
+    <div class="ad-box">
+      <div class="ad-text">
+        <div class="ad-title">🎬 Dukung Developer</div>
+        <div class="ad-sub">App gratis. Bantu kami dengan nonton iklan.</div>
+      </div>
+      <button class="ad-btn" onclick="tontonIklan()">Tonton Iklan</button>
+    </div>
+
+    <div class="card">
+      <div class="info-last">
+        <div class="ico">🗓️</div>
         <div>
-          <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-amber-900 drop-shadow-sm">
-            <span class="text-amber-700">Armada Play</span> Indonesia
-          </h1>
-          <p class="text-xl md:text-2xl font-semibold text-amber-800/80 mt-1">(API) — Control Center</p>
-          <p class="text-sm text-amber-700/70 mt-2 flex items-center gap-2">
-            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Connected to Supabase Cloud
-          </p>
-        </div>
-        <div class="flex items-center gap-3 bg-white/60 px-5 py-3 rounded-2xl border border-amber-300/50 shadow-sm">
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-600 to-amber-900 flex items-center justify-center text-white font-bold text-lg shadow">A</div>
-          <div>
-            <p class="text-xs font-semibold text-amber-800">Admin</p>
-            <p class="text-sm font-bold text-amber-950">Armada Play</p>
-          </div>
+          <div class="lbl">Terakhir cuci</div>
+          <div class="val" id="lastWash">—</div>
         </div>
       </div>
     </div>
-    <!-- Garis aksen batik -->
-    <div class="batik-accent h-4 rounded-b-2xl mx-4 -mt-2"></div>
-  </header>
+  </div>
 
-  <!-- MAIN CONTENT -->
-  <main class="max-w-7xl mx-auto space-y-8">
+  <!-- ===== PRODUK ===== -->
+  <div id="page-produk" class="page">
+    <div class="greet">🛍️ Katalog Produk</div>
+    <div class="prod-grid" id="prodGrid"></div>
+  </div>
 
-    <!-- STATISTIK RINGKASAN -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      <!-- Total Game Aktif -->
-      <div class="card-soft rounded-2xl shadow-md p-6 border-l-4 border-l-amber-600 flex items-center gap-4">
-        <div class="bg-amber-100 p-3 rounded-xl">
-          <svg class="w-7 h-7 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-amber-700">Total Game Aktif</p>
-          <p id="statTotalGames" class="text-2xl font-bold text-amber-950">—</p>
-        </div>
+  <!-- ===== RIWAYAT ===== -->
+  <div id="page-riwayat" class="page">
+    <div class="greet">📜 Riwayat Cuci</div>
+    <div id="riwayatList"></div>
+  </div>
+
+  <!-- ===== PROFIL ===== -->
+  <div id="page-profil" class="page">
+    <div class="prof-head">
+      <div class="prof-avatar">👤</div>
+      <div class="prof-name" id="profName">Pelanggan</div>
+      <div class="prof-wa" id="profWA">-</div>
+    </div>
+
+    <div class="card">
+      <div class="prof-row">
+        <span class="k">Total Kunjungan</span>
+        <span class="v" id="profTotal">0x</span>
       </div>
-      <!-- Total Pemain -->
-      <div class="card-soft rounded-2xl shadow-md p-6 border-l-4 border-l-emerald-600 flex items-center gap-4">
-        <div class="bg-emerald-100 p-3 rounded-xl">
-          <svg class="w-7 h-7 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-emerald-700">Total Pemain</p>
-          <p id="statTotalUsers" class="text-2xl font-bold text-emerald-950">—</p>
-        </div>
+      <div class="prof-row">
+        <span class="k">Status</span>
+        <span class="v"><span id="profBadge" class="badge badge-proses">Proses</span></span>
       </div>
-      <!-- Total Transaksi -->
-      <div class="card-soft rounded-2xl shadow-md p-6 border-l-4 border-l-sky-600 flex items-center gap-4">
-        <div class="bg-sky-100 p-3 rounded-xl">
-          <svg class="w-7 h-7 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-sky-700">Total Transaksi</p>
-          <p id="statTotalTransactions" class="text-2xl font-bold text-sky-950">—</p>
-        </div>
+      <div class="prof-row">
+        <span class="k">Harga per Cuci</span>
+        <span class="v">Rp7.000</span>
       </div>
-    </section>
+    </div>
 
-    <!-- TAMBAH GAME BARU -->
-    <section class="card-soft rounded-2xl shadow-md p-6 md:p-8">
-      <h2 class="text-xl font-bold text-amber-900 flex items-center gap-2 mb-4">
-        <span class="w-1.5 h-6 bg-amber-600 rounded-full inline-block"></span>
-        Tambah Game Baru
-      </h2>
-      <form id="formTambahGame" class="flex flex-col sm:flex-row gap-4 items-end">
-        <div class="flex-1 w-full">
-          <label class="block text-sm font-semibold text-amber-800 mb-1">Game ID</label>
-          <input type="text" id="inputGameId" placeholder="cth: GAME001" required
-                 class="w-full px-4 py-3 rounded-xl border border-amber-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-amber-400 text-amber-950 placeholder-amber-400/60" />
-        </div>
-        <div class="flex-1 w-full">
-          <label class="block text-sm font-semibold text-amber-800 mb-1">Nama Game</label>
-          <input type="text" id="inputGameName" placeholder="cth: Petualangan Nusantara" required
-                 class="w-full px-4 py-3 rounded-xl border border-amber-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-amber-400 text-amber-950 placeholder-amber-400/60" />
-        </div>
-        <button type="submit"
-                class="btn-nusantara text-white font-bold px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 whitespace-nowrap">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-          Daftarkan Game
-        </button>
-      </form>
-      <p id="gameMessage" class="mt-3 text-sm font-medium"></p>
-    </section>
+    <a class="btn-outline" href="https://wa.me/6283191125094" target="_blank" rel="noopener">💬 Hubungi Kami</a>
+    <button class="btn-danger" onclick="logout()">🚪 Logout</button>
+  </div>
 
-    <!-- TABEL PEMAIN & SALDO -->
-    <section class="card-soft rounded-2xl shadow-md p-6 md:p-8 overflow-hidden">
-      <h2 class="text-xl font-bold text-amber-900 flex items-center gap-2 mb-4">
-        <span class="w-1.5 h-6 bg-emerald-600 rounded-full inline-block"></span>
-        Daftar Pemain & Saldo Koin
-      </h2>
-      <div class="overflow-x-auto -mx-2">
-        <table class="w-full min-w-[500px] text-left border-collapse">
-          <thead>
-            <tr class="border-b-2 border-amber-200 text-amber-800 text-sm font-semibold">
-              <th class="py-3 px-3">ID</th>
-              <th class="py-3 px-3">Nama Pemain</th>
-              <th class="py-3 px-3 text-right">Saldo Koin</th>
-            </tr>
-          </thead>
-          <tbody id="tableUsersBody" class="text-amber-950 text-sm divide-y divide-amber-100">
-            <tr><td colspan="3" class="py-6 text-center text-amber-600/60">Memuat data pemain...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="nav-inner">
+      <button class="nav-item active" data-nav="home"    onclick="switchPage('home')"><span class="nav-ico">🏠</span>Home</button>
+      <button class="nav-item"        data-nav="produk"  onclick="switchPage('produk')"><span class="nav-ico">🛍️</span>Produk</button>
+      <button class="nav-item"        data-nav="riwayat" onclick="switchPage('riwayat')"><span class="nav-ico">📜</span>Riwayat</button>
+      <button class="nav-item"        data-nav="profil"  onclick="switchPage('profil')"><span class="nav-ico">👤</span>Profil</button>
+    </div>
+  </nav>
 
-    <!-- MANAJEMEN WITHDRAW (WD) -->
-    <section class="card-soft rounded-2xl shadow-md p-6 md:p-8 overflow-hidden">
-      <h2 class="text-xl font-bold text-amber-900 flex items-center gap-2 mb-4">
-        <span class="w-1.5 h-6 bg-sky-600 rounded-full inline-block"></span>
-        Manajemen Withdraw (WD)
-      </h2>
-      <div class="overflow-x-auto -mx-2">
-        <table class="w-full min-w-[800px] text-left border-collapse">
-          <thead>
-            <tr class="border-b-2 border-amber-200 text-amber-800 text-xs md:text-sm font-semibold uppercase tracking-wider">
-              <th class="py-3 px-3">Nama User</th>
-              <th class="py-3 px-3">E-Wallet</th>
-              <th class="py-3 px-3">Nomor Tujuan</th>
-              <th class="py-3 px-3 text-right">Jumlah</th>
-              <th class="py-3 px-3 text-center">Status</th>
-              <th class="py-3 px-3 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tableWithdrawBody" class="text-amber-950 text-sm divide-y divide-amber-100">
-            <tr><td colspan="6" class="py-6 text-center text-amber-600/60">Memuat data withdraw...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+</div>
 
-  </main>
+<div id="toast" class="toast"></div>
 
-  <!-- FOOTER -->
-  <footer class="max-w-7xl mx-auto mt-12 pt-6 pb-4 border-t border-amber-300/50 text-center space-y-2">
-    <p class="text-sm font-semibold text-amber-800">
-      Armada Play Indonesia (API) Control Center • Connected to Supabase Cloud • Built for Autonomous Game Network.
-    </p>
-    <p class="text-xs text-amber-700/80">
-      © 2026 Armada Play Indonesia (API). All rights reserved.
-    </p>
-    <p class="text-xs text-amber-600/70 italic bg-amber-100/60 inline-block px-4 py-1.5 rounded-full">
-      Tip: Pastikan transfer manual e-wallet sudah berhasil sebelum mengklik tombol 'Selesai' di dashboard.
-    </p>
-  </footer>
+<script>
+/* =========================================================
+   KONFIGURASI
+   ========================================================= */
+var URL_APPS_SCRIPT = 'GANTI_DENGAN_URL_APPS_SCRIPT_ANDA';
+var IKLAN_URL_MONETAG = 'https://omg10.com/4/11785165';
+var IKLAN_URL_ADSTERRA = 'https://www.profitableratecpmnetwork.com/q9qnyhdf9c?key=56f60182ff2837aef7d8e65616a77746';
+var WA_TOKO = '6283191125094';
 
-  <!-- ============================================= -->
-  <!-- SCRIPT SUPABASE & LOGIKA DASHBOARD -->
-  <!-- ============================================= -->
-  <script>
-    // === KONFIGURASI SUPABASE ===
-    const SUPABASE_URL = 'https://wzuzxmgffvknjufyexdv.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_2cMa6V8qtI4Wv_RfcrWdCg_cPyfjMQA';
+/* =========================================================
+   STATE
+   ========================================================= */
+var state = {
+  noWA: '',
+  nama: 'Pelanggan',
+  total: 0,
+  target: 10,
+  status: 'Proses',
+  lastWash: '-',
+  riwayat: []
+};
 
-    // Inisialisasi client Supabase
-    const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+/* =========================================================
+   UTIL
+   ========================================================= */
+function $(id){ return document.getElementById(id); }
 
-    // === ELEMEN DOM ===
-    const statTotalGames = document.getElementById('statTotalGames');
-    const statTotalUsers = document.getElementById('statTotalUsers');
-    const statTotalTransactions = document.getElementById('statTotalTransactions');
-    const formTambahGame = document.getElementById('formTambahGame');
-    const inputGameId = document.getElementById('inputGameId');
-    const inputGameName = document.getElementById('inputGameName');
-    const gameMessage = document.getElementById('gameMessage');
-    const tableUsersBody = document.getElementById('tableUsersBody');
-    const tableWithdrawBody = document.getElementById('tableWithdrawBody');
+function showToast(msg){
+  var t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tm);
+  t._tm = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
 
-    // === FUNGSI BANTUAN ===
-    function formatRupiah(amount) {
-      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+function formatTanggal(str){
+  if(!str) return '-';
+  try{
+    var d = new Date(str);
+    if(isNaN(d.getTime())) return str;
+    var bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    return d.getDate() + ' ' + bulan[d.getMonth()] + ' ' + d.getFullYear();
+  }catch(e){ return str; }
+}
+
+/* Panggil Apps Script — response plain/text, wajib JSON.parse */
+async function callAppsScript(payload){
+  var res = await fetch(URL_APPS_SCRIPT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  var text = await res.text();
+  return JSON.parse(text);
+}
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+$('btnLogin').addEventListener('click', doLogin);
+$('inputWA').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') doLogin();
+});
+
+function validasiNoWA(no){
+  if(!/^0\d{9,12}$/.test(no)) return false; // diawali 0, total 10-13 digit
+  return true;
+}
+
+async function doLogin(){
+  var raw = $('inputWA').value.trim().replace(/\s|-/g,'');
+  var errEl = $('loginErr');
+  errEl.textContent = '';
+
+  if(!raw){
+    errEl.textContent = 'Nomor WhatsApp wajib diisi.';
+    return;
+  }
+  if(raw[0] !== '0'){
+    errEl.textContent = 'Format nomor harus pakai 0 di depan ya!';
+    return;
+  }
+  if(!validasiNoWA(raw)){
+    errEl.textContent = 'Format nomor harus pakai 0 di depan ya!';
+    return;
+  }
+
+  var btn = $('btnLogin');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Memuat...';
+
+  try{
+    var data = await callAppsScript({ action: 'cekProgres', noWA: raw });
+
+    if(data && data.success){
+      state.noWA = raw;
+      state.nama = data.nama || 'Pelanggan';
+      state.total = Number(data.total) || 0;
+      state.target = Number(data.target) || 10;
+      state.status = data.status || 'Proses';
+      state.lastWash = data.lastWash || data.terakhir || '-';
+
+      localStorage.setItem('steam_noWA', raw);
+
+      renderHome();
+      renderProfil();
+      loadRiwayat();
+
+      $('loginPage').style.display = 'none';
+      $('appPage').style.display = 'block';
+      switchPage('home');
+    }else{
+      errEl.textContent = (data && data.message) ? data.message : 'Nomor tidak ditemukan. Coba lagi ya.';
     }
+  }catch(e){
+    errEl.textContent = 'Gagal terhubung ke server. Cek koneksi internet kamu.';
+    console.error(e);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Lihat Progres';
+  }
+}
 
-    function showMessage(el, text, type = 'success') {
-      el.textContent = text;
-      el.className = `mt-3 text-sm font-medium ${type === 'success' ? 'text-emerald-700' : 'text-red-600'}`;
-      setTimeout(() => { el.textContent = ''; }, 4000);
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+function logout(){
+  localStorage.removeItem('steam_noWA');
+  state = { noWA:'', nama:'Pelanggan', total:0, target:10, status:'Proses', lastWash:'-', riwayat:[] };
+  $('appPage').style.display = 'none';
+  $('loginPage').style.display = 'flex';
+  $('inputWA').value = '';
+  $('loginErr').textContent = '';
+  switchPage('home');
+}
+
+/* =========================================================
+   CEK SESSION SAAT LOAD
+   ========================================================= */
+async function cekSession(){
+  var saved = localStorage.getItem('steam_noWA');
+  if(!saved) return;
+
+  try{
+    var data = await callAppsScript({ action: 'cekProgres', noWA: saved });
+    if(data && data.success){
+      state.noWA = saved;
+      state.nama = data.nama || 'Pelanggan';
+      state.total = Number(data.total) || 0;
+      state.target = Number(data.target) || 10;
+      state.status = data.status || 'Proses';
+      state.lastWash = data.lastWash || data.terakhir || '-';
+
+      renderHome();
+      renderProfil();
+      loadRiwayat();
+
+      $('loginPage').style.display = 'none';
+      $('appPage').style.display = 'block';
+      switchPage('home');
+    }else{
+      localStorage.removeItem('steam_noWA');
     }
+  }catch(e){
+    // kalau gagal, biarkan di login
+    console.error('Session check gagal:', e);
+  }
+}
 
-    // === 1. MUAT STATISTIK RINGKASAN ===
-    async function loadStats() {
-      try {
-        // Total Game
-        const { count: gamesCount, error: errGames } = await supabaseClient
-          .from('games')
-          .select('*', { count: 'exact', head: true });
-        if (errGames) throw errGames;
-        statTotalGames.textContent = gamesCount ?? 0;
+/* =========================================================
+   RENDER HOME
+   ========================================================= */
+function renderHome(){
+  $('greetText').textContent = 'Halo, ' + state.nama + '! 👋';
 
-        // Total Pemain
-        const { count: usersCount, error: errUsers } = await supabaseClient
-          .from('users')
-          .select('*', { count: 'exact', head: true });
-        if (errUsers) throw errUsers;
-        statTotalUsers.textContent = usersCount ?? 0;
+  var total = state.total;
+  var target = state.target || 10;
+  var sisa = target - total;
 
-        // Total Transaksi (dari tabel transactions)
-        const { count: transCount, error: errTrans } = await supabaseClient
-          .from('transactions')
-          .select('*', { count: 'exact', head: true });
-        if (errTrans) throw errTrans;
-        statTotalTransactions.textContent = transCount ?? 0;
+  var pct = Math.min(100, Math.round((total / target) * 100));
+  $('progFill').style.width = pct + '%';
+  $('progLeft').textContent = 'Kunjungan ke-' + total + ' dari ' + target;
+  $('progRight').textContent = total + '/' + target;
+  $('progCount').textContent = total + ' / ' + target;
 
-      } catch (err) {
-        console.error('Gagal memuat statistik:', err.message);
-        statTotalGames.textContent = '—';
-        statTotalUsers.textContent = '—';
-        statTotalTransactions.textContent = '—';
-      }
+  var msg = '';
+  if(total >= target){
+    msg = 'Selamat! Kamu sudah gratis 1x cuci! 🎉';
+  }else if(sisa === 1){
+    msg = 'Tinggal 1x lagi gratis! 💨';
+  }else{
+    msg = 'Tinggal ' + sisa + 'x lagi gratis! 💨';
+  }
+  $('progMsg').textContent = msg;
+
+  $('lastWash').textContent = formatTanggal(state.lastWash);
+}
+
+/* =========================================================
+   RENDER PROFIL
+   ========================================================= */
+function renderProfil(){
+  $('profName').textContent = state.nama;
+  $('profWA').textContent = state.noWA;
+  $('profTotal').textContent = state.total + 'x';
+
+  var badge = $('profBadge');
+  var st = (state.status || 'Proses').toLowerCase();
+
+  if(st.indexOf('gratis') > -1 && st.indexOf('siap') === -1){
+    badge.textContent = 'Gratis';
+    badge.className = 'badge badge-gratis';
+  }else if(st.indexOf('siap') > -1){
+    badge.textContent = 'Siap Gratis';
+    badge.className = 'badge badge-siap';
+  }else{
+    badge.textContent = 'Proses';
+    badge.className = 'badge badge-proses';
+  }
+}
+
+/* =========================================================
+   PRODUK
+   ========================================================= */
+var PRODUK = [
+  { nama:'Kain Mikrofiber', harga:'Rp15.000', emoji:'🧽' },
+  { nama:'Kanebo',          harga:'Rp25.000', emoji:'🧴' },
+  { nama:'Sabun',           harga:'Rp10.000', emoji:'🧼' },
+  { nama:'Pengilap',        harga:'Rp20.000', emoji:'✨' }
+];
+
+function renderProduk(){
+  var grid = $('prodGrid');
+  grid.innerHTML = '';
+
+  PRODUK.forEach(function(p){
+    var waText = encodeURIComponent('Halo, saya mau ambil ' + p.nama + ' di toko');
+    var waLink = 'https://wa.me/' + WA_TOKO + '?text=' + waText;
+
+    var card = document.createElement('div');
+    card.className = 'prod-card';
+    card.innerHTML =
+      '<div class="prod-img">' + p.emoji + '</div>' +
+      '<div class="prod-body">' +
+        '<div class="prod-name">' + p.nama + '</div>' +
+        '<div class="prod-price">' + p.harga + '</div>' +
+        '<div class="prod-actions">' +
+          '<a class="btn-toko" href="' + waLink + '" target="_blank" rel="noopener">Ambil di Toko</a>' +
+          '<a class="btn-online" href="#" onclick="belumTersedia(event)">Beli Online</a>' +
+        '</div>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+}
+
+function belumTersedia(e){
+  e.preventDefault();
+  showToast('Toko online segera hadir 🙏');
+}
+
+/* =========================================================
+   RIWAYAT
+   ========================================================= */
+async function loadRiwayat(){
+  var listEl = $('riwayatList');
+
+  if(URL_APPS_SCRIPT.indexOf('GANTI_DENGAN') === 0){
+    listEl.innerHTML = '<div class="empty"><span class="em-ico">📭</span>Belum ada riwayat</div>';
+    return;
+  }
+
+  listEl.innerHTML = '<div class="empty"><span class="em-ico">⏳</span>Memuat riwayat...</div>';
+
+  try{
+    var data = await callAppsScript({ action:'getRiwayat', noWA: state.noWA });
+
+    if(data && data.success && Array.isArray(data.riwayat) && data.riwayat.length > 0){
+      listEl.innerHTML = '';
+      data.riwayat.forEach(function(r){
+        var item = document.createElement('div');
+        item.className = 'riw-item';
+        item.innerHTML =
+          '<div class="riw-ico">🏍️</div>' +
+          '<div class="riw-body">' +
+            '<div class="riw-date">' + formatTanggal(r.tanggal || r.date) + '</div>' +
+            '<div class="riw-detail">Plat: ' + (r.plat || '-') + ' • ' + (r.jenis || r.motor || '-') + '</div>' +
+          '</div>';
+        listEl.appendChild(item);
+      });
+    }else{
+      listEl.innerHTML = '<div class="empty"><span class="em-ico">📭</span>Belum ada riwayat</div>';
     }
+  }catch(e){
+    listEl.innerHTML = '<div class="empty"><span class="em-ico">📭</span>Belum ada riwayat</div>';
+    console.error(e);
+  }
+}
 
-    // === 2. MUAT TABEL PEMAIN (USERS) ===
-    async function loadUsers() {
-      try {
-        const { data: users, error } = await supabaseClient
-          .from('users')
-          .select('id, username, coin_balance')
-          .order('id', { ascending: true });
-        if (error) throw error;
+/* =========================================================
+   NAVIGASI
+   ========================================================= */
+function switchPage(name){
+  ['home','produk','riwayat','profil'].forEach(function(p){
+    var el = $('page-' + p);
+    if(el) el.classList.toggle('active', p === name);
+  });
 
-        if (!users || users.length === 0) {
-          tableUsersBody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-amber-600/60">Belum ada pemain terdaftar.</td></tr>`;
-          return;
-        }
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    btn.classList.toggle('active', btn.getAttribute('data-nav') === name);
+  });
 
-        tableUsersBody.innerHTML = users.map(user => `
-          <tr class="table-row-hover transition-colors">
-            <td class="py-3 px-3 font-mono text-xs text-amber-700">${user.id}</td>
-            <td class="py-3 px-3 font-medium">${user.username || 'Tanpa Nama'}</td>
-            <td class="py-3 px-3 text-right font-bold text-amber-800">${formatRupiah(user.coin_balance || 0)}</td>
-          </tr>
-        `).join('');
-      } catch (err) {
-        console.error('Gagal memuat users:', err.message);
-        tableUsersBody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-red-500">Gagal memuat data pemain: ${err.message}</td></tr>`;
-      }
-    }
+  if(name === 'produk') renderProduk();
+  if(name === 'riwayat') loadRiwayat();
+  if(name === 'profil') renderProfil();
 
-    // === 3. MUAT TABEL WITHDRAW ===
-    async function loadWithdrawals() {
-      try {
-        // Ambil dari tabel 'transactions' dengan tipe 'withdraw'
-        // Sesuaikan nama kolom dengan skema umum: id, user_id, amount, status, ewallet, ewallet_number
-        const { data: withdrawals, error } = await supabaseClient
-          .from('transactions')
-          .select('id, user_id, amount, status, ewallet, ewallet_number')
-          .eq('type', 'withdraw')       // filter tipe withdraw
-          .order('id', { ascending: false });
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
 
-        if (error) throw error;
+/* =========================================================
+   IKLAN
+   ========================================================= */
+function tontonIklan(){
+  window.open(IKLAN_URL_MONETAG, '_blank', 'noopener');
+}
 
-        if (!withdrawals || withdrawals.length === 0) {
-          tableWithdrawBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-amber-600/60">Tidak ada permintaan withdraw.</td></tr>`;
-          return;
-        }
-
-        // Ambil data user untuk mapping nama
-        const userIds = [...new Set(withdrawals.map(w => w.user_id))];
-        let userMap = {};
-        if (userIds.length > 0) {
-          const { data: usersData } = await supabaseClient
-            .from('users')
-            .select('id, username')
-            .in('id', userIds);
-          if (usersData) {
-            usersData.forEach(u => { userMap[u.id] = u.username || `User#${u.id}`; });
-          }
-        }
-
-        tableWithdrawBody.innerHTML = withdrawals.map(w => {
-          const isPending = w.status === 'pending';
-          const statusBadge = isPending
-            ? `<span class="badge-pending text-xs font-bold px-3 py-1 rounded-full">Pending</span>`
-            : `<span class="badge-completed text-xs font-bold px-3 py-1 rounded-full">Completed</span>`;
-
-          const actionButton = isPending
-            ? `<button data-id="${w.id}" data-userid="${w.user_id}" data-amount="${w.amount}" 
-                       class="btn-selesai btn-nusantara text-white text-xs font-bold px-4 py-2 rounded-lg shadow hover:shadow-md transition-all whitespace-nowrap">
-                 Selesai / Transfer
-               </button>`
-            : `<span class="text-xs text-emerald-600 font-semibold">✓ Selesai</span>`;
-
-          return `
-            <tr class="table-row-hover transition-colors">
-              <td class="py-3 px-3 font-medium">${userMap[w.user_id] || `User#${w.user_id}`}</td>
-              <td class="py-3 px-3 uppercase font-semibold text-amber-800">${w.ewallet || '-'}</td>
-              <td class="py-3 px-3 font-mono text-sm">${w.ewallet_number || '-'}</td>
-              <td class="py-3 px-3 text-right font-bold text-amber-900">${formatRupiah(w.amount || 0)}</td>
-              <td class="py-3 px-3 text-center">${statusBadge}</td>
-              <td class="py-3 px-3 text-center">${actionButton}</td>
-            </tr>
-          `;
-        }).join('');
-
-        // Pasang event listener untuk tombol "Selesai / Transfer"
-        document.querySelectorAll('.btn-selesai').forEach(btn => {
-          btn.addEventListener('click', handleSelesaiWithdraw);
-        });
-
-      } catch (err) {
-        console.error('Gagal memuat withdraw:', err.message);
-        tableWithdrawBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-red-500">Gagal memuat data withdraw: ${err.message}</td></tr>`;
-      }
-    }
-
-    // === 4. HANDLE SELESAI WITHDRAW (UPDATE STATUS + POTONG SALDO) ===
-    async function handleSelesaiWithdraw(e) {
-      const btn = e.currentTarget;
-      const transactionId = btn.dataset.id;
-      const userId = btn.dataset.userid;
-      const amount = parseFloat(btn.dataset.amount);
-
-      if (!transactionId || !userId || isNaN(amount)) {
-        alert('Data transaksi tidak valid.');
-        return;
-      }
-
-      if (!confirm(`Konfirmasi: Transfer sebesar ${formatRupiah(amount)} sudah berhasil? Saldo user akan dipotong.`)) return;
-
-      // Nonaktifkan tombol sementara
-      btn.disabled = true;
-      btn.innerHTML = 'Memproses...';
-      btn.classList.add('opacity-70', 'cursor-wait');
-
-      try {
-        // 1. Update status transaksi menjadi 'completed'
-        const { error: updateError } = await supabaseClient
-          .from('transactions')
-          .update({ status: 'completed' })
-          .eq('id', transactionId);
-        if (updateError) throw updateError;
-
-        // 2. Ambil saldo user saat ini
-        const { data: userData, error: fetchError } = await supabaseClient
-          .from('users')
-          .select('coin_balance')
-          .eq('id', userId)
-          .single();
-        if (fetchError) throw fetchError;
-
-        const currentBalance = userData.coin_balance || 0;
-        const newBalance = Math.max(0, currentBalance - amount); // hindari minus
-
-        // 3. Update saldo user
-        const { error: updateBalanceError } = await supabaseClient
-          .from('users')
-          .update({ coin_balance: newBalance })
-          .eq('id', userId);
-        if (updateBalanceError) throw updateBalanceError;
-
-        // 4. Refresh tampilan
-        await loadUsers();
-        await loadWithdrawals();
-        await loadStats();
-
-        alert(`Berhasil! Status transaksi #${transactionId} menjadi 'completed' dan saldo user telah dipotong ${formatRupiah(amount)}.`);
-
-      } catch (err) {
-        console.error('Gagal memproses withdraw:', err.message);
-        alert('Gagal memproses: ' + err.message);
-        // Kembalikan tombol
-        btn.disabled = false;
-        btn.innerHTML = 'Selesai / Transfer';
-        btn.classList.remove('opacity-70', 'cursor-wait');
-      }
-    }
-
-    // === 5. TAMBAH GAME BARU ===
-    formTambahGame.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const gameId = inputGameId.value.trim();
-      const gameName = inputGameName.value.trim();
-
-      if (!gameId || !gameName) {
-        showMessage(gameMessage, 'Game ID dan Nama Game wajib diisi.', 'error');
-        return;
-      }
-
-      const submitBtn = formTambahGame.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = 'Menyimpan...';
-
-      try {
-        const { error } = await supabaseClient
-          .from('games')
-          .insert([{ id: gameId, name: gameName }]);
-        if (error) throw error;
-
-        showMessage(gameMessage, `Game "${gameName}" (${gameId}) berhasil didaftarkan!`, 'success');
-        inputGameId.value = '';
-        inputGameName.value = '';
-        await loadStats(); // refresh total game
-      } catch (err) {
-        console.error('Gagal menambah game:', err.message);
-        showMessage(gameMessage, `Gagal menambah game: ${err.message}`, 'error');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> Daftarkan Game`;
-      }
-    });
-
-    // === 6. INISIALISASI DASHBOARD ===
-    async function initDashboard() {
-      await loadStats();
-      await loadUsers();
-      await loadWithdrawals();
-    }
-
-    // Jalankan saat halaman siap
-    window.addEventListener('DOMContentLoaded', initDashboard);
-
-    // Opsional: refresh data setiap 30 detik (real-time feel)
-    setInterval(() => {
-      loadStats();
-      loadUsers();
-      loadWithdrawals();
-    }, 30000);
-  </script>
+/* =========================================================
+   INIT
+   ========================================================= */
+window.addEventListener('load', function(){
+  renderProduk();
+  cekSession();
+});
+</script>
 </body>
 </html>
