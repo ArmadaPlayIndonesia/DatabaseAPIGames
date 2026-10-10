@@ -1,1020 +1,1496 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>Steam MP 7000 – Pelanggan</title>
-  <!-- Popunder Adsterra (hanya di index.html) -->
-  <script type="text/javascript">
-    // Popunder Adsterra – profitableratecpmnetwork
-    (function() {
-      var s = document.createElement('script');
-      s.src = '//www.profitableratecpmnetwork.com/q9qnyhdf9c?key=56f60182ff2837aef7d8e65616a77746';
-      s.async = true;
-      document.head.appendChild(s);
-    })();
-  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Duitin Aja — Selesaikan Misi, Dapat Duit</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    /* ===== RESET & GLOBAL ===== */
-    * {
+    /* ========== GLOBAL & PALET WARNA ========== */
+    :root {
+      --primary: #FF4D6D;
+      --secondary: #C9184A;
+      --bg: #FFF5F7;
+      --card: #FFFFFF;
+      --text: #1A1A1A;
+      --text-sec: #8A5A64;
+      --coin: #FFD700;
+      --success: #00C853;
+    }
+    * { font-family: 'Poppins', 'Nunito', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: var(--bg);
+      color: var(--text);
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #ffffff;
-      color: #1f2937;
-      line-height: 1.5;
-      padding-bottom: 80px; /* ruang untuk bottom nav */
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
-    /* ===== VARIABEL WARNA ===== */
-    :root {
-      --merah: #dc2626;
-      --merah-gelap: #b91c1c;
-      --putih: #ffffff;
-      --abu-muda: #f3f4f6;
-      --abu-teks: #6b7280;
-      --border-abu: #e5e7eb;
-    }
-
-    /* ===== UTILITY ===== */
-    .hidden {
-      display: none !important;
-    }
-
-    .container {
-      padding: 16px;
-      max-width: 480px;
-      margin: 0 auto;
-    }
-
-    .text-merah {
-      color: var(--merah);
-    }
-
-    .text-abu {
-      color: var(--abu-teks);
-    }
-
-    /* ===== TOMBOL ===== */
-    .btn {
-      display: inline-block;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 16px;
-      text-align: center;
-      cursor: pointer;
-      border: none;
-      transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-      text-decoration: none;
-    }
-
-    .btn-primary {
-      background-color: var(--merah);
-      color: var(--putih);
-      border: 1px solid var(--merah);
-    }
-
-    .btn-primary:hover,
-    .btn-primary:active {
-      background-color: var(--merah-gelap);
-      border-color: var(--merah-gelap);
-    }
-
-    .btn-secondary {
-      background-color: var(--putih);
-      color: var(--merah);
-      border: 1px solid var(--merah);
-    }
-
-    .btn-secondary:hover,
-    .btn-secondary:active {
-      background-color: #fef2f2;
-    }
-
-    .btn-gray {
-      background-color: var(--abu-muda);
-      color: #374151;
-      border: 1px solid var(--border-abu);
-    }
-
-    .btn-gray:hover,
-    .btn-gray:active {
-      background-color: #e5e7eb;
-    }
-
-    .btn-sm {
-      padding: 8px 16px;
-      font-size: 14px;
-    }
-
-    .btn-block {
-      width: 100%;
-      display: block;
-    }
-
-    /* ===== HEADER ===== */
-    .header-merah {
-      background-color: var(--merah);
-      color: var(--putih);
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .header-merah h1 {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-
-    .header-merah .btn-logout {
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      color: var(--putih);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .header-merah .btn-logout:active {
-      background: rgba(255, 255, 255, 0.35);
-    }
-
-    /* ===== KARTU ===== */
-    .card {
-      background: var(--putih);
-      border-radius: 12px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-
-    /* ===== LOGIN ===== */
-    .login-wrapper {
-      display: flex;
-      flex-direction: column;
+    /* ========== KOIN EMAS ========== */
+    .coin-icon {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 90vh;
-      padding: 24px;
-    }
-
-    .login-logo {
-      font-size: 32px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #FFE066, #FFD700, #D4A017);
+      color: #7A5C00;
       font-weight: 800;
-      color: var(--merah);
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-    }
-
-    .login-sub {
-      color: var(--abu-teks);
-      font-size: 14px;
-      margin-bottom: 32px;
-    }
-
-    .login-form {
-      width: 100%;
-      max-width: 360px;
-    }
-
-    .login-form label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: #374151;
-    }
-
-    .login-form input {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid var(--border-abu);
-      border-radius: 8px;
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.2s;
-      background: var(--putih);
-    }
-
-    .login-form input:focus {
-      border-color: var(--merah);
-      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-    }
-
-    .login-form .error-msg {
-      color: var(--merah);
-      font-size: 13px;
-      margin-top: 6px;
-      min-height: 20px;
-      font-weight: 500;
-    }
-
-    .login-form .btn-primary {
-      margin-top: 20px;
-      width: 100%;
-    }
-
-    /* ===== PROGRESS BAR ===== */
-    .progress-bar-container {
-      width: 100%;
-      height: 12px;
-      background-color: var(--abu-muda);
-      border-radius: 6px;
-      overflow: hidden;
-      margin: 12px 0;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background-color: var(--merah);
-      border-radius: 6px;
-      transition: width 0.4s ease;
-      min-width: 0%;
-    }
-
-    .progress-label {
-      font-size: 15px;
-      font-weight: 600;
-      color: #374151;
-    }
-
-    .progress-motivation {
-      font-size: 14px;
-      color: var(--abu-teks);
-      margin-top: 4px;
-    }
-
-    /* ===== IKLAN ===== */
-    .iklan-box {
-      background: #fff5f5;
-      border: 1px solid #fecaca;
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-top: 4px;
-      margin-bottom: 16px;
-    }
-
-    .iklan-box .iklan-judul {
-      font-size: 14px;
-      font-weight: 700;
-      color: #991b1b;
-      margin-bottom: 8px;
-    }
-
-    .iklan-box .btn-iklan {
-      background: var(--merah);
-      color: var(--putih);
-      border: none;
-      border-radius: 6px;
-      padding: 8px 16px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .iklan-box .btn-iklan:active {
-      background: var(--merah-gelap);
-    }
-
-    .iklan-box .iklan-sub {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-top: 6px;
-    }
-
-    /* ===== PRODUK ===== */
-    .produk-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border-abu);
-    }
-
-    .produk-item:last-child {
-      border-bottom: none;
-    }
-
-    .produk-foto {
-      width: 64px;
-      height: 64px;
-      background: var(--abu-muda);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
+      font-size: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(255,255,255,0.6);
       flex-shrink: 0;
     }
-
-    .produk-info {
-      flex: 1;
-      min-width: 0;
+    .coin-icon.lg { width: 32px; height: 32px; font-size: 16px; }
+    .coin-icon.xl { width: 56px; height: 56px; font-size: 28px; }
+    /* ========== CARD ========== */
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(255, 77, 109, 0.15);
+      padding: 20px;
     }
-
-    .produk-info .nama {
-      font-weight: 600;
-      font-size: 15px;
-      margin-bottom: 2px;
-    }
-
-    .produk-info .harga {
+    /* ========== TOMBOL BOUNCY ========== */
+    .btn-bouncy {
+      transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+      cursor: pointer;
+      border: none;
       font-weight: 700;
-      color: var(--merah);
-      font-size: 15px;
-      margin-bottom: 6px;
+      border-radius: 16px;
     }
-
-    .produk-aksi {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+    .btn-bouncy:active {
+      transform: scale(0.92);
+      box-shadow: 0 2px 6px rgba(255, 77, 109, 0.2);
     }
-
-    .produk-aksi .btn {
-      padding: 6px 12px;
-      font-size: 12px;
-      border-radius: 6px;
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(255, 77, 109, 0.4);
     }
-
-    /* ===== RIWAYAT ===== */
-    .riwayat-item {
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border-abu);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .btn-primary:disabled {
+      background: #d9d9d9;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none !important;
     }
-
-    .riwayat-item:last-child {
-      border-bottom: none;
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0, 200, 83, 0.4);
     }
-
-    .riwayat-tanggal {
-      font-size: 14px;
-      font-weight: 600;
-      color: #374151;
+    /* ========== PROGRESS BAR ========== */
+    .progress-track {
+      background: #F0E0E4;
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+      width: 100%;
     }
-
-    .riwayat-detail {
-      font-size: 13px;
-      color: var(--abu-teks);
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #FF4D6D, #C9184A);
+      transition: width 0.4s ease;
     }
-
-    .riwayat-kosong {
-      text-align: center;
-      color: var(--abu-teks);
-      padding: 32px 0;
-      font-size: 14px;
-    }
-
-    /* ===== PROFIL ===== */
-    .profil-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border-abu);
-      font-size: 15px;
-    }
-
-    .profil-row:last-child {
-      border-bottom: none;
-    }
-
-    .profil-label {
-      color: var(--abu-teks);
-    }
-
-    .profil-value {
-      font-weight: 600;
-      color: #1f2937;
-      text-align: right;
-    }
-
-    .profil-aksi {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    /* ===== BOTTOM NAV ===== */
+    /* ========== BOTTOM NAV ========== */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 60px;
-      background: var(--putih);
-      border-top: 1px solid var(--border-abu);
+      background: #fff;
+      box-shadow: 0 -2px 16px rgba(255, 77, 109, 0.12);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 6px 0 env(safe-area-inset-bottom, 6px) 0;
+      z-index: 40;
+      border-top-left-radius: 22px;
+      border-top-right-radius: 22px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 6px 18px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sec);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .nav-item.active {
+      color: var(--primary);
+      background: #FFF0F3;
+    }
+    .nav-item .nav-icon { font-size: 22px; line-height: 1; }
+    /* ========== LOADING SCREEN ========== */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #FF4D6D, #C9184A);
+      color: #fff;
+      padding: 24px;
+      text-align: center;
+    }
+    .loading-screen.active { display: flex; }
+    .spinning-coin {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #FFE066, #FFD700, #D4A017);
       display: flex;
       align-items: center;
-      justify-content: space-around;
-      z-index: 100;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.04);
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 800;
+      color: #7A5C00;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25), inset 0 -4px 8px rgba(255,255,255,0.5);
+      animation: spinCoin 2.5s linear infinite;
+      margin-bottom: 24px;
     }
-
-    .bottom-nav .nav-item {
+    @keyframes spinCoin {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+    .countdown-text {
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1;
+      margin: 12px 0;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .loading-progress-track {
+      width: 100%;
+      max-width: 320px;
+      height: 14px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+    .loading-progress-fill {
+      height: 100%;
+      background: #FFD700;
+      border-radius: 999px;
+      width: 0%;
+      transition: width 1s linear;
+    }
+    .loading-tip {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.95;
+      max-width: 300px;
+      min-height: 40px;
+      margin-top: 8px;
+    }
+    .close-loading-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 700;
+    }
+    .close-loading-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .close-loading-btn:not(:disabled):active {
+      transform: scale(0.88);
+      background: rgba(255,255,255,0.4);
+    }
+    /* ========== COIN RAIN ANIMATION ========== */
+    .coin-rain {
+      position: fixed;
+      top: -40px;
+      z-index: 90;
+      font-size: 28px;
+      pointer-events: none;
+      animation: fallDown 1.6s ease-in forwards;
+      opacity: 0.9;
+    }
+    @keyframes fallDown {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      80% { opacity: 0.9; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+    /* ========== NOTIFIKASI TOAST ========== */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: #1A1A1A;
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 16px;
+      font-weight: 600;
+      font-size: 14px;
+      z-index: 200;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    /* ========== PAGE TRANSITIONS ========== */
+    .page-section { display: none; animation: fadeIn 0.3s ease; }
+    .page-section.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* ========== FORM INPUT ========== */
+    .input-field {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 2px solid #F0E0E4;
+      background: #fff;
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s;
+      color: var(--text);
+    }
+    .input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(255, 77, 109, 0.1);
+    }
+    .input-field::placeholder { color: #C9A9B2; }
+    /* ========== TRANSACTION ITEM ========== */
+    .tx-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid #F5E4E8;
+    }
+    .tx-item:last-child { border-bottom: none; }
+    /* ========== LOGIN PAGE ========== */
+    #loginPage {
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      flex: 1;
-      height: 100%;
-      cursor: pointer;
-      color: var(--abu-teks);
-      font-size: 11px;
+      padding: 32px 24px;
+      text-align: center;
+      background: linear-gradient(180deg, #FFF5F7 0%, #FFE0E6 100%);
+    }
+    .login-logo {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -1px;
+      margin-bottom: 4px;
+    }
+    .login-tagline {
+      color: var(--text-sec);
+      font-size: 15px;
       font-weight: 500;
-      gap: 2px;
-      transition: color 0.2s;
-      -webkit-tap-highlight-color: transparent;
+      margin-bottom: 40px;
     }
-
-    .bottom-nav .nav-item .nav-icon {
-      font-size: 20px;
-      line-height: 1;
-    }
-
-    .bottom-nav .nav-item.aktif {
-      color: var(--merah);
-      font-weight: 700;
-    }
-
-    .bottom-nav .nav-item.aktif .nav-icon {
-      color: var(--merah);
-    }
-
-    /* ===== SAPAAN ===== */
-    .sapaan {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: #1f2937;
-    }
-
-    /* ===== INFO TERAKHIR ===== */
-    .info-terakhir {
-      font-size: 14px;
-      color: var(--abu-teks);
-      margin-top: 12px;
+    .google-btn {
       display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      gap: 12px;
+      background: #fff;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 16px;
+      padding: 16px 28px;
+      border-radius: 18px;
+      border: 2px solid #F0E0E4;
+      box-shadow: 0 4px 12px rgba(255, 77, 109, 0.12);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      width: 100%;
+      max-width: 320px;
     }
-
-    /* ===== PAGE TITLE ===== */
-    .page-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: #1f2937;
+    .google-btn:active { transform: scale(0.95); }
+    .google-btn img { width: 24px; height: 24px; }
+    /* ========== RESPONSIVE WRAPPER ========== */
+    .app-wrapper { max-width: 480px; margin: 0 auto; padding: 0 16px; }
+    @media (min-width: 481px) {
+      .bottom-nav { max-width: 480px; left: 50%; transform: translateX(-50%); }
     }
-
-    /* ===== RESPONSIVE ===== */
-    @media (min-width: 480px) {
-      .container {
-        padding: 20px;
-      }
+    /* ========== HEADER ========== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(255, 245, 247, 0.92);
+      backdrop-filter: blur(12px);
+      padding: 14px 0 10px 0;
+      border-bottom: 1px solid rgba(255, 77, 109, 0.08);
     }
+    /* ========== AVATAR ========== */
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--primary);
+      box-shadow: 0 2px 8px rgba(255, 77, 109, 0.25);
+    }
+    /* ========== SCROLLBAR HIDE ========== */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body>
 
-  <!-- ======================= HALAMAN LOGIN ======================= -->
-  <div id="pageLogin" class="login-wrapper">
-    <div class="login-logo">Steam MP 7000</div>
-    <div class="login-sub">Masukkan nomor WhatsApp kamu</div>
-    <div class="login-form">
-      <label for="inputWA">Nomor WhatsApp</label>
-      <input type="tel" id="inputWA" placeholder="08123456789" inputmode="numeric" autocomplete="tel">
-      <div id="loginError" class="error-msg"></div>
-      <button id="btnLogin" class="btn btn-primary">Lihat Progres</button>
-    </div>
+  <!-- ============================================================ -->
+  <!-- HALAMAN LOGIN — HANYA MUNCUL SAAT BELUM LOGIN               -->
+  <!-- ============================================================ -->
+  <div id="loginPage">
+    <div class="coin-icon xl" style="margin-bottom:20px;">K</div>
+    <h1 class="login-logo">Duitin Aja</h1>
+    <p class="login-tagline">Selesaikan Misi, Dapat Duit</p>
+    <button id="googleLoginBtn" class="google-btn btn-bouncy">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+      Login dengan Google
+    </button>
+    <p style="color:#8A5A64; font-size:12px; margin-top:32px; max-width:280px;">
+      Dengan masuk, kamu menyetujui Syarat & Ketentuan serta Kebijakan Privasi Duitin Aja.
+    </p>
   </div>
 
-  <!-- ======================= HALAMAN HOME ======================= -->
-  <div id="pageHome" class="hidden">
-    <div class="header-merah">
-      <h1>Steam MP 7000</h1>
-      <button id="btnLogoutHome" class="btn-logout">Logout</button>
-    </div>
-    <div class="container">
-      <div id="sapaanHome" class="sapaan">Halo, Pelanggan! 👋</div>
-
-      <!-- Kartu Progres -->
-      <div class="card">
-        <div class="progress-label" id="progressLabel">Kunjungan ke-0 dari 10</div>
-        <div class="progress-bar-container">
-          <div id="progressFill" class="progress-bar-fill" style="width:0%"></div>
+  <!-- ============================================================ -->
+  <!-- APLIKASI UTAMA — HANYA MUNCUL SETELAH LOGIN                 -->
+  <!-- ============================================================ -->
+  <div id="mainApp" style="display:none;">
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="app-wrapper" style="display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="coin-icon" style="width:28px;height:28px;font-size:15px;">K</div>
+          <span style="font-weight:800; font-size:18px; color:var(--primary); letter-spacing:-0.5px;">Duitin Aja</span>
         </div>
-        <div id="progressMotivation" class="progress-motivation">Ayo mulai cuci motor pertamamu! 💨</div>
-        <div id="infoTerakhir" class="info-terakhir">🕐 Terakhir cuci: -</div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <img id="headerAvatar" class="avatar" src="" alt="Avatar" />
+          <button id="logoutBtn" class="btn-bouncy" style="background:#FFF0F3; color:var(--secondary); padding:8px 14px; border-radius:12px; font-size:13px; font-weight:700; border:none;">
+            Keluar
+          </button>
+        </div>
       </div>
+    </header>
 
-      <!-- Kotak Iklan -->
-      <div class="iklan-box">
-        <div class="iklan-judul">🎬 Dukung Developer</div>
-        <button id="btnTontonIklan" class="btn-iklan">Tonton Iklan</button>
-        <div class="iklan-sub">App gratis. Bantu kami dengan nonton iklan.</div>
-      </div>
-    </div>
+    <!-- MAIN CONTENT -->
+    <main class="app-wrapper" style="padding-top:16px; padding-bottom:100px; min-height:calc(100vh - 140px);">
+
+      <!-- ===== HALAMAN HOME ===== -->
+      <section id="page-home" class="page-section active">
+        <!-- Kartu Poin -->
+        <div class="card" style="margin-bottom:16px; background: linear-gradient(135deg, #FFFFFF 0%, #FFF5F7 100%);">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+            <span style="font-weight:700; font-size:16px; color:var(--text);">💰 Poin Anda</span>
+            <span style="font-size:12px; color:var(--text-sec); font-weight:500;">1 Koin = Rp 0,1</span>
+          </div>
+          <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:4px;">
+            <span class="coin-icon lg" style="margin-right:2px;">K</span>
+            <span id="totalCoins" style="font-size:32px; font-weight:800; color:var(--text); line-height:1;">0</span>
+            <span style="font-size:18px; font-weight:700; color:var(--text-sec);">Koin</span>
+          </div>
+          <div style="font-size:15px; font-weight:600; color:var(--success); margin-bottom:16px;">
+            ≈ Rp <span id="rupiahValue">0</span>
+          </div>
+          <button id="withdrawBtn" class="btn-bouncy btn-primary" style="width:100%; padding:14px; font-size:15px;">
+            💸 Tarik Uang
+          </button>
+        </div>
+
+        <!-- Kartu Kode Rujukan -->
+        <div class="card" style="margin-bottom:16px;">
+          <div style="font-weight:700; font-size:15px; margin-bottom:10px;">🎟️ Kode Rujukan</div>
+          <p style="font-size:13px; color:var(--text-sec); margin-bottom:12px;">Punya kode dari teman? Masukkan di sini dan dapatkan <strong>500 Koin</strong>!</p>
+          <div style="display:flex; gap:10px;">
+            <input id="referralInput" class="input-field" type="text" placeholder="Contoh: DUIT1234" maxlength="10" style="flex:1; text-transform:uppercase;" />
+            <button id="confirmReferralBtn" class="btn-bouncy btn-primary" style="padding:14px 20px; font-size:14px; white-space:nowrap;">
+              Konfirmasi
+            </button>
+          </div>
+          <div style="margin-top:14px; padding-top:14px; border-top:1px dashed #F0E0E4;">
+            <div style="font-size:12px; color:var(--text-sec); margin-bottom:4px;">Kode rujukan kamu:</div>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span id="myReferralCode" style="font-weight:800; font-size:18px; color:var(--primary); letter-spacing:1px;">DUIT0000</span>
+              <button id="copyReferralBtn" class="btn-bouncy" style="background:#FFF0F3; color:var(--primary); padding:8px 14px; border-radius:12px; font-size:12px; font-weight:700; border:none;">
+                Salin
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Misi Harian -->
+        <div class="card">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+            <span style="font-weight:700; font-size:16px;">🎁 Misi Harian</span>
+            <span id="claimCountLabel" style="font-size:13px; color:var(--text-sec); font-weight:600;">0/35</span>
+          </div>
+          <p style="font-size:13px; color:var(--text-sec); margin-bottom:14px;">Selesaikan misi dan dapatkan <strong>80 Koin</strong> per misi. Maksimal 35 misi per hari.</p>
+          <div class="progress-track" style="margin-bottom:16px;">
+            <div id="claimProgressBar" class="progress-fill" style="width:0%;"></div>
+          </div>
+          <button id="claimMissionBtn" class="btn-bouncy btn-primary" style="width:100%; padding:16px; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>🚀</span> Klaim Misi
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== HALAMAN RIWAYAT ===== -->
+      <section id="page-history" class="page-section">
+        <div class="card">
+          <div style="font-weight:700; font-size:17px; margin-bottom:14px;">📋 Riwayat Transaksi</div>
+          <div id="transactionList">
+            <div style="text-align:center; padding:40px 0; color:var(--text-sec); font-size:14px;">
+              Belum ada transaksi.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== HALAMAN PROFIL ===== -->
+      <section id="page-profile" class="page-section">
+        <div class="card" style="text-align:center; margin-bottom:16px;">
+          <img id="profileAvatar" class="avatar" src="" alt="Avatar" style="width:80px; height:80px; margin:0 auto 12px auto;" />
+          <div id="profileName" style="font-weight:700; font-size:18px;">User</div>
+          <div id="profileEmail" style="font-size:13px; color:var(--text-sec); margin-top:2px;">email@contoh.com</div>
+          <div style="margin-top:16px; display:flex; justify-content:center; gap:24px;">
+            <div style="text-align:center;">
+              <div style="font-size:20px; font-weight:800; color:var(--primary);" id="profileTotalCoins">0</div>
+              <div style="font-size:11px; color:var(--text-sec); font-weight:600;">Total Koin</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:20px; font-weight:800; color:var(--primary);" id="profileTotalClaims">0</div>
+              <div style="font-size:11px; color:var(--text-sec); font-weight:600;">Total Klaim</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0;">
+            <span style="font-size:14px; font-weight:600;">Kode Rujukan</span>
+            <span id="profileReferral" style="font-weight:800; color:var(--primary);">DUIT0000</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-top:1px solid #F5E4E8;">
+            <span style="font-size:14px; font-weight:600;">Status Akun</span>
+            <span style="font-size:13px; font-weight:700; color:var(--success);">✓ Terverifikasi</span>
+          </div>
+        </div>
+        <button id="profileLogoutBtn" class="btn-bouncy" style="width:100%; padding:16px; background:#FFF0F3; color:var(--secondary); font-size:15px; font-weight:700; border:none; border-radius:18px;">
+          🚪 Keluar dari Akun
+        </button>
+      </section>
+
+      <!-- ===== HALAMAN WITHDRAW ===== -->
+      <section id="page-withdraw" class="page-section">
+        <button id="backFromWithdraw" class="btn-bouncy" style="background:transparent; color:var(--primary); font-size:14px; font-weight:700; padding:8px 0; margin-bottom:8px; border:none;">
+          ← Kembali
+        </button>
+        <div class="card">
+          <div style="font-weight:700; font-size:17px; margin-bottom:4px;">💸 Tarik Uang</div>
+          <p style="font-size:13px; color:var(--text-sec); margin-bottom:18px;">Withdraw via DANA. Minimal 5.000 Koin (Rp 500).</p>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:13px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:6px;">Nomor DANA</label>
+            <input id="withdrawPhone" class="input-field" type="tel" placeholder="08xxxxxxxxxx" />
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:13px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:6px;">Jumlah Koin</label>
+            <input id="withdrawAmount" class="input-field" type="number" placeholder="Minimal 5000" min="5000" />
+            <div style="font-size:12px; color:var(--text-sec); margin-top:6px;">
+              ≈ Rp <span id="withdrawRupiahPreview">0</span>
+            </div>
+          </div>
+          <div style="background:#FFF5F7; border-radius:14px; padding:12px 14px; margin-bottom:18px; font-size:12px; color:var(--text-sec);">
+            Saldo kamu: <strong id="withdrawBalance" style="color:var(--primary);">0 Koin</strong>
+          </div>
+          <button id="submitWithdrawBtn" class="btn-bouncy btn-success" style="width:100%; padding:16px; font-size:16px;">
+            Ajukan Penarikan
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BOTTOM NAVIGATION — HANYA MUNCUL SETELAH LOGIN -->
+    <nav class="bottom-nav" id="bottomNav">
+      <button class="nav-item active" data-page="home">
+        <span class="nav-icon">🏠</span>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" data-page="history">
+        <span class="nav-icon">📋</span>
+        <span>Riwayat</span>
+      </button>
+      <button class="nav-item" data-page="profile">
+        <span class="nav-icon">👤</span>
+        <span>Profil</span>
+      </button>
+    </nav>
   </div>
 
-  <!-- ======================= HALAMAN PRODUK ======================= -->
-  <div id="pageProduk" class="hidden">
-    <div class="header-merah">
-      <h1>Produk</h1>
+  <!-- ============================================================ -->
+  <!-- LOADING SCREEN — PENGGANTI SEMENTARA UNTUK IKLAN             -->
+  <!-- ============================================================ -->
+  <!-- LOADING SCREEN INI ADALAH PENGGANTI SEMENTARA UNTUK IKLAN.
+       Setelah AdSense disetujui, ganti seluruh div "loading-screen" 
+       dengan kode AdSense Rewarded Video. -->
+  <div id="loadingScreen" class="loading-screen">
+    <button id="closeLoadingBtn" class="close-loading-btn" disabled>✕</button>
+    <div class="spinning-coin">K</div>
+    <div style="font-size:16px; font-weight:600; opacity:0.95;">Mohon tunggu, sedang menyiapkan reward...</div>
+    <div id="countdownText" class="countdown-text">15</div>
+    <div class="loading-progress-track">
+      <div id="loadingProgressFill" class="loading-progress-fill"></div>
     </div>
-    <div class="container">
-      <div class="page-title">🛍️ Katalog Produk</div>
-      <div class="card" id="produkList">
-        <!-- Produk diisi via JS -->
-      </div>
-    </div>
+    <div id="loadingTip" class="loading-tip">Tahukah kamu? 1.000 Koin = Rp 100</div>
+    <button id="claimRewardBtn" class="btn-bouncy btn-success" style="display:none; padding:16px 40px; font-size:18px; margin-top:20px; border-radius:18px;">
+      🎉 Klaim 80 Koin
+    </button>
   </div>
 
-  <!-- ======================= HALAMAN RIWAYAT ======================= -->
-  <div id="pageRiwayat" class="hidden">
-    <div class="header-merah">
-      <h1>Riwayat</h1>
-    </div>
-    <div class="container">
-      <div class="page-title">📜 Riwayat Kunjungan</div>
-      <div class="card" id="riwayatList">
-        <div class="riwayat-kosong">Belum ada riwayat</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ======================= HALAMAN PROFIL ======================= -->
-  <div id="pageProfil" class="hidden">
-    <div class="header-merah">
-      <h1>Profil</h1>
-    </div>
-    <div class="container">
-      <div class="page-title">👤 Profil Pelanggan</div>
-      <div class="card" id="profilCard">
-        <div class="profil-row">
-          <span class="profil-label">Nama</span>
-          <span class="profil-value" id="profilNama">-</span>
-        </div>
-        <div class="profil-row">
-          <span class="profil-label">No WhatsApp</span>
-          <span class="profil-value" id="profilWA">-</span>
-        </div>
-        <div class="profil-row">
-          <span class="profil-label">Total Kunjungan</span>
-          <span class="profil-value" id="profilTotal">-</span>
-        </div>
-        <div class="profil-row">
-          <span class="profil-label">Status</span>
-          <span class="profil-value" id="profilStatus">-</span>
-        </div>
-        <div class="profil-aksi">
-          <a id="btnHubungi" href="https://wa.me/6283191125094" target="_blank" rel="noopener" class="btn btn-primary btn-block">Hubungi Kami</a>
-          <button id="btnLogoutProfil" class="btn btn-gray btn-block">Logout</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ======================= BOTTOM NAVIGATION ======================= -->
-  <nav id="bottomNav" class="bottom-nav hidden">
-    <div class="nav-item aktif" data-page="home">
-      <span class="nav-icon">🏠</span>
-      <span>Home</span>
-    </div>
-    <div class="nav-item" data-page="produk">
-      <span class="nav-icon">🛍️</span>
-      <span>Produk</span>
-    </div>
-    <div class="nav-item" data-page="riwayat">
-      <span class="nav-icon">📜</span>
-      <span>Riwayat</span>
-    </div>
-    <div class="nav-item" data-page="profil">
-      <span class="nav-icon">👤</span>
-      <span>Profil</span>
-    </div>
-  </nav>
-
-  <script>
+  <!-- ============================================================ -->
+  <!-- FIREBASE SDK 10.12.0 (MODULE)                                -->
+  <!-- ============================================================ -->
+  <script type="module">
     // ============================================================
-    // KONFIGURASI
+    // IMPORTS — Firebase SDK 10.12.0 via CDN (module type)
     // ============================================================
-    var URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbzXzxJ08ucucnfN8G6LClchYLNuggbXW3Kr9bHSzvxEI9M_3bD37Q8zELTW3uM3M5exBw/exec';
-    var TOKEN = 'steammp7000-rahasia-2026';
-
-    var IKLAN_URL_MONETAG = 'https://omg10.com/4/11785165';
-    // IKLAN_URL_ADSTERRA sudah dipasang di <head> sebagai popunder
-
-    var WA_ADMIN = '6283191125094';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      increment,
+      collection,
+      addDoc,
+      query,
+      where,
+      orderBy,
+      getDocs,
+      serverTimestamp,
+      Timestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // ============================================================
-    // STATE
+    // KONFIGURASI FIREBASE
     // ============================================================
-    var state = {
-      noWA: null,
-      nama: '',
-      totalKunjungan: 0,
-      status: '',
-      terakhirCuci: '',
-      halamanAktif: 'home'
+    const firebaseConfig = {
+      apiKey: "AIzaSyApF5o2IMBcXfI1iez-BnkfHUBue_7ToMY",
+      authDomain: "duitin-aja-cbc24.firebaseapp.com",
+      projectId: "duitin-aja-cbc24",
+      storageBucket: "duitin-aja-cbc24.firebasestorage.app",
+      messagingSenderId: "278491222742",
+      appId: "1:278491222742:web:404687a6885c115d152f77"
     };
 
+    // Inisialisasi Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
     // ============================================================
-    // UTILITY
+    // KONSTANTA APLIKASI
     // ============================================================
-    function $(id) {
-      return document.getElementById(id);
+    const COIN_TO_RUPIAH = 0.1;          // 1 Koin = Rp 0,1
+    const CLAIM_REWARD = 80;              // Koin per klaim misi
+    const MAX_CLAIMS_PER_DAY = 35;        // Maks klaim per hari
+    const LOGIN_BONUS = 50;               // Koin login harian
+    const REFERRAL_BONUS = 500;           // Koin kode rujukan
+    const MIN_WITHDRAW_COINS = 5000;      // Minimal withdraw
+    const LOADING_DURATION = 15;          // Detik loading screen
+
+    // ============================================================
+    // STATE GLOBAL
+    // ============================================================
+    let currentUser = null;               // Firebase user object
+    let userData = null;                  // Data user dari Firestore
+    let unsubscribeUserDoc = null;        // Listener snapshot user doc
+    let countdownInterval = null;         // Interval countdown loading
+    let tipInterval = null;               // Interval tips loading
+    let loadingSecondsLeft = 0;           // Sisa detik loading
+    let claimButtonReady = false;         // Status tombol klaim di loading
+
+    // ============================================================
+    // DOM REFERENCES
+    // ============================================================
+    const $ = (id) => document.getElementById(id);
+
+    const loginPage = $("loginPage");
+    const mainApp = $("mainApp");
+    const googleLoginBtn = $("googleLoginBtn");
+    const logoutBtn = $("logoutBtn");
+    const profileLogoutBtn = $("profileLogoutBtn");
+
+    const totalCoinsEl = $("totalCoins");
+    const rupiahValueEl = $("rupiahValue");
+    const myReferralCodeEl = $("myReferralCode");
+    const referralInput = $("referralInput");
+    const confirmReferralBtn = $("confirmReferralBtn");
+    const copyReferralBtn = $("copyReferralBtn");
+
+    const claimCountLabel = $("claimCountLabel");
+    const claimProgressBar = $("claimProgressBar");
+    const claimMissionBtn = $("claimMissionBtn");
+
+    const transactionList = $("transactionList");
+    const profileAvatar = $("profileAvatar");
+    const profileName = $("profileName");
+    const profileEmail = $("profileEmail");
+    const profileTotalCoins = $("profileTotalCoins");
+    const profileTotalClaims = $("profileTotalClaims");
+    const profileReferral = $("profileReferral");
+    const headerAvatar = $("headerAvatar");
+
+    const withdrawBtn = $("withdrawBtn");
+    const withdrawPhone = $("withdrawPhone");
+    const withdrawAmount = $("withdrawAmount");
+    const withdrawRupiahPreview = $("withdrawRupiahPreview");
+    const withdrawBalance = $("withdrawBalance");
+    const submitWithdrawBtn = $("submitWithdrawBtn");
+    const backFromWithdraw = $("backFromWithdraw");
+
+    const loadingScreen = $("loadingScreen");
+    const closeLoadingBtn = $("closeLoadingBtn");
+    const countdownText = $("countdownText");
+    const loadingProgressFill = $("loadingProgressFill");
+    const loadingTip = $("loadingTip");
+    const claimRewardBtn = $("claimRewardBtn");
+
+    const bottomNav = $("bottomNav");
+    const navItems = document.querySelectorAll(".nav-item");
+
+    // ============================================================
+    // FUNGSI UTILITAS
+    // ============================================================
+
+    /**
+     * Format angka dengan pemisah ribuan (contoh: 2800 -> "2.800")
+     */
+    function formatNumber(num) {
+      return num.toLocaleString("id-ID");
     }
 
-    function sembunyikanSemuaHalaman() {
-      var halaman = ['pageLogin', 'pageHome', 'pageProduk', 'pageRiwayat', 'pageProfil'];
-      halaman.forEach(function(id) {
-        var el = $(id);
-        if (el) el.classList.add('hidden');
+    /**
+     * Konversi Koin ke Rupiah
+     */
+    function coinsToRupiah(coins) {
+      return Math.round(coins * COIN_TO_RUPIAH);
+    }
+
+    /**
+     * Mendapatkan tanggal hari ini dalam format "YYYY-MM-DD"
+     */
+    function getTodayDateString() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    /**
+     * Menampilkan notifikasi toast
+     */
+    function showToast(message, duration = 2800) {
+      const existing = document.querySelector(".toast");
+      if (existing) existing.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => toast.classList.add("show"));
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 400);
+      }, duration);
+    }
+
+    /**
+     * Animasi koin jatuh dari atas layar
+     */
+    function coinRain(count = 20) {
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          const coin = document.createElement("div");
+          coin.className = "coin-rain";
+          coin.textContent = "🪙";
+          coin.style.left = Math.random() * 100 + "vw";
+          coin.style.animationDuration = (1.2 + Math.random() * 1.2) + "s";
+          coin.style.fontSize = (20 + Math.random() * 24) + "px";
+          document.body.appendChild(coin);
+          setTimeout(() => coin.remove(), 2400);
+        }, i * 60);
+      }
+    }
+
+    /**
+     * Menghasilkan kode rujukan acak "DUIT" + 4 digit
+     */
+    function generateReferralCode() {
+      const digits = String(Math.floor(1000 + Math.random() * 9000));
+      return "DUIT" + digits;
+    }
+
+    /**
+     * Menampilkan halaman tertentu (home/history/profile/withdraw)
+     */
+    function showPage(pageName) {
+      document.querySelectorAll(".page-section").forEach((el) => el.classList.remove("active"));
+      const target = $("page-" + pageName);
+      if (target) target.classList.add("active");
+
+      // Update bottom nav active state
+      navItems.forEach((item) => {
+        item.classList.toggle("active", item.dataset.page === pageName);
       });
-      // bottom nav hanya tampil kalau sudah login
-      if (state.noWA) {
-        $('bottomNav').classList.remove('hidden');
+
+      // Scroll ke atas
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // ============================================================
+    // FUNGSI FIRESTORE — USER
+    // ============================================================
+
+    /**
+     * Membuat atau mengambil data user dari Firestore
+     */
+    async function ensureUserDocument(user) {
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        // Buat dokumen user baru
+        const referralCode = generateReferralCode();
+        const newUserData = {
+          uid: user.uid,
+          username: user.displayName || "Pengguna",
+          email: user.email || "",
+          photoURL: user.photoURL || "",
+          total_coins: 0,
+          claims_today: 0,
+          last_claim_date: "",
+          referral_code: referralCode,
+          referred_by: null,
+          created_at: serverTimestamp(),
+        };
+        await setDoc(userRef, newUserData);
+        return { ...newUserData, created_at: Timestamp.now() };
       } else {
-        $('bottomNav').classList.add('hidden');
+        return userSnap.data();
       }
     }
 
-    function tampilkanHalaman(nama) {
-      sembunyikanSemuaHalaman();
-
-      if (nama === 'login') {
-        $('pageLogin').classList.remove('hidden');
-        $('bottomNav').classList.add('hidden');
-        state.halamanAktif = 'login';
-        return;
+    /**
+     * Memuat ulang data user ke state global & UI
+     */
+    async function refreshUserData() {
+      if (!currentUser) return;
+      const userRef = doc(db, "users", currentUser.uid);
+      const snap = await getDoc(userRef);
+      if (snap.exists()) {
+        userData = snap.data();
+        updateUIFromUserData();
       }
-
-      // Pastikan sudah login
-      if (!state.noWA) {
-        tampilkanHalaman('login');
-        return;
-      }
-
-      $('bottomNav').classList.remove('hidden');
-      state.halamanAktif = nama;
-
-      if (nama === 'home') {
-        $('pageHome').classList.remove('hidden');
-        perbaruiTampilanHome();
-      } else if (nama === 'produk') {
-        $('pageProduk').classList.remove('hidden');
-        renderProduk();
-      } else if (nama === 'riwayat') {
-        $('pageRiwayat').classList.remove('hidden');
-        muatRiwayat();
-      } else if (nama === 'profil') {
-        $('pageProfil').classList.remove('hidden');
-        perbaruiTampilanProfil();
-      }
-
-      // Update bottom nav aktif
-      var navItems = document.querySelectorAll('.bottom-nav .nav-item');
-      navItems.forEach(function(item) {
-        if (item.dataset.page === nama) {
-          item.classList.add('aktif');
-        } else {
-          item.classList.remove('aktif');
-        }
-      });
     }
 
-    function formatTanggal(isoString) {
-      if (!isoString) return '-';
+    /**
+     * Update seluruh UI berdasarkan userData
+     */
+    function updateUIFromUserData() {
+      if (!userData) return;
+
+      const coins = userData.total_coins || 0;
+      const claimsToday = userData.claims_today || 0;
+
+      // Home
+      totalCoinsEl.textContent = formatNumber(coins);
+      rupiahValueEl.textContent = formatNumber(coinsToRupiah(coins));
+      myReferralCodeEl.textContent = userData.referral_code || "DUIT0000";
+
+      // Progress misi
+      claimCountLabel.textContent = `${claimsToday}/${MAX_CLAIMS_PER_DAY}`;
+      claimProgressBar.style.width = (claimsToday / MAX_CLAIMS_PER_DAY) * 100 + "%";
+
+      // Tombol klaim
+      claimMissionBtn.disabled = claimsToday >= MAX_CLAIMS_PER_DAY;
+      if (claimsToday >= MAX_CLAIMS_PER_DAY) {
+        claimMissionBtn.innerHTML = "<span>✅</span> Misi Harian Selesai";
+      } else {
+        claimMissionBtn.innerHTML = "<span>🚀</span> Klaim Misi";
+      }
+
+      // Withdraw balance
+      withdrawBalance.textContent = formatNumber(coins) + " Koin";
+
+      // Profile
+      profileTotalCoins.textContent = formatNumber(coins);
+      profileTotalClaims.textContent = formatNumber(claimsToday);
+      profileReferral.textContent = userData.referral_code || "DUIT0000";
+      profileName.textContent = userData.username || "Pengguna";
+      profileEmail.textContent = userData.email || "";
+      profileAvatar.src = userData.photoURL || "https://via.placeholder.com/80";
+      headerAvatar.src = userData.photoURL || "https://via.placeholder.com/40";
+
+      // Referral sudah pernah dipakai?
+      if (userData.referred_by) {
+        referralInput.disabled = true;
+        referralInput.placeholder = "Kode sudah pernah digunakan";
+        confirmReferralBtn.disabled = true;
+        confirmReferralBtn.textContent = "✓";
+      }
+    }
+
+    // ============================================================
+    // FUNGSI LOGIN / LOGOUT
+    // ============================================================
+
+    /**
+     * Login dengan Google
+     */
+    async function signInWithGoogle() {
+      const provider = new GoogleAuthProvider();
       try {
-        var d = new Date(isoString);
-        if (isNaN(d.getTime())) return '-';
-        var bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        return d.getDate() + ' ' + bulan[d.getMonth()] + ' ' + d.getFullYear();
-      } catch (e) {
-        return '-';
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        console.error("Login error:", error);
+        showToast("Gagal login: " + (error.message || "Coba lagi"));
+      }
+    }
+
+    /**
+     * Logout dari akun
+     */
+    async function handleLogout() {
+      try {
+        await signOut(auth);
+      } catch (error) {
+        console.error("Logout error:", error);
+        showToast("Gagal logout");
       }
     }
 
     // ============================================================
-    // VALIDASI NOMOR WA
+    // FUNGSI KLAIM MISI
     // ============================================================
-    function validasiNoWA(noWA) {
-      if (!noWA) return 'Nomor WhatsApp wajib diisi.';
-      if (noWA[0] !== '0') return 'Format nomor harus pakai 0 di depan ya!';
-      if (!/^\d{10,13}$/.test(noWA)) return 'Nomor harus 10-13 digit angka.';
-      return null; // valid
+
+    /**
+     * Membuka loading screen 15 detik
+     */
+    function openLoadingScreen() {
+      loadingScreen.classList.add("active");
+      claimButtonReady = false;
+      claimRewardBtn.style.display = "none";
+      closeLoadingBtn.disabled = true;
+      loadingProgressFill.style.width = "0%";
+      countdownText.textContent = LOADING_DURATION;
+      loadingTip.textContent = "Tahukah kamu? 1.000 Koin = Rp 100";
+
+      loadingSecondsLeft = LOADING_DURATION;
+
+      // Interval countdown
+      countdownInterval = setInterval(() => {
+        loadingSecondsLeft--;
+        countdownText.textContent = loadingSecondsLeft;
+        const progressPercent = ((LOADING_DURATION - loadingSecondsLeft) / LOADING_DURATION) * 100;
+        loadingProgressFill.style.width = progressPercent + "%";
+
+        // Ganti tips setiap 5 detik
+        if (loadingSecondsLeft >= 11) {
+          loadingTip.textContent = "Tahukah kamu? 1.000 Koin = Rp 100";
+        } else if (loadingSecondsLeft >= 6) {
+          loadingTip.textContent = "Ajak temanmu, dapat 500 Koin!";
+        } else if (loadingSecondsLeft >= 1) {
+          loadingTip.textContent = "Withdraw minimal 5.000 Koin via DANA";
+        }
+
+        // Timer habis
+        if (loadingSecondsLeft <= 0) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+          countdownText.textContent = "0";
+          loadingProgressFill.style.width = "100%";
+          claimButtonReady = true;
+          closeLoadingBtn.disabled = false;
+          claimRewardBtn.style.display = "inline-flex";
+          loadingTip.textContent = "🎉 Reward siap diklaim!";
+        }
+      }, 1000);
+    }
+
+    /**
+     * Menutup loading screen (tanpa klaim jika belum selesai)
+     */
+    function closeLoadingScreen() {
+      if (!claimButtonReady) {
+        // Jika belum 15 detik, konfirmasi
+        const yakin = confirm("Reward belum selesai disiapkan. Tutup dan tidak dapat Koin?");
+        if (!yakin) return;
+      }
+      loadingScreen.classList.remove("active");
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+      claimButtonReady = false;
+    }
+
+    /**
+     * Proses klaim misi setelah loading selesai
+     */
+    async function processClaim() {
+      if (!currentUser || !userData) {
+        showToast("Silakan login terlebih dahulu");
+        return;
+      }
+
+      // Tutup loading screen
+      loadingScreen.classList.remove("active");
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+
+      try {
+        const userRef = doc(db, "users", currentUser.uid);
+        const today = getTodayDateString();
+
+        // Baca data terbaru
+        const snap = await getDoc(userRef);
+        const freshData = snap.data();
+
+        let claimsToday = freshData.claims_today || 0;
+        let lastClaimDate = freshData.last_claim_date || "";
+
+        // Reset jika beda hari
+        if (lastClaimDate !== today) {
+          claimsToday = 0;
+        }
+
+        // Cek batas maksimal
+        if (claimsToday >= MAX_CLAIMS_PER_DAY) {
+          showToast("Misi harian sudah habis! Kembali besok ya 😊");
+          await refreshUserData();
+          return;
+        }
+
+        // Update Firestore
+        await updateDoc(userRef, {
+          total_coins: increment(CLAIM_REWARD),
+          claims_today: claimsToday + 1,
+          last_claim_date: today,
+        });
+
+        // Tambah transaksi
+        await addDoc(collection(db, "transactions"), {
+          user_id: currentUser.uid,
+          type: "claim",
+          amount: CLAIM_REWARD,
+          timestamp: serverTimestamp(),
+        });
+
+        // Refresh UI
+        await refreshUserData();
+
+        // Notifikasi & animasi
+        showToast("Yeay! Kamu dapat 80 Koin! 🎉");
+        coinRain(24);
+      } catch (error) {
+        console.error("Claim error:", error);
+        showToast("Gagal klaim misi: " + (error.message || "Coba lagi"));
+      }
     }
 
     // ============================================================
-    // FETCH KE APPS SCRIPT
+    // FUNGSI REFERRAL
     // ============================================================
-    function panggilAppsScript(action, dataTambahan) {
-      var body = {
-        token: TOKEN,
-        action: action
-      };
-      if (dataTambahan) {
-        for (var key in dataTambahan) {
-          if (dataTambahan.hasOwnProperty(key)) {
-            body[key] = dataTambahan[key];
+
+    /**
+     * Konfirmasi kode rujukan
+     */
+    async function confirmReferral() {
+      if (!currentUser || !userData) return;
+
+      // Cek apakah sudah pernah pakai referral
+      if (userData.referred_by) {
+        showToast("Kamu sudah pernah menggunakan kode rujukan");
+        return;
+      }
+
+      const code = referralInput.value.trim().toUpperCase();
+      if (!code) {
+        showToast("Masukkan kode rujukan terlebih dahulu");
+        return;
+      }
+
+      if (code === userData.referral_code) {
+        showToast("Tidak bisa menggunakan kode sendiri");
+        return;
+      }
+
+      try {
+        // Cari user dengan referral_code = code
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("referral_code", "==", code));
+        const querySnap = await getDocs(q);
+
+        if (querySnap.empty) {
+          showToast("Kode rujukan tidak ditemukan");
+          return;
+        }
+
+        // Update user saat ini: referred_by + bonus
+        const userRef = doc(db, "users", currentUser.uid);
+        await updateDoc(userRef, {
+          referred_by: code,
+          total_coins: increment(REFERRAL_BONUS),
+        });
+
+        // Tambah transaksi
+        await addDoc(collection(db, "transactions"), {
+          user_id: currentUser.uid,
+          type: "referral",
+          amount: REFERRAL_BONUS,
+          timestamp: serverTimestamp(),
+        });
+
+        await refreshUserData();
+        showToast("Berhasil! Kamu dapat 500 Koin! 🎁");
+        coinRain(16);
+      } catch (error) {
+        console.error("Referral error:", error);
+        showToast("Gagal menggunakan kode: " + (error.message || "Coba lagi"));
+      }
+    }
+
+    // ============================================================
+    // FUNGSI RIWAYAT TRANSAKSI
+    // ============================================================
+
+    /**
+     * Memuat riwayat transaksi user
+     */
+    async function loadTransactions() {
+      if (!currentUser) return;
+
+      try {
+        const q = query(
+          collection(db, "transactions"),
+          where("user_id", "==", currentUser.uid),
+          orderBy("timestamp", "desc")
+        );
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+          transactionList.innerHTML = `
+            <div style="text-align:center; padding:40px 0; color:var(--text-sec); font-size:14px;">
+              Belum ada transaksi.
+            </div>`;
+          return;
+        }
+
+        let html = "";
+        snap.forEach((docSnap) => {
+          const tx = docSnap.data();
+          const date = tx.timestamp?.toDate
+            ? tx.timestamp.toDate().toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "Baru saja";
+
+          const isPositive = tx.amount > 0;
+          const icon = tx.type === "claim" ? "🎁" : tx.type === "referral" ? "🎟️" : "💰";
+          const label = tx.type === "claim" ? "Klaim Misi" : tx.type === "referral" ? "Bonus Rujukan" : "Transaksi";
+
+          html += `
+            <div class="tx-item">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:20px;">${icon}</span>
+                <div>
+                  <div style="font-weight:600; font-size:14px;">${label}</div>
+                  <div style="font-size:11px; color:var(--text-sec);">${date}</div>
+                </div>
+              </div>
+              <div style="font-weight:700; font-size:14px; color:${isPositive ? "var(--success)" : "var(--secondary)"};">
+                ${isPositive ? "+" : ""}${formatNumber(tx.amount)} K
+              </div>
+            </div>`;
+        });
+        transactionList.innerHTML = html;
+      } catch (error) {
+        console.error("Load transactions error:", error);
+        // Fallback jika index belum dibuat
+        transactionList.innerHTML = `
+          <div style="text-align:center; padding:40px 0; color:var(--text-sec); font-size:13px;">
+            Gagal memuat riwayat. Pastikan index Firestore sudah dibuat.
+          </div>`;
+      }
+    }
+
+    // ============================================================
+    // FUNGSI WITHDRAW
+    // ============================================================
+
+    /**
+     * Preview Rupiah saat input jumlah koin berubah
+     */
+    function updateWithdrawPreview() {
+      const amount = parseInt(withdrawAmount.value) || 0;
+      withdrawRupiahPreview.textContent = formatNumber(coinsToRupiah(amount));
+    }
+
+    /**
+     * Submit pengajuan withdraw
+     */
+    async function submitWithdraw() {
+      if (!currentUser || !userData) return;
+
+      const phone = withdrawPhone.value.trim();
+      const amountCoins = parseInt(withdrawAmount.value) || 0;
+      const coins = userData.total_coins || 0;
+
+      // Validasi
+      if (!phone || phone.length < 10) {
+        showToast("Masukkan nomor DANA yang valid");
+        return;
+      }
+      if (amountCoins < MIN_WITHDRAW_COINS) {
+        showToast("Minimal withdraw 5.000 Koin");
+        return;
+      }
+      if (amountCoins > coins) {
+        showToast("Saldo Koin tidak mencukupi");
+        return;
+      }
+
+      try {
+        // Kurangi saldo user
+        const userRef = doc(db, "users", currentUser.uid);
+        await updateDoc(userRef, {
+          total_coins: increment(-amountCoins),
+        });
+
+        // Buat dokumen withdrawal
+        await addDoc(collection(db, "withdrawals"), {
+          user_id: currentUser.uid,
+          method: "DANA",
+          phone_number: phone,
+          amount_coins: amountCoins,
+          amount_rupiah: coinsToRupiah(amountCoins),
+          status: "pending",
+          timestamp: serverTimestamp(),
+        });
+
+        // Tambah transaksi
+        await addDoc(collection(db, "transactions"), {
+          user_id: currentUser.uid,
+          type: "withdraw",
+          amount: -amountCoins,
+          timestamp: serverTimestamp(),
+        });
+
+        await refreshUserData();
+        showToast("Pengajuan withdraw berhasil! Diproses 1x24 jam ⏳");
+
+        // Reset form
+        withdrawPhone.value = "";
+        withdrawAmount.value = "";
+        withdrawRupiahPreview.textContent = "0";
+
+        // Kembali ke home
+        setTimeout(() => showPage("home"), 1200);
+      } catch (error) {
+        console.error("Withdraw error:", error);
+        showToast("Gagal withdraw: " + (error.message || "Coba lagi"));
+      }
+    }
+
+    // ============================================================
+    // FUNGSI NAVIGASI
+    // ============================================================
+
+    /**
+     * Setup event listener untuk bottom navigation
+     */
+    function setupNavigation() {
+      navItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          const page = item.dataset.page;
+          if (page === "history") {
+            loadTransactions();
           }
-        }
-      }
-
-      return fetch(URL_APPS_SCRIPT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8'
-        },
-        body: JSON.stringify(body)
-      })
-      .then(function(res) {
-        return res.text();
-      })
-      .then(function(text) {
-        try {
-          return JSON.parse(text);
-        } catch (e) {
-          throw new Error('Respons tidak valid: ' + text.substring(0, 100));
-        }
+          showPage(page);
+        });
       });
     }
 
     // ============================================================
-    // LOGIN
+    // FUNGSI BONUS LOGIN HARIAN
     // ============================================================
-    function prosesLogin() {
-      var input = $('inputWA');
-      var errorEl = $('loginError');
-      var noWA = input.value.trim();
 
-      // Validasi client-side
-      var err = validasiNoWA(noWA);
-      if (err) {
-        errorEl.textContent = err;
-        return;
-      }
-      errorEl.textContent = '';
+    /**
+     * Cek & berikan bonus login harian (50 Koin)
+     */
+    async function giveDailyLoginBonus() {
+      if (!currentUser || !userData) return;
 
-      // Tampilkan loading
-      var btn = $('btnLogin');
-      btn.disabled = true;
-      btn.textContent = 'Memuat...';
+      const today = getTodayDateString();
+      const lastLoginBonus = localStorage.getItem("lastLoginBonus_" + currentUser.uid);
 
-      panggilAppsScript('cekProgres', { noWA: noWA })
-        .then(function(data) {
-          btn.disabled = false;
-          btn.textContent = 'Lihat Progres';
+      if (lastLoginBonus === today) return; // sudah dapat hari ini
 
-          if (data && data.sukses) {
-            // Simpan ke state
-            state.noWA = noWA;
-            state.nama = data.nama || 'Pelanggan';
-            state.totalKunjungan = data.totalKunjungan || 0;
-            state.status = data.status || 'Proses';
-            state.terakhirCuci = data.terakhirCuci || '';
-
-            // Simpan ke localStorage
-            localStorage.setItem('steam_mp7000_noWA', noWA);
-
-            // Tampilkan home
-            tampilkanHalaman('home');
-          } else {
-            errorEl.textContent = (data && data.pesan) ? data.pesan : 'Nomor tidak ditemukan. Hubungi admin.';
-          }
-        })
-        .catch(function(err) {
-          btn.disabled = false;
-          btn.textContent = 'Lihat Progres';
-          errorEl.textContent = 'Gagal terhubung. Coba lagi. (' + err.message + ')';
+      try {
+        const userRef = doc(db, "users", currentUser.uid);
+        await updateDoc(userRef, {
+          total_coins: increment(LOGIN_BONUS),
         });
-    }
 
-    // ============================================================
-    // HOME
-    // ============================================================
-    function perbaruiTampilanHome() {
-      if (!state.noWA) return;
-
-      // Sapaan
-      $('sapaanHome').textContent = 'Halo, ' + (state.nama || 'Pelanggan') + '! 👋';
-
-      // Progres
-      var total = state.totalKunjungan || 0;
-      var target = 10;
-      var persen = Math.min((total / target) * 100, 100);
-
-      $('progressLabel').textContent = 'Kunjungan ke-' + total + ' dari ' + target;
-      $('progressFill').style.width = persen + '%';
-
-      // Pesan penyemangat
-      var sisa = target - total;
-      var motivasi = '';
-      if (total === 0) {
-        motivasi = 'Ayo mulai cuci motor pertamamu! 💨';
-      } else if (sisa > 0) {
-        motivasi = 'Tinggal ' + sisa + 'x lagi gratis! 💨';
-      } else {
-        motivasi = 'Selamat! Kamu sudah bisa gratis 1x cuci! 🎉';
-      }
-      $('progressMotivation').textContent = motivasi;
-
-      // Info terakhir cuci
-      $('infoTerakhir').textContent = '🕐 Terakhir cuci: ' + formatTanggal(state.terakhirCuci);
-    }
-
-    // ============================================================
-    // PRODUK
-    // ============================================================
-    var PRODUK_LIST = [
-      { nama: 'Kain Mikrofiber', harga: 'Rp15.000', emoji: '🧽' },
-      { nama: 'Kanebo', harga: 'Rp25.000', emoji: '🧴' },
-      { nama: 'Sabun', harga: 'Rp10.000', emoji: '🧼' },
-      { nama: 'Pengilap', harga: 'Rp30.000', emoji: '✨' }
-    ];
-
-    function renderProduk() {
-      var container = $('produkList');
-      if (!container) return;
-
-      var html = '';
-      PRODUK_LIST.forEach(function(p) {
-        var linkWA = 'https://wa.me/' + WA_ADMIN + '?text=' + encodeURIComponent('Halo, saya mau ambil ' + p.nama + ' di toko');
-        // Placeholder link Shopee – nanti diisi
-        var linkShopee = '#';
-
-        html += '<div class="produk-item">';
-        html += '  <div class="produk-foto">' + p.emoji + '</div>';
-        html += '  <div class="produk-info">';
-        html += '    <div class="nama">' + p.nama + '</div>';
-        html += '    <div class="harga">' + p.harga + '</div>';
-        html += '    <div class="produk-aksi">';
-        html += '      <a href="' + linkWA + '" target="_blank" rel="noopener" class="btn btn-primary">Ambil di Toko</a>';
-        html += '      <a href="' + linkShopee + '" target="_blank" rel="noopener" class="btn btn-secondary">Beli Online</a>';
-        html += '    </div>';
-        html += '  </div>';
-        html += '</div>';
-      });
-
-      container.innerHTML = html;
-    }
-
-    // ============================================================
-    // RIWAYAT
-    // ============================================================
-    function muatRiwayat() {
-      var container = $('riwayatList');
-      if (!container) return;
-
-      if (!state.noWA) {
-        container.innerHTML = '<div class="riwayat-kosong">Belum ada riwayat</div>';
-        return;
-      }
-
-      container.innerHTML = '<div class="riwayat-kosong">Memuat riwayat...</div>';
-
-      panggilAppsScript('getRiwayat', { noWA: state.noWA })
-        .then(function(data) {
-          if (data && data.sukses && data.riwayat && data.riwayat.length > 0) {
-            var html = '';
-            data.riwayat.forEach(function(item) {
-              html += '<div class="riwayat-item">';
-              html += '  <div>';
-              html += '    <div class="riwayat-tanggal">' + formatTanggal(item.tanggal) + '</div>';
-              html += '    <div class="riwayat-detail">' + (item.plat || '-') + ' · ' + (item.jenisMotor || '-') + '</div>';
-              html += '  </div>';
-              html += '</div>';
-            });
-            container.innerHTML = html;
-          } else {
-            container.innerHTML = '<div class="riwayat-kosong">Belum ada riwayat</div>';
-          }
-        })
-        .catch(function() {
-          container.innerHTML = '<div class="riwayat-kosong">Belum ada riwayat</div>';
+        await addDoc(collection(db, "transactions"), {
+          user_id: currentUser.uid,
+          type: "login_bonus",
+          amount: LOGIN_BONUS,
+          timestamp: serverTimestamp(),
         });
+
+        localStorage.setItem("lastLoginBonus_" + currentUser.uid, today);
+        await refreshUserData();
+        showToast("Bonus login harian: +50 Koin! 🎉");
+        coinRain(10);
+      } catch (error) {
+        console.error("Login bonus error:", error);
+      }
     }
 
     // ============================================================
-    // PROFIL
+    // FUNGSI AUTH STATE LISTENER
     // ============================================================
-    function perbaruiTampilanProfil() {
-      if (!state.noWA) return;
 
-      $('profilNama').textContent = state.nama || 'Pelanggan';
-      $('profilWA').textContent = state.noWA;
-      $('profilTotal').textContent = state.totalKunjungan + 'x';
-      $('profilStatus').textContent = state.status || 'Proses';
+    /**
+     * Listener utama perubahan status autentikasi
+     */
+    function setupAuthListener() {
+      onAuthStateChanged(auth, async (user) => {
+        // Bersihkan listener user doc sebelumnya
+        if (unsubscribeUserDoc) {
+          unsubscribeUserDoc();
+          unsubscribeUserDoc = null;
+        }
 
-      // Tombol hubungi
-      $('btnHubungi').href = 'https://wa.me/' + WA_ADMIN;
-    }
+        if (user) {
+          // ===== USER LOGIN =====
+          currentUser = user;
 
-    // ============================================================
-    // LOGOUT
-    // ============================================================
-    function logout() {
-      localStorage.removeItem('steam_mp7000_noWA');
-      state.noWA = null;
-      state.nama = '';
-      state.totalKunjungan = 0;
-      state.status = '';
-      state.terakhirCuci = '';
-      $('inputWA').value = '';
-      $('loginError').textContent = '';
-      tampilkanHalaman('login');
-    }
+          // Sembunyikan login page, tampilkan main app
+          loginPage.style.display = "none";
+          mainApp.style.display = "block";
 
-    // ============================================================
-    // INISIALISASI
-    // ============================================================
-    function init() {
-      // Cek localStorage
-      var tersimpan = localStorage.getItem('steam_mp7000_noWA');
-      if (tersimpan) {
-        // Validasi cepat
-        if (tersimpan[0] === '0' && /^\d{10,13}$/.test(tersimpan)) {
-          state.noWA = tersimpan;
-          // Panggil cekProgres untuk refresh data
-          panggilAppsScript('cekProgres', { noWA: tersimpan })
-            .then(function(data) {
-              if (data && data.sukses) {
-                state.nama = data.nama || 'Pelanggan';
-                state.totalKunjungan = data.totalKunjungan || 0;
-                state.status = data.status || 'Proses';
-                state.terakhirCuci = data.terakhirCuci || '';
-                tampilkanHalaman('home');
-              } else {
-                // Data tidak valid, logout
-                logout();
-              }
-            })
-            .catch(function() {
-              // Gagal fetch, tetap tampilkan home dengan data minimal
-              state.nama = 'Pelanggan';
-              state.totalKunjungan = 0;
-              state.status = 'Proses';
-              state.terakhirCuci = '';
-              tampilkanHalaman('home');
-            });
+          // Pastikan bottom nav terlihat
+          bottomNav.style.display = "flex";
+
+          // Inisialisasi / ambil data user
+          userData = await ensureUserDocument(user);
+          updateUIFromUserData();
+
+          // Beri bonus login harian
+          await giveDailyLoginBonus();
+
+          // Muat riwayat transaksi
+          await loadTransactions();
+
+          // Set halaman awal ke home
+          showPage("home");
+
+          // Listen perubahan dokumen user secara real-time
+          const userRef = doc(db, "users", user.uid);
+          // (Opsional: gunakan onSnapshot jika ingin real-time)
+          // Untuk kesederhanaan, refresh manual setelah aksi.
         } else {
-          localStorage.removeItem('steam_mp7000_noWA');
-          tampilkanHalaman('login');
+          // ===== USER LOGOUT =====
+          currentUser = null;
+          userData = null;
+
+          // Tampilkan login page, sembunyikan main app
+          loginPage.style.display = "flex";
+          mainApp.style.display = "none";
+
+          // Sembunyikan bottom nav
+          bottomNav.style.display = "none";
+
+          // Reset form
+          referralInput.value = "";
+          referralInput.disabled = false;
+          confirmReferralBtn.disabled = false;
+          confirmReferralBtn.textContent = "Konfirmasi";
         }
-      } else {
-        tampilkanHalaman('login');
-      }
+      });
     }
 
     // ============================================================
-    // EVENT LISTENER
+    // SETUP EVENT LISTENER
     // ============================================================
-    document.addEventListener('DOMContentLoaded', function() {
+
+    function setupEventListeners() {
       // Login
-      $('btnLogin').addEventListener('click', prosesLogin);
-      $('inputWA').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') prosesLogin();
-      });
+      googleLoginBtn.addEventListener("click", signInWithGoogle);
 
       // Logout
-      $('btnLogoutHome').addEventListener('click', logout);
-      $('btnLogoutProfil').addEventListener('click', logout);
+      logoutBtn.addEventListener("click", handleLogout);
+      profileLogoutBtn.addEventListener("click", handleLogout);
 
-      // Tonton Iklan
-      $('btnTontonIklan').addEventListener('click', function() {
-        window.open(IKLAN_URL_MONETAG, '_blank');
-      });
-
-      // Bottom Nav
-      document.querySelectorAll('.bottom-nav .nav-item').forEach(function(item) {
-        item.addEventListener('click', function() {
-          var page = this.dataset.page;
-          if (page) tampilkanHalaman(page);
+      // Referral
+      confirmReferralBtn.addEventListener("click", confirmReferral);
+      copyReferralBtn.addEventListener("click", () => {
+        const code = myReferralCodeEl.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          showToast("Kode rujukan disalin! 📋");
+        }).catch(() => {
+          showToast("Gagal menyalin kode");
         });
       });
 
-      // Mulai
+      // Klaim Misi
+      claimMissionBtn.addEventListener("click", () => {
+        if (claimMissionBtn.disabled) return;
+        openLoadingScreen();
+      });
+
+      // Loading screen
+      closeLoadingBtn.addEventListener("click", closeLoadingScreen);
+      claimRewardBtn.addEventListener("click", processClaim);
+
+      // Withdraw
+      withdrawBtn.addEventListener("click", () => showPage("withdraw"));
+      backFromWithdraw.addEventListener("click", () => showPage("home"));
+      withdrawAmount.addEventListener("input", updateWithdrawPreview);
+      submitWithdrawBtn.addEventListener("click", submitWithdraw);
+
+      // Navigasi
+      setupNavigation();
+    }
+
+    // ============================================================
+    // INISIALISASI APLIKASI
+    // ============================================================
+
+    function init() {
+      setupEventListeners();
+      setupAuthListener();
+    }
+
+    // Jalankan saat DOM siap
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
       init();
-    });
+    }
+
+    // ============================================================
+    // CATATAN KEAMANAN FIRESTORE
+    // ============================================================
+    /*
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /users/{userId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+        match /transactions/{transactionId} {
+          allow read: if request.auth != null && request.auth.uid == resource.data.user_id;
+          allow create: if request.auth != null;
+        }
+        match /withdrawals/{withdrawalId} {
+          allow read, create: if request.auth != null && request.auth.uid == request.resource.data.user_id;
+        }
+      }
+    }
+    */
   </script>
+
+  <!-- ============================================================ -->
+  <!-- PANDUAN DEPLOY & GANTI ADSENSE (KOMENTAR)                     -->
+  <!-- ============================================================ -->
+  <!--
+  ============================================================
+  PANDUAN DEPLOY KE GITHUB PAGES
+  ============================================================
+  1. Buat repository baru di GitHub (misal: duitin-aja).
+  2. Upload file index.html ke repository tersebut.
+  3. Buka Settings > Pages.
+  4. Pada "Branch", pilih "main" dan folder "/ (root)".
+  5. Klik Save. Tunggu 1-2 menit.
+  6. Aplikasi akan tersedia di:
+     https://<username>.github.io/duitin-aja/
+  7. Pastikan domain GitHub Pages sudah ditambahkan di
+     Firebase Console > Authentication > Sign-in method >
+     Authorized domains.
+  ============================================================
+
+  ============================================================
+  CARA GANTI LOADING SCREEN DENGAN ADSENSE NANTI
+  ============================================================
+  1. Cari komentar:
+     "LOADING SCREEN INI ADALAH PENGGANTI SEMENTARA UNTUK IKLAN."
+  2. Hapus seluruh <div id="loadingScreen" class="loading-screen"> ... </div>
+  3. Ganti dengan kode AdSense Rewarded Video, contoh:
+     <div id="adContainer"></div>
+     <script>
+       // Inisialisasi AdSense Rewarded
+       // adBreakDone callback -> panggil processClaim()
+     </script>
+  4. Pastikan fungsi processClaim() tetap dipanggil setelah
+     user selesai menonton iklan.
+  5. Hapus atau nonaktifkan fungsi openLoadingScreen() dan
+     closeLoadingScreen() yang lama.
+  ============================================================
+  -->
 </body>
 </html>
