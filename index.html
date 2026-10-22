@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PixelSplice · 2D sandbox</title>
+  <title>PixelSplice · sandbox</title>
   <style>
     * {
       box-sizing: border-box;
@@ -12,768 +12,1587 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: #1a2a32;
+      background: #0e1a2b;
       display: flex;
-      align-items: center;
       justify-content: center;
-      font-family: 'Segoe UI', system-ui, monospace;
+      align-items: center;
+      font-family: 'Courier New', Courier, monospace;
     }
     .game-wrapper {
-      background: #2e4a5c;
-      padding: 12px;
+      background: #1a2a3a;
+      padding: 20px;
       border-radius: 24px;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.7);
     }
     canvas {
       display: block;
+      width: 960px;
+      height: 640px;
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
       border-radius: 16px;
-      box-shadow: inset 0 0 0 2px #466b7e, 0 4px 0 #0d1c24;
+      box-shadow: inset 0 0 0 2px #3e5e7a, 0 0 0 3px #0f1a24;
       cursor: crosshair;
-      background: #6f9ab0;
     }
-    .ui-panel {
-      margin-top: 12px;
+    .info-bar {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
       justify-content: space-between;
-      color: #f0f9ff;
-      text-shadow: 2px 2px 0 #0d1c24;
-      font-weight: bold;
-      font-size: 15px;
-    }
-    .hotbar {
-      display: flex;
-      gap: 6px;
-      background: #1e3b48;
-      padding: 6px 10px;
-      border-radius: 40px;
-      box-shadow: inset 0 0 0 2px #2f5a6b, 0 4px 0 #0a1a22;
-    }
-    .slot {
-      width: 52px;
-      height: 52px;
-      background: #234a5a;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: inset 0 -3px 0 #0e2a33, 0 2px 0 #0d1c24;
-      transition: 0.05s linear;
-      color: white;
-      font-weight: bold;
-    }
-    .slot.active {
-      background: #5d8fa5;
-      box-shadow: inset 0 0 0 3px #f5e56b, 0 2px 0 #0d1c24;
-      transform: scale(1.02);
-    }
-    .slot .count {
-      font-size: 12px;
-      background: #00000055;
-      padding: 0 6px;
-      border-radius: 20px;
-      margin-top: 2px;
-    }
-    .gems {
-      background: #1e3b48;
-      padding: 8px 18px;
-      border-radius: 40px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: inset 0 0 0 2px #2f5a6b, 0 4px 0 #0a1a22;
-    }
-    .btn {
-      background: #3d6d82;
-      border: none;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 40px;
-      font-weight: bold;
-      font-size: 15px;
-      cursor: pointer;
-      box-shadow: 0 4px 0 #0e2a33;
-      transition: 0.08s linear;
-      text-shadow: 1px 1px 0 #0d1c24;
-      font-family: inherit;
-    }
-    .btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #0e2a33;
-    }
-    .recipe-toggle {
-      background: #6b4f2e;
-      box-shadow: 0 4px 0 #3d2e1b;
-    }
-    .toast {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #0d1c24ee;
-      color: #f5e56b;
-      padding: 10px 28px;
-      border-radius: 40px;
-      font-weight: bold;
-      font-size: 18px;
-      letter-spacing: 1px;
-      backdrop-filter: blur(4px);
-      box-shadow: 0 8px 0 #00000055;
-      transition: opacity 0.3s;
-      pointer-events: none;
-      opacity: 0;
-      z-index: 999;
-      border: 2px solid #f5e56b88;
-      white-space: nowrap;
-    }
-    .toast.show {
-      opacity: 1;
-    }
-    .recipe-panel {
-      background: #1e3b48ee;
-      backdrop-filter: blur(6px);
-      border-radius: 24px;
-      padding: 18px 24px;
-      max-width: 400px;
-      color: #d9eef9;
+      color: #b8d4e8;
       font-size: 14px;
-      line-height: 1.6;
-      box-shadow: 0 8px 0 #0a1a22;
-      border: 2px solid #2f5a6b;
-      max-height: 240px;
-      overflow-y: auto;
-      pointer-events: auto;
-      position: fixed;
-      bottom: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      display: none;
+      font-weight: bold;
+      letter-spacing: 1px;
+      padding: 8px 8px 0;
+      text-shadow: 2px 2px 0 #0e1a2b;
     }
-    .recipe-panel.visible {
-      display: block;
-    }
-    .recipe-panel h3 {
-      margin: 0 0 8px;
-      color: #f5e56b;
-      font-size: 18px;
-      text-align: center;
-    }
-    .recipe-item {
-      padding: 4px 0;
-      border-bottom: 1px dashed #3d6d82;
+    .info-bar span {
+      background: #1f3142;
+      padding: 2px 10px;
+      border-radius: 20px;
+      border: 1px solid #3f607e;
     }
   </style>
 </head>
 <body>
-<div class="game-wrapper">
-  <canvas id="gameCanvas" width="800" height="576"></canvas>
-  <div class="ui-panel">
-    <div class="hotbar" id="hotbar"></div>
-    <div class="gems">
-      <span>💎</span>
-      <span id="gemDisplay">0</span>
-    </div>
-    <button class="btn" id="buySeedPack">🌱 Seed Pack (10💎)</button>
-    <button class="btn recipe-toggle" id="toggleRecipes">📖 Recipes</button>
+<div>
+  <div class="info-bar">
+    <span>💎 GEMS: <span id="gemsDisplay">0</span></span>
+    <span>🔒 LOCKS: <span id="locksDisplay">0</span></span>
+    <span>⚡ FPS: <span id="fpsDisplay">60</span></span>
   </div>
-</div>
-<div id="toast" class="toast"></div>
-<div id="recipePanel" class="recipe-panel">
-  <h3>🔬 Splicing Recipes</h3>
-  <div id="recipeList"></div>
-  <div style="margin-top:12px; font-size:12px; opacity:0.8; text-align:center;">Plant two seeds side by side, wait for the splice!</div>
+  <canvas id="gameCanvas" width="960" height="640"></canvas>
 </div>
 
 <script>
   (function() {
-    // ---------- CONSTANTS ----------
-    const TILE_SIZE = 32;
-    const COLS = 25;
-    const ROWS = 18;
-    const CANVAS_W = COLS * TILE_SIZE;
-    const CANVAS_H = ROWS * TILE_SIZE;
+    // ============================================================
+    // PIXEL SPLICE — ORIGINAL SANDBOX GAME
+    // ============================================================
 
-    // ---------- TILE TYPES ----------
-    const TILE_TYPES = {
-      EMPTY: 0,
-      DIRT: 1,
-      ROCK: 2,
-      WATER: 3,
-      GRASS: 4,
-      SAND: 5,
-      FLOWER: 6,
-      GLASS: 7,
-      STONE: 8,
-      WOOD: 9,
-      LEAF: 10,
-      GOLD: 11,
-    };
-
-    // ---------- ITEM DEFINITIONS (seed / block) ----------
-    const ITEMS = {
-      dirt_seed:   { name: 'Dirt Seed',   emoji: '🟫', color: '#8b5a2b', type: 'seed',  tile: TILE_TYPES.DIRT,  sell: 1 },
-      rock_seed:   { name: 'Rock Seed',   emoji: '🪨', color: '#7a7a7a', type: 'seed',  tile: TILE_TYPES.ROCK,  sell: 1 },
-      water_seed:  { name: 'Water Seed',  emoji: '💧', color: '#3a8fc2', type: 'seed',  tile: TILE_TYPES.WATER, sell: 1 },
-      grass_seed:  { name: 'Grass Seed',  emoji: '🌿', color: '#4caf50', type: 'seed',  tile: TILE_TYPES.GRASS, sell: 2 },
-      sand_seed:   { name: 'Sand Seed',   emoji: '🏖️', color: '#e3c27b', type: 'seed',  tile: TILE_TYPES.SAND,  sell: 2 },
-      flower_seed: { name: 'Flower Seed', emoji: '🌸', color: '#e97a9e', type: 'seed',  tile: TILE_TYPES.FLOWER, sell: 3 },
-      wood_seed:   { name: 'Wood Seed',   emoji: '🪵', color: '#a0662b', type: 'seed',  tile: TILE_TYPES.WOOD,  sell: 3 },
-      gold_seed:   { name: 'Gold Seed',   emoji: '✨', color: '#f5c542', type: 'seed',  tile: TILE_TYPES.GOLD,  sell: 8 },
-
-      dirt_block:   { name: 'Dirt Block',   emoji: '🟫', color: '#8b5a2b', type: 'block', tile: TILE_TYPES.DIRT,  sell: 1 },
-      rock_block:   { name: 'Rock Block',   emoji: '🪨', color: '#7a7a7a', type: 'block', tile: TILE_TYPES.ROCK,  sell: 1 },
-      water_block:  { name: 'Water Block',  emoji: '💧', color: '#3a8fc2', type: 'block', tile: TILE_TYPES.WATER, sell: 1 },
-      grass_block:  { name: 'Grass Block',  emoji: '🌿', color: '#4caf50', type: 'block', tile: TILE_TYPES.GRASS, sell: 2 },
-      sand_block:   { name: 'Sand Block',   emoji: '🏖️', color: '#e3c27b', type: 'block', tile: TILE_TYPES.SAND,  sell: 2 },
-      flower_block: { name: 'Flower Block', emoji: '🌸', color: '#e97a9e', type: 'block', tile: TILE_TYPES.FLOWER, sell: 3 },
-      glass_block:  { name: 'Glass Block',  emoji: '🔷', color: '#a8d8ea', type: 'block', tile: TILE_TYPES.GLASS, sell: 4 },
-      stone_block:  { name: 'Stone Block',  emoji: '⬛', color: '#5a5a5a', type: 'block', tile: TILE_TYPES.STONE, sell: 3 },
-      wood_block:   { name: 'Wood Block',   emoji: '🪵', color: '#a0662b', type: 'block', tile: TILE_TYPES.WOOD,  sell: 3 },
-      leaf_block:   { name: 'Leaf Block',   emoji: '🍃', color: '#3e9e4b', type: 'block', tile: TILE_TYPES.LEAF,  sell: 2 },
-      gold_block:   { name: 'Gold Block',   emoji: '✨', color: '#f5c542', type: 'block', tile: TILE_TYPES.GOLD,  sell: 10 },
-    };
-
-    // ---------- SPLICING RECIPES (unordered pairs) ----------
-    const SPLICE_RECIPES = [
-      { a: 'dirt_seed', b: 'rock_seed', result: 'sand_seed', count: 1 },
-      { a: 'sand_seed', b: 'water_seed', result: 'glass_block', count: 1 },
-      { a: 'dirt_seed', b: 'water_seed', result: 'grass_seed', count: 1 },
-      { a: 'rock_seed', b: 'rock_seed', result: 'stone_block', count: 1 },
-      { a: 'grass_seed', b: 'sand_seed', result: 'flower_seed', count: 1 },
-      { a: 'wood_seed', b: 'leaf_seed', result: 'wood_block', count: 1 },      // leaf_seed not in items? we'll add a dummy leaf_seed? We'll use wood_seed + grass_seed = wood_block
-      { a: 'grass_seed', b: 'wood_seed', result: 'wood_block', count: 1 },
-      { a: 'stone_block', b: 'gold_seed', result: 'gold_block', count: 1 },
-      { a: 'flower_seed', b: 'water_seed', result: 'flower_block', count: 1 },
-    ];
-
-    // ---------- GAME STATE ----------
-    let world = [];          // 2D array of tile types
-    let inventory = {};      // itemId -> count
-    let gems = 0;
-    let hotbar = [
-      'dirt_seed', 'rock_seed', 'water_seed', 'grass_seed',
-      'sand_seed', 'flower_seed', 'stone_block', 'gold_seed'
-    ];
-    let selectedSlot = 0;    // 0-7
-
-    // Player position (grid coords, can be fractional)
-    let player = { x: 10.5, y: 9.5 };
-
-    // Splice timers: { tileIndex: { x, y, otherX, otherY, result, timeLeft, seedA, seedB } }
-    // We'll store active splice as array of objects for simplicity
-    let activeSplices = [];   // each: { x1,y1, x2,y2, resultItem, timeLeft, timerId }
-
-    // Toast timeout
-    let toastTimer = null;
-
-    // ---------- CANVAS SETUP ----------
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = CANVAS_W;
-    canvas.height = CANVAS_H;
+    ctx.imageSmoothingEnabled = false;
 
-    // ---------- HELPER FUNCTIONS ----------
-    function getItem(id) {
-      return ITEMS[id] || null;
-    }
+    // ---------- CONSTANTS ----------
+    const TILE = 32;
+    const MAP_W = 60;
+    const MAP_H = 40;
+    const WORLD_W = MAP_W * TILE;
+    const WORLD_H = MAP_H * TILE;
 
-    function addItem(itemId, amount = 1) {
-      if (!ITEMS[itemId]) return;
-      inventory[itemId] = (inventory[itemId] || 0) + amount;
-      autoSave();
-    }
+    // ---------- ITEM REGISTRY (original names) ----------
+    const ITEMS = {
+      // id: { name, color, rarity, type, solid }
+      dirt:      { name: 'Dirt',        color: '#7b5e3b', rarity: 'Common',    type: 'block', solid: true },
+      rock:      { name: 'Rock',        color: '#7a7a7a', rarity: 'Common',    type: 'block', solid: true },
+      grass:     { name: 'Grass',       color: '#5e9c4b', rarity: 'Common',    type: 'block', solid: true },
+      water:     { name: 'Water',       color: '#3a7ca5', rarity: 'Uncommon',  type: 'block', solid: false },
+      lava:      { name: 'Lava',        color: '#c44b2b', rarity: 'Rare',      type: 'block', solid: false },
+      wood:      { name: 'Wood',        color: '#8b5a2b', rarity: 'Common',    type: 'block', solid: true },
+      leaf:      { name: 'Leaf',        color: '#3e8e41', rarity: 'Common',    type: 'block', solid: true },
+      sand:      { name: 'Sand',        color: '#d4b06a', rarity: 'Common',    type: 'block', solid: true },
+      glass:     { name: 'Glass',       color: '#a0d4e0', rarity: 'Uncommon',  type: 'block', solid: true },
+      flower:    { name: 'Flower',      color: '#c75b8c', rarity: 'Uncommon',  type: 'block', solid: false },
+      stone:     { name: 'Stone',       color: '#5e5e5e', rarity: 'Uncommon',  type: 'block', solid: true },
+      sandstone: { name: 'Sandstone',   color: '#b89b5e', rarity: 'Uncommon',  type: 'block', solid: true },
+      rose:      { name: 'Rose',        color: '#d43f5a', rarity: 'Rare',      type: 'block', solid: false },
+      crystal:   { name: 'Crystal',     color: '#b87cff', rarity: 'Rare',      type: 'block', solid: true },
+      ember:     { name: 'Ember',       color: '#e66b1e', rarity: 'Rare',      type: 'block', solid: true },
+      obsidian:  { name: 'Obsidian',    color: '#2d2d3f', rarity: 'Rare',      type: 'block', solid: true },
+      gold:      { name: 'Gold',        color: '#e6c34a', rarity: 'Legendary', type: 'block', solid: true },
+      seed_pack: { name: 'Seed Pack',   color: '#a67c52', rarity: 'Common',    type: 'seed',  solid: false },
+      tree_seed: { name: 'Tree Seed',   color: '#5d8c4a', rarity: 'Uncommon',  type: 'seed',  solid: false },
+      world_lock:{ name: 'World Lock',  color: '#f0d050', rarity: 'Legendary', type: 'special', solid: false }
+    };
 
-    function removeItem(itemId, amount = 1) {
-      if (!inventory[itemId] || inventory[itemId] < amount) return false;
-      inventory[itemId] -= amount;
-      if (inventory[itemId] <= 0) delete inventory[itemId];
-      autoSave();
-      return true;
-    }
+    // ---------- SPLICING RECIPES (40+) ----------
+    // [seedA, seedB] -> result seed/block
+    const SPLICE_RECIPES = [
+      ['dirt','rock','sand'],
+      ['sand','water','glass'],
+      ['dirt','water','grass'],
+      ['grass','flower','rose'],
+      ['rock','rock','stone'],
+      ['wood','leaf','tree_seed'],
+      ['sand','sand','sandstone'],
+      ['stone','stone','crystal'],
+      ['lava','rock','ember'],
+      ['water','lava','obsidian'],
+      ['gold','rock','gold'],
+      ['dirt','dirt','dirt'],
+      ['leaf','leaf','wood'],
+      ['flower','flower','rose'],
+      ['glass','sand','glass'],
+      ['crystal','stone','crystal'],
+      ['ember','ember','lava'],
+      ['obsidian','obsidian','obsidian'],
+      ['gold','gold','gold'],
+      ['tree_seed','dirt','wood'],
+      ['grass','grass','flower'],
+      ['sand','dirt','dirt'],
+      ['rock','stone','stone'],
+      ['water','water','water'],
+      ['lava','lava','lava'],
+      ['wood','wood','wood'],
+      ['leaf','wood','tree_seed'],
+      ['flower','grass','rose'],
+      ['glass','glass','glass'],
+      ['sandstone','sand','sand'],
+      ['crystal','crystal','crystal'],
+      ['ember','lava','ember'],
+      ['obsidian','stone','crystal'],
+      ['gold','crystal','gold'],
+      ['dirt','grass','grass'],
+      ['sand','rock','sandstone'],
+      ['water','glass','glass'],
+      ['lava','ember','ember'],
+      ['tree_seed','flower','rose'],
+      ['rock','leaf','dirt'],
+      ['stone','sand','sandstone'],
+      ['wood','sand','dirt'],
+      ['flower','water','grass'],
+      ['leaf','water','grass'],
+      ['crystal','water','glass'],
+      ['gold','sand','sandstone'],
+      ['obsidian','lava','ember']
+    ];
 
-    function getItemCount(itemId) {
-      return inventory[itemId] || 0;
-    }
+    // ---------- RARITY COLOR ----------
+    const RARITY_COLORS = {
+      Common: '#b0b0b0',
+      Uncommon: '#5fbf5f',
+      Rare: '#5f8fdf',
+      Legendary: '#f0d050'
+    };
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
-    }
+    // ---------- GAME STATE ----------
+    let state = {
+      player: {
+        x: 10 * TILE,
+        y: 10 * TILE,
+        vx: 0,
+        vy: 0,
+        w: 16,
+        h: 24,
+        onGround: false,
+        facing: 1,         // 1 right, -1 left
+        punchTimer: 0,
+        animFrame: 0,
+        animTimer: 0
+      },
+      camera: { x: 0, y: 0 },
+      gems: 0,
+      worldLocks: 0,
+      inventory: {},      // itemId -> count
+      hotbar: new Array(8).fill(null), // itemId or null
+      selectedSlot: 0,
+      tiles: [],          // MAP_H x MAP_W, each { itemId, solid, growth, plantedSeedA, plantedSeedB }
+      trees: [],          // { x, y, growth, seedA, seedB, ready }
+      particles: [],
+      floatTexts: [],
+      screenShake: 0,
+      chatOpen: false,
+      chatText: '',
+      chatMessages: [],
+      inventoryOpen: false,
+      recipeOpen: false,
+      shopOpen: false,
+      toast: { text: '', timer: 0 },
+      lastTime: 0,
+      fps: 60,
+      frameCount: 0,
+      fpsTimer: 0,
+      keys: {},
+      mouse: { x: 0, y: 0, worldX: 0, worldY: 0, left: false, right: false }
+    };
 
-    // ---------- WORLD GENERATION ----------
-    function generateWorld() {
-      world = [];
-      for (let r = 0; r < ROWS; r++) {
-        let row = [];
-        for (let c = 0; c < COLS; c++) {
-          // simple terrain: mostly dirt, some rock, water at bottom?
-          if (r > ROWS - 4 && Math.random() < 0.2) row.push(TILE_TYPES.WATER);
-          else if (Math.random() < 0.15) row.push(TILE_TYPES.ROCK);
-          else if (Math.random() < 0.08) row.push(TILE_TYPES.GOLD);
-          else row.push(TILE_TYPES.DIRT);
+    // ---------- INIT WORLD ----------
+    function initTiles() {
+      const tiles = [];
+      for (let y = 0; y < MAP_H; y++) {
+        tiles[y] = [];
+        for (let x = 0; x < MAP_W; x++) {
+          let itemId = 'dirt';
+          if (y > MAP_H - 5) itemId = 'rock';
+          if (y > MAP_H - 3) itemId = 'stone';
+          if (y === MAP_H - 1) itemId = 'obsidian';
+          if (x < 3 || x > MAP_W - 4) itemId = 'rock';
+          tiles[y][x] = {
+            itemId: itemId,
+            solid: ITEMS[itemId]?.solid ?? true,
+            growth: 0,
+            seedA: null,
+            seedB: null
+          };
         }
-        world.push(row);
       }
-      // clear an area around spawn
-      for (let r = 7; r < 12; r++) {
-        for (let c = 8; c < 13; c++) {
-          world[r][c] = TILE_TYPES.EMPTY;
+      // carve a little spawn area
+      for (let y = 8; y < 14; y++) {
+        for (let x = 8; x < 16; x++) {
+          if (y > 10) {
+            tiles[y][x] = { itemId: null, solid: false, growth: 0, seedA: null, seedB: null };
+          }
         }
       }
+      return tiles;
+    }
+
+    function resetWorld() {
+      state.player = {
+        x: 12 * TILE, y: 8 * TILE, vx: 0, vy: 0,
+        w: 16, h: 24, onGround: false, facing: 1,
+        punchTimer: 0, animFrame: 0, animTimer: 0
+      };
+      state.gems = 10;
+      state.worldLocks = 0;
+      state.inventory = { dirt: 5, rock: 3, wood: 2, tree_seed: 1, sand: 2 };
+      state.hotbar = ['dirt', 'rock', 'wood', 'tree_seed', 'sand', null, null, null];
+      state.selectedSlot = 0;
+      state.tiles = initTiles();
+      state.trees = [];
+      state.particles = [];
+      state.floatTexts = [];
+      state.screenShake = 0;
+      state.chatMessages = [];
+      state.lastTime = performance.now();
+      saveGame();
     }
 
     // ---------- SAVE / LOAD ----------
     function saveGame() {
-      const data = {
-        world,
-        inventory,
-        gems,
-        hotbar,
-        selectedSlot,
-        player: { x: player.x, y: player.y },
-        // we don't save active splices – they reset on reload
-      };
       try {
-        localStorage.setItem('pixelsplice_save', JSON.stringify(data));
-      } catch (e) { /* ignore */ }
+        const save = {
+          player: { x: state.player.x, y: state.player.y, facing: state.player.facing },
+          gems: state.gems,
+          worldLocks: state.worldLocks,
+          inventory: state.inventory,
+          hotbar: state.hotbar,
+          selectedSlot: state.selectedSlot,
+          tiles: state.tiles.map(row => row.map(t => ({
+            itemId: t.itemId, solid: t.solid, growth: t.growth, seedA: t.seedA, seedB: t.seedB
+          }))),
+          trees: state.trees.map(t => ({ ...t })),
+          timestamp: Date.now()
+        };
+        localStorage.setItem('pixelsplice_save', JSON.stringify(save));
+      } catch (e) { /* ignore quota errors */ }
     }
 
     function loadGame() {
       const raw = localStorage.getItem('pixelsplice_save');
       if (!raw) return false;
       try {
-        const data = JSON.parse(raw);
-        if (data.world && data.world.length === ROWS && data.world[0].length === COLS) {
-          world = data.world;
-        } else {
-          generateWorld();
+        const save = JSON.parse(raw);
+        state.player.x = save.player.x;
+        state.player.y = save.player.y;
+        state.player.facing = save.player.facing ?? 1;
+        state.player.vx = 0;
+        state.player.vy = 0;
+        state.gems = save.gems ?? 10;
+        state.worldLocks = save.worldLocks ?? 0;
+        state.inventory = save.inventory ?? {};
+        state.hotbar = save.hotbar ?? new Array(8).fill(null);
+        state.selectedSlot = save.selectedSlot ?? 0;
+        state.tiles = save.tiles.map(row => row.map(t => ({
+          itemId: t.itemId, solid: t.solid ?? (ITEMS[t.itemId]?.solid ?? false),
+          growth: t.growth ?? 0, seedA: t.seedA ?? null, seedB: t.seedB ?? null
+        })));
+        state.trees = save.trees ?? [];
+        // rebuild solid flags for safety
+        for (let y = 0; y < MAP_H; y++) {
+          for (let x = 0; x < MAP_W; x++) {
+            const t = state.tiles[y][x];
+            if (t.itemId && ITEMS[t.itemId]) t.solid = ITEMS[t.itemId].solid;
+            else t.solid = false;
+          }
         }
-        inventory = data.inventory || {};
-        gems = data.gems || 0;
-        hotbar = data.hotbar || ['dirt_seed', 'rock_seed', 'water_seed', 'grass_seed', 'sand_seed', 'flower_seed', 'stone_block', 'gold_seed'];
-        selectedSlot = data.selectedSlot || 0;
-        if (data.player) player = { x: data.player.x, y: data.player.y };
-        else player = { x: 10.5, y: 9.5 };
         return true;
       } catch (e) {
-        generateWorld();
         return false;
       }
     }
 
-    function autoSave() {
+    // ---------- INVENTORY HELPERS ----------
+    function addItem(itemId, count = 1) {
+      if (!ITEMS[itemId]) return;
+      if (!state.inventory[itemId]) state.inventory[itemId] = 0;
+      state.inventory[itemId] += count;
+      // auto assign to empty hotbar slot if possible
+      if (!state.hotbar.includes(itemId)) {
+        for (let i = 0; i < 8; i++) {
+          if (!state.hotbar[i]) { state.hotbar[i] = itemId; break; }
+        }
+      }
       saveGame();
     }
 
-    // ---------- INITIALIZE INVENTORY IF EMPTY (first play) ----------
-    function initStartingInventory() {
-      if (Object.keys(inventory).length === 0) {
-        inventory = {
-          dirt_seed: 5,
-          rock_seed: 3,
-          water_seed: 3,
-          grass_seed: 2,
-          sand_seed: 1,
-          flower_seed: 1,
-          wood_seed: 1,
-          stone_block: 1,
-          gold_seed: 0,
-        };
-        gems = 15;
-        autoSave();
-      }
-    }
-
-    // ---------- UI RENDERING ----------
-    function renderHotbar() {
-      const hotbarDiv = document.getElementById('hotbar');
-      hotbarDiv.innerHTML = '';
-      for (let i = 0; i < 8; i++) {
-        const itemId = hotbar[i];
-        const item = getItem(itemId);
-        const slot = document.createElement('div');
-        slot.className = 'slot' + (i === selectedSlot ? ' active' : '');
-        slot.dataset.index = i;
-        if (item) {
-          slot.innerHTML = `${item.emoji}<span class="count">${getItemCount(itemId)}</span>`;
-          slot.title = item.name;
-        } else {
-          slot.innerHTML = '·';
+    function removeItem(itemId, count = 1) {
+      if (!state.inventory[itemId] || state.inventory[itemId] < count) return false;
+      state.inventory[itemId] -= count;
+      if (state.inventory[itemId] <= 0) {
+        delete state.inventory[itemId];
+        // remove from hotbar if present
+        for (let i = 0; i < 8; i++) {
+          if (state.hotbar[i] === itemId) state.hotbar[i] = null;
         }
-        slot.addEventListener('click', () => {
-          selectedSlot = i;
-          renderHotbar();
-        });
-        hotbarDiv.appendChild(slot);
       }
-      document.getElementById('gemDisplay').textContent = gems;
+      saveGame();
+      return true;
     }
 
-    function updateGemDisplay() {
-      document.getElementById('gemDisplay').textContent = gems;
+    function hasItem(itemId, count = 1) {
+      return (state.inventory[itemId] || 0) >= count;
     }
 
-    // ---------- WORLD RENDERING ----------
-    function drawWorld() {
-      // background grid
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          const x = c * TILE_SIZE;
-          const y = r * TILE_SIZE;
-          const tile = world[r][c];
-          // base grass background
-          ctx.fillStyle = '#7fb08c';
-          ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-          // tile color
-          let color = '#6b8f7a';
-          let emoji = null;
-          switch (tile) {
-            case TILE_TYPES.DIRT: color = '#8b5a2b'; emoji = '🟫'; break;
-            case TILE_TYPES.ROCK: color = '#6e6e6e'; emoji = '🪨'; break;
-            case TILE_TYPES.WATER: color = '#3a8fc2'; emoji = '💧'; break;
-            case TILE_TYPES.GRASS: color = '#4caf50'; emoji = '🌿'; break;
-            case TILE_TYPES.SAND: color = '#e3c27b'; emoji = '🏖️'; break;
-            case TILE_TYPES.FLOWER: color = '#e97a9e'; emoji = '🌸'; break;
-            case TILE_TYPES.GLASS: color = '#a8d8ea'; emoji = '🔷'; break;
-            case TILE_TYPES.STONE: color = '#5a5a5a'; emoji = '⬛'; break;
-            case TILE_TYPES.WOOD: color = '#a0662b'; emoji = '🪵'; break;
-            case TILE_TYPES.LEAF: color = '#3e9e4b'; emoji = '🍃'; break;
-            case TILE_TYPES.GOLD: color = '#f5c542'; emoji = '✨'; break;
-            case TILE_TYPES.EMPTY: color = '#6f9ab0'; emoji = null; break;
-            default: color = '#6f9ab0';
+    // ---------- TILE UTILS ----------
+    function getTile(tx, ty) {
+      if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) return null;
+      return state.tiles[ty][tx];
+    }
+
+    function isSolidTile(tx, ty) {
+      const t = getTile(tx, ty);
+      return t && t.solid === true;
+    }
+
+    // ---------- PHYSICS ----------
+    function updatePhysics(dt) {
+      const p = state.player;
+      const GRAVITY = 1500;
+      const MOVE_SPEED = 180;
+      const JUMP_FORCE = -450;
+
+      // horizontal input
+      let move = 0;
+      if (state.keys['a'] || state.keys['arrowleft']) move -= 1;
+      if (state.keys['d'] || state.keys['arrowright']) move += 1;
+
+      if (move !== 0) p.facing = move;
+
+      p.vx = move * MOVE_SPEED;
+
+      // jump
+      if ((state.keys['w'] || state.keys[' '] || state.keys['arrowup']) && p.onGround) {
+        p.vy = JUMP_FORCE;
+        p.onGround = false;
+      }
+
+      // gravity
+      p.vy += GRAVITY * dt;
+      if (p.vy > 800) p.vy = 800;
+
+      // ---- horizontal movement + collision ----
+      p.x += p.vx * dt;
+      // clamp to world
+      p.x = Math.max(0, Math.min(WORLD_W - p.w, p.x));
+
+      // check tile collisions horizontally
+      let left = Math.floor(p.x / TILE);
+      let right = Math.floor((p.x + p.w - 1) / TILE);
+      let top = Math.floor(p.y / TILE);
+      let bottom = Math.floor((p.y + p.h - 1) / TILE);
+
+      for (let ty = top; ty <= bottom; ty++) {
+        for (let tx = left; tx <= right; tx++) {
+          if (isSolidTile(tx, ty)) {
+            // resolve
+            if (p.vx > 0) p.x = tx * TILE - p.w;
+            else if (p.vx < 0) p.x = (tx + 1) * TILE;
+            p.vx = 0;
           }
-          if (tile !== TILE_TYPES.EMPTY) {
-            ctx.fillStyle = color;
-            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-            if (emoji) {
-              ctx.font = '20px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              ctx.fillStyle = '#00000066';
-              ctx.fillText(emoji, x + TILE_SIZE/2 + 1, y + TILE_SIZE/2 + 2);
-              ctx.fillStyle = '#ffffff';
-              ctx.fillText(emoji, x + TILE_SIZE/2, y + TILE_SIZE/2);
+        }
+      }
+
+      // ---- vertical movement + collision ----
+      p.y += p.vy * dt;
+      p.y = Math.max(0, Math.min(WORLD_H - p.h, p.y));
+
+      left = Math.floor(p.x / TILE);
+      right = Math.floor((p.x + p.w - 1) / TILE);
+      top = Math.floor(p.y / TILE);
+      bottom = Math.floor((p.y + p.h - 1) / TILE);
+
+      p.onGround = false;
+      for (let ty = top; ty <= bottom; ty++) {
+        for (let tx = left; tx <= right; tx++) {
+          if (isSolidTile(tx, ty)) {
+            if (p.vy > 0) { // falling
+              p.y = ty * TILE - p.h;
+              p.vy = 0;
+              p.onGround = true;
+            } else if (p.vy < 0) { // jumping up
+              p.y = (ty + 1) * TILE;
+              p.vy = 0;
             }
-          } else {
-            // empty grid line
-            ctx.strokeStyle = '#4d7a8f';
-            ctx.lineWidth = 0.5;
-            ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
           }
         }
       }
 
-      // draw active splices (glowing)
-      for (let s of activeSplices) {
-        // draw two markers at positions
-        [ [s.x1, s.y1], [s.x2, s.y2] ].forEach(([sx, sy]) => {
-          ctx.fillStyle = '#f5e56bcc';
-          ctx.beginPath();
-          ctx.arc(sx * TILE_SIZE + TILE_SIZE/2, sy * TILE_SIZE + TILE_SIZE/2, 10, 0, 2*Math.PI);
-          ctx.fill();
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 2;
-          ctx.stroke();
+      // punch timer
+      if (p.punchTimer > 0) {
+        p.punchTimer -= dt;
+        if (p.punchTimer < 0) p.punchTimer = 0;
+      }
+
+      // animation
+      if (move !== 0 && p.onGround) {
+        p.animTimer += dt;
+        if (p.animTimer > 0.15) {
+          p.animTimer = 0;
+          p.animFrame = (p.animFrame + 1) % 4;
+        }
+      } else if (p.onGround) {
+        p.animFrame = 0;
+        p.animTimer = 0;
+      }
+    }
+
+    // ---------- CAMERA ----------
+    function updateCamera() {
+      const p = state.player;
+      const targetX = p.x + p.w / 2 - canvas.width / 2;
+      const targetY = p.y + p.h / 2 - canvas.height / 2;
+      state.camera.x += (targetX - state.camera.x) * 0.1;
+      state.camera.y += (targetY - state.camera.y) * 0.1;
+      state.camera.x = Math.max(0, Math.min(WORLD_W - canvas.width, state.camera.x));
+      state.camera.y = Math.max(0, Math.min(WORLD_H - canvas.height, state.camera.y));
+    }
+
+    // ---------- PARTICLES ----------
+    function spawnParticles(x, y, color, count = 6) {
+      for (let i = 0; i < count; i++) {
+        state.particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 120,
+          vy: (Math.random() - 0.8) * 120,
+          life: 0.4 + Math.random() * 0.3,
+          maxLife: 0.7,
+          color,
+          size: 2 + Math.random() * 3
         });
-        // draw result icon floating between
-        const midX = (s.x1 + s.x2) / 2 * TILE_SIZE + TILE_SIZE/2;
-        const midY = (s.y1 + s.y2) / 2 * TILE_SIZE + TILE_SIZE/2;
-        ctx.font = '28px "Segoe UI Emoji", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#ffffffee';
-        ctx.fillText('✨', midX, midY - 12);
-      }
-
-      // draw player (simple emoji)
-      const px = player.x * TILE_SIZE;
-      const py = player.y * TILE_SIZE;
-      ctx.font = '32px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#00000066';
-      ctx.fillText('🧑', px + 2, py + 4);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText('🧑', px, py);
-    }
-
-    // ---------- PLAYER MOVEMENT ----------
-    const keys = {};
-    window.addEventListener('keydown', (e) => {
-      const key = e.key;
-      if (key.startsWith('Arrow') || key === ' ' || key === 'w' || key === 'a' || key === 's' || key === 'd') {
-        e.preventDefault();
-      }
-      keys[key] = true;
-      // number keys 1-8 select hotbar
-      if (key >= '1' && key <= '8') {
-        selectedSlot = parseInt(key) - 1;
-        renderHotbar();
-      }
-    });
-    window.addEventListener('keyup', (e) => {
-      keys[e.key] = false;
-    });
-
-    function updatePlayerMovement(delta) {
-      const speed = 0.15;
-      let dx = 0, dy = 0;
-      if (keys['w'] || keys['ArrowUp']) dy -= speed;
-      if (keys['s'] || keys['ArrowDown']) dy += speed;
-      if (keys['a'] || keys['ArrowLeft']) dx -= speed;
-      if (keys['d'] || keys['ArrowRight']) dx += speed;
-      if (dx !== 0 || dy !== 0) {
-        // clamp within world
-        let nx = player.x + dx;
-        let ny = player.y + dy;
-        nx = Math.max(0.5, Math.min(COLS - 0.5, nx));
-        ny = Math.max(0.5, Math.min(ROWS - 0.5, ny));
-        player.x = nx;
-        player.y = ny;
       }
     }
 
-    // ---------- SPLICING LOGIC ----------
-    function trySplice(x1, y1, x2, y2) {
-      // Check if tiles are adjacent (orthogonal)
-      const dx = Math.abs(x1 - x2);
-      const dy = Math.abs(y1 - y2);
-      if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-        // Get tile contents from world
-        const tile1 = world[y1][x1];
-        const tile2 = world[y2][x2];
-        // map tile types to seed items (reverse lookup)
-        const tileToSeed = {
-          [TILE_TYPES.DIRT]: 'dirt_seed',
-          [TILE_TYPES.ROCK]: 'rock_seed',
-          [TILE_TYPES.WATER]: 'water_seed',
-          [TILE_TYPES.GRASS]: 'grass_seed',
-          [TILE_TYPES.SAND]: 'sand_seed',
-          [TILE_TYPES.FLOWER]: 'flower_seed',
-          [TILE_TYPES.WOOD]: 'wood_seed',
-          [TILE_TYPES.GOLD]: 'gold_seed',
-        };
-        const seed1 = tileToSeed[tile1];
-        const seed2 = tileToSeed[tile2];
-        if (!seed1 || !seed2) return false;
-
-        // find matching recipe
-        for (let rec of SPLICE_RECIPES) {
-          if ((rec.a === seed1 && rec.b === seed2) || (rec.a === seed2 && rec.b === seed1)) {
-            // Remove the two tiles (set to empty)
-            world[y1][x1] = TILE_TYPES.EMPTY;
-            world[y2][x2] = TILE_TYPES.EMPTY;
-            // Create active splice
-            const splice = {
-              x1, y1, x2, y2,
-              resultItem: rec.result,
-              resultCount: rec.count || 1,
-              timeLeft: 4.0, // seconds
-            };
-            activeSplices.push(splice);
-            autoSave();
-            showToast(`✨ Splice started! Wait ${splice.timeLeft.toFixed(0)}s`);
-            return true;
-          }
-        }
-        // no valid recipe
-        showToast('❌ Kombinasi gagal');
-        // return one seed? we didn't consume, just failed
-        return false;
-      }
-      return false;
+    function spawnFloatText(x, y, text, color) {
+      state.floatTexts.push({
+        x, y,
+        text,
+        color: color || '#fff',
+        life: 1.2,
+        maxLife: 1.2,
+        vy: -30
+      });
     }
 
-    function updateSplices(delta) {
-      for (let i = activeSplices.length - 1; i >= 0; i--) {
-        const s = activeSplices[i];
-        s.timeLeft -= delta;
-        if (s.timeLeft <= 0) {
-          // Harvest: give result item to inventory
-          addItem(s.resultItem, s.resultCount);
-          showToast(`🌱 Splice complete! +${s.resultCount} ${getItem(s.resultItem)?.name || 'item'}`);
-          activeSplices.splice(i, 1);
-          autoSave();
-        }
+    function updateParticles(dt) {
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 300 * dt;
+        p.life -= dt;
+        if (p.life <= 0) state.particles.splice(i, 1);
+      }
+      for (let i = state.floatTexts.length - 1; i >= 0; i--) {
+        const ft = state.floatTexts[i];
+        ft.y += ft.vy * dt;
+        ft.life -= dt;
+        if (ft.life <= 0) state.floatTexts.splice(i, 1);
       }
     }
 
-    // ---------- MOUSE INTERACTION ----------
-    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-    canvas.addEventListener('mousedown', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const mouseX = (e.clientX - rect.left) * scaleX;
-      const mouseY = (e.clientY - rect.top) * scaleY;
-      const tileX = Math.floor(mouseX / TILE_SIZE);
-      const tileY = Math.floor(mouseY / TILE_SIZE);
-      if (tileX < 0 || tileX >= COLS || tileY < 0 || tileY >= ROWS) return;
+    // ---------- SOUND (Web Audio API) ----------
+    let audioCtx = null;
+    function getAudio() {
+      if (!audioCtx) {
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { }
+      }
+      return audioCtx;
+    }
+    function playTone(freq, type, duration, vol = 0.15) {
+      const ac = getAudio();
+      if (!ac) return;
+      try {
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.value = vol;
+        gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ac.destination);
+        osc.start();
+        osc.stop(ac.currentTime + duration);
+      } catch (e) { }
+    }
+    function sfxPunch() { playTone(120, 'square', 0.08, 0.2); playTone(60, 'sawtooth', 0.1, 0.15); }
+    function sfxPlace() { playTone(600, 'sine', 0.06, 0.1); }
+    function sfxHarvest() { playTone(880, 'sine', 0.12, 0.12); playTone(1200, 'sine', 0.08, 0.08); }
+    function sfxBuy() { playTone(520, 'square', 0.05, 0.1); playTone(780, 'square', 0.07, 0.1); }
+    function sfxError() { playTone(150, 'sawtooth', 0.15, 0.15); }
 
-      // check distance from player (max 3 tiles)
-      const dist = Math.hypot(player.x - (tileX + 0.5), player.y - (tileY + 0.5));
-      if (dist > 3.5) {
-        showToast('📏 Terlalu jauh');
+    // ---------- TOAST ----------
+    function showToast(text) {
+      state.toast = { text, timer: 2.2 };
+    }
+
+    // ---------- PUNCH ----------
+    function punchAt(worldX, worldY) {
+      const p = state.player;
+      const tx = Math.floor(worldX / TILE);
+      const ty = Math.floor(worldY / TILE);
+      const tile = getTile(tx, ty);
+      if (!tile || !tile.itemId) return;
+
+      // distance check
+      const dx = (tx * TILE + TILE / 2) - (p.x + p.w / 2);
+      const dy = (ty * TILE + TILE / 2) - (p.y + p.h / 2);
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > TILE * 2.2) return;
+
+      // punch animation
+      p.punchTimer = 0.18;
+      p.facing = dx > 0 ? 1 : -1;
+
+      const item = ITEMS[tile.itemId];
+      if (!item) return;
+
+      // remove tile
+      const oldItem = tile.itemId;
+      tile.itemId = null;
+      tile.solid = false;
+      tile.growth = 0;
+      tile.seedA = null;
+      tile.seedB = null;
+
+      // particles + sound + shake
+      spawnParticles(tx * TILE + TILE / 2, ty * TILE + TILE / 2, item.color, 8);
+      sfxPunch();
+      state.screenShake = 3;
+
+      // reward
+      const gemGain = item.rarity === 'Legendary' ? 5 : item.rarity === 'Rare' ? 3 : 1;
+      state.gems += gemGain;
+      spawnFloatText(tx * TILE + 16, ty * TILE + 4, `+${gemGain} 💎`, '#f0d050');
+
+      // add to inventory
+      addItem(oldItem, 1);
+      saveGame();
+    }
+
+    // ---------- PLACE ----------
+    function placeBlock(worldX, worldY) {
+      const p = state.player;
+      const tx = Math.floor(worldX / TILE);
+      const ty = Math.floor(worldY / TILE);
+      const tile = getTile(tx, ty);
+      if (!tile) return;
+      if (tile.itemId) {
+        showToast('Tile already occupied');
+        sfxError();
         return;
       }
 
-      const currentTile = world[tileY][tileX];
+      const slot = state.selectedSlot;
+      const itemId = state.hotbar[slot];
+      if (!itemId) { showToast('No item selected'); sfxError(); return; }
+      if (!hasItem(itemId, 1)) { showToast('Not enough items'); sfxError(); return; }
 
-      if (e.button === 0) { // LEFT CLICK = BREAK
-        if (currentTile === TILE_TYPES.EMPTY) return;
-        // break tile -> get block item + gems
-        const tileToBlock = {
-          [TILE_TYPES.DIRT]: 'dirt_block',
-          [TILE_TYPES.ROCK]: 'rock_block',
-          [TILE_TYPES.WATER]: 'water_block',
-          [TILE_TYPES.GRASS]: 'grass_block',
-          [TILE_TYPES.SAND]: 'sand_block',
-          [TILE_TYPES.FLOWER]: 'flower_block',
-          [TILE_TYPES.GLASS]: 'glass_block',
-          [TILE_TYPES.STONE]: 'stone_block',
-          [TILE_TYPES.WOOD]: 'wood_block',
-          [TILE_TYPES.LEAF]: 'leaf_block',
-          [TILE_TYPES.GOLD]: 'gold_block',
-        };
-        const blockId = tileToBlock[currentTile];
-        if (blockId) {
-          addItem(blockId, 1);
-          // give gems (1-3)
-          const gemReward = Math.floor(Math.random() * 3) + 1;
-          gems += gemReward;
-          updateGemDisplay();
-          world[tileY][tileX] = TILE_TYPES.EMPTY;
-          showToast(`⛏️ +1 ${getItem(blockId)?.name || 'Block'} & +${gemReward}💎`);
-          autoSave();
+      // distance check
+      const dx = (tx * TILE + TILE / 2) - (p.x + p.w / 2);
+      const dy = (ty * TILE + TILE / 2) - (p.y + p.h / 2);
+      if (Math.sqrt(dx * dx + dy * dy) > TILE * 3) return;
+
+      // place
+      const item = ITEMS[itemId];
+      if (!item) return;
+      tile.itemId = itemId;
+      tile.solid = item.solid;
+      tile.growth = 0;
+      tile.seedA = null;
+      tile.seedB = null;
+
+      removeItem(itemId, 1);
+      spawnParticles(tx * TILE + 16, ty * TILE + 16, item.color, 4);
+      sfxPlace();
+      saveGame();
+    }
+
+    // ---------- SPLICE / TREE ----------
+    function tryPlantSeed(worldX, worldY) {
+      const p = state.player;
+      const tx = Math.floor(worldX / TILE);
+      const ty = Math.floor(worldY / TILE);
+      const tile = getTile(tx, ty);
+      if (!tile) return;
+      if (tile.itemId) { showToast('Need empty soil'); sfxError(); return; }
+
+      const slot = state.selectedSlot;
+      const itemId = state.hotbar[slot];
+      if (!itemId || !ITEMS[itemId]) { showToast('Select a seed'); sfxError(); return; }
+      if (ITEMS[itemId].type !== 'seed') { showToast('Not a seed'); sfxError(); return; }
+      if (!hasItem(itemId, 1)) { showToast('No seed in inventory'); sfxError(); return; }
+
+      // distance check
+      const dx = (tx * TILE + TILE / 2) - (p.x + p.w / 2);
+      const dy = (ty * TILE + TILE / 2) - (p.y + p.h / 2);
+      if (Math.sqrt(dx * dx + dy * dy) > TILE * 3) return;
+
+      // remove seed from inventory
+      removeItem(itemId, 1);
+
+      // Create a "tree" on this tile — we'll treat the tile as growing
+      tile.itemId = null;
+      tile.solid = false;
+      tile.growth = 0.01; // start growing
+      tile.seedA = itemId;
+      tile.seedB = null;
+
+      // add tree record
+      state.trees.push({
+        x: tx, y: ty,
+        growth: 0,
+        seedA: itemId,
+        seedB: null,
+        ready: false
+      });
+
+      // Also check neighbouring tile for splice
+      const neighbours = [[tx-1,ty],[tx+1,ty],[tx,ty-1],[tx,ty+1]];
+      for (const [nx, ny] of neighbours) {
+        const nt = getTile(nx, ny);
+        if (nt && nt.growth > 0 && nt.seedA && !nt.seedB && nt.seedA !== itemId) {
+          // found potential splice!
+          const a = nt.seedA;
+          const b = itemId;
+          const recipe = SPLICE_RECIPES.find(r => (r[0] === a && r[1] === b) || (r[0] === b && r[1] === a));
+          if (recipe) {
+            const resultId = recipe[2];
+            // mark both tiles as spliced
+            nt.seedB = itemId;
+            nt.growth = 0.01; // restart growth
+            // update the tree record for neighbour
+            const ntree = state.trees.find(t => t.x === nx && t.y === ny);
+            if (ntree) { ntree.seedB = itemId; ntree.growth = 0; ntree.ready = false; }
+            // Also update current tile
+            tile.seedB = nt.seedA;
+            const curTree = state.trees.find(t => t.x === tx && t.y === ty);
+            if (curTree) { curTree.seedB = nt.seedA; curTree.growth = 0; curTree.ready = false; }
+            showToast(`Spliced! ${ITEMS[a]?.name} + ${ITEMS[b]?.name} → ${ITEMS[resultId]?.name}`);
+            sfxHarvest();
+            spawnFloatText(tx * TILE + 16, ty * TILE, 'SPLICE!', '#f0d050');
+          }
+          break;
         }
-      } else if (e.button === 2) { // RIGHT CLICK = PLACE or SPLICE
-        const selectedItemId = hotbar[selectedSlot];
-        const item = getItem(selectedItemId);
-        if (!item) return;
+      }
 
-        // If tile is empty and we have seed/block, place it
-        if (currentTile === TILE_TYPES.EMPTY) {
-          if (item.type === 'seed' || item.type === 'block') {
-            if (getItemCount(selectedItemId) > 0) {
-              // Place tile (use item.tile)
-              world[tileY][tileX] = item.tile;
-              removeItem(selectedItemId, 1);
-              showToast(`✅ Placed ${item.name}`);
-              autoSave();
-              // After placing, check for splice opportunities with adjacent tiles
-              // check all 4 neighbors
-              const neighbors = [
-                [tileX+1, tileY], [tileX-1, tileY], [tileX, tileY+1], [tileX, tileY-1]
-              ];
-              for (let [nx, ny] of neighbors) {
-                if (nx >= 0 && nx < COLS && ny >= 0 && ny < ROWS) {
-                  const neighborTile = world[ny][nx];
-                  if (neighborTile !== TILE_TYPES.EMPTY) {
-                    trySplice(tileX, tileY, nx, ny);
-                  }
-                }
+      saveGame();
+      sfxPlace();
+    }
+
+    // ---------- GROWTH UPDATE ----------
+    function updateTrees(dt) {
+      for (const tree of state.trees) {
+        if (tree.ready) continue;
+        if (tree.seedA && tree.seedB) {
+          // spliced tree, grows in 5s
+          tree.growth += dt / 5;
+          if (tree.growth >= 1) {
+            tree.growth = 1;
+            tree.ready = true;
+            // update tile visual
+            const tile = getTile(tree.x, tree.y);
+            if (tile) {
+              const recipe = SPLICE_RECIPES.find(r =>
+                (r[0] === tree.seedA && r[1] === tree.seedB) ||
+                (r[0] === tree.seedB && r[1] === tree.seedA)
+              );
+              if (recipe) {
+                const resultId = recipe[2];
+                tile.itemId = resultId;
+                tile.solid = ITEMS[resultId]?.solid ?? false;
               }
-            } else {
-              showToast(`❌ ${item.name} habis`);
             }
+            spawnFloatText(tree.x * TILE + 16, tree.y * TILE - 10, '✨ READY ✨', '#a0ffa0');
+            sfxHarvest();
           }
-        } else {
-          // Tile not empty -> attempt splice if both are seeds (tiles represent seeds)
-          trySplice(tileX, tileY, tileX, tileY); // not adjacent; but we need second tile
-          // Actually splice is triggered by placing second seed. So nothing here.
+        } else if (tree.seedA) {
+          // single seed tree, grows in 4s
+          tree.growth += dt / 4;
+          if (tree.growth >= 1) {
+            tree.growth = 1;
+            tree.ready = true;
+            const tile = getTile(tree.x, tree.y);
+            if (tile) {
+              tile.itemId = 'wood'; // tree yields wood
+              tile.solid = true;
+            }
+            spawnFloatText(tree.x * TILE + 16, tree.y * TILE - 10, '🌳 READY', '#a0ffa0');
+            sfxHarvest();
+          }
         }
       }
-      renderHotbar();
-    });
+      // clean up trees that have been harvested and tiles no longer growing
+      state.trees = state.trees.filter(t => {
+        const tile = getTile(t.x, t.y);
+        if (!tile) return false;
+        if (t.ready && tile.itemId && tile.itemId !== 'wood') {
+          // spliced result already in tile; keep until harvested?
+          // We'll allow harvest via click on tile with special handling
+        }
+        return true;
+      });
+    }
 
-    // ---------- SHOP / SEED PACK ----------
-    document.getElementById('buySeedPack').addEventListener('click', () => {
-      if (gems < 10) {
-        showToast('💎 Permata tidak cukup!');
-        return;
-      }
-      gems -= 10;
+    // ---------- HARVEST TREE (when clicking on a ready tree tile) ----------
+    function tryHarvest(worldX, worldY) {
+      const tx = Math.floor(worldX / TILE);
+      const ty = Math.floor(worldY / TILE);
+      const tree = state.trees.find(t => t.x === tx && t.y === ty);
+      if (!tree || !tree.ready) return false;
+
+      const tile = getTile(tx, ty);
+      if (!tile || !tile.itemId) return false;
+
+      const item = ITEMS[tile.itemId];
+      if (!item) return false;
+
+      // check distance
+      const p = state.player;
+      const dx = (tx * TILE + 16) - (p.x + p.w / 2);
+      const dy = (ty * TILE + 16) - (p.y + p.h / 2);
+      if (Math.sqrt(dx * dx + dy * dy) > TILE * 3) return false;
+
+      // harvest!
+      const itemId = tile.itemId;
+      const count = 1 + (Math.random() < 0.3 ? 1 : 0); // sometimes 2
+
+      // add to inventory
+      addItem(itemId, count);
+
+      // gems
+      const gemGain = item.rarity === 'Legendary' ? 8 : item.rarity === 'Rare' ? 5 : 2;
+      state.gems += gemGain;
+      spawnFloatText(tx * TILE + 16, ty * TILE, `+${gemGain} 💎`, '#f0d050');
+
+      // particles
+      spawnParticles(tx * TILE + 16, ty * TILE + 16, item.color, 12);
+      sfxHarvest();
+      state.screenShake = 2;
+
+      // remove tree record
+      state.trees = state.trees.filter(t => !(t.x === tx && t.y === ty));
+
+      // clear tile
+      tile.itemId = null;
+      tile.solid = false;
+      tile.growth = 0;
+      tile.seedA = null;
+      tile.seedB = null;
+
+      saveGame();
+      return true;
+    }
+
+    // ---------- SHOP ----------
+    function buySeedPack() {
+      if (state.gems < 10) { showToast('Not enough gems (10)'); sfxError(); return; }
+      state.gems -= 10;
       // random seed from a pool
-      const seedPool = ['dirt_seed', 'rock_seed', 'water_seed', 'grass_seed', 'sand_seed', 'flower_seed', 'wood_seed'];
+      const seedPool = ['dirt','rock','sand','wood','leaf','flower','tree_seed','grass','water'];
       const randomSeed = seedPool[Math.floor(Math.random() * seedPool.length)];
       addItem(randomSeed, 1);
-      updateGemDisplay();
-      renderHotbar();
-      showToast(`🎁 Dapat ${getItem(randomSeed)?.name || 'seed'}!`);
-      autoSave();
-    });
+      showToast(`Bought Seed Pack → ${ITEMS[randomSeed]?.name}`);
+      spawnFloatText(state.player.x, state.player.y - 20, '🎁 SEED', '#a0d0ff');
+      sfxBuy();
+      saveGame();
+    }
 
-    // ---------- RECIPE PANEL TOGGLE ----------
-    const recipePanel = document.getElementById('recipePanel');
-    document.getElementById('toggleRecipes').addEventListener('click', () => {
-      recipePanel.classList.toggle('visible');
-    });
+    function sellItem(itemId) {
+      if (!hasItem(itemId, 1)) { showToast('No item to sell'); sfxError(); return; }
+      const item = ITEMS[itemId];
+      if (!item) return;
+      const price = item.rarity === 'Legendary' ? 30 : item.rarity === 'Rare' ? 15 : item.rarity === 'Uncommon' ? 7 : 3;
+      removeItem(itemId, 1);
+      state.gems += price;
+      // World Lock from selling Legendary
+      if (item.rarity === 'Legendary' && Math.random() < 0.4) {
+        state.worldLocks += 1;
+        showToast(`Sold ${item.name} → ${price}💎 + World Lock!`);
+      } else {
+        showToast(`Sold ${item.name} → ${price}💎`);
+      }
+      spawnFloatText(state.player.x, state.player.y - 20, `+${price} 💎`, '#f0d050');
+      sfxBuy();
+      saveGame();
+    }
 
-    // populate recipe list
-    function renderRecipeList() {
-      const listDiv = document.getElementById('recipeList');
-      listDiv.innerHTML = '';
-      SPLICE_RECIPES.forEach(rec => {
-        const itemA = getItem(rec.a);
-        const itemB = getItem(rec.b);
-        const resultItem = getItem(rec.result);
-        if (itemA && itemB && resultItem) {
-          const el = document.createElement('div');
-          el.className = 'recipe-item';
-          el.textContent = `${itemA.emoji} ${itemA.name} + ${itemB.emoji} ${itemB.name} → ${resultItem.emoji} ${resultItem.name} (x${rec.count || 1})`;
-          listDiv.appendChild(el);
+    // ---------- DRAWING (PIXEL ART VIA CANVAS) ----------
+
+    // ---------- TILE SPRITES (drawn with fillRect) ----------
+    function drawTileSprite(itemId, x, y, size) {
+      const item = ITEMS[itemId];
+      if (!item) return;
+
+      // base fill
+      ctx.fillStyle = item.color;
+      ctx.fillRect(x, y, size, size);
+
+      // texture per type
+      if (itemId === 'dirt') {
+        ctx.fillStyle = '#5e452a';
+        for (let i = 0; i < 6; i++) {
+          const px = x + 4 + Math.floor(Math.random() * 24);
+          const py = y + 4 + Math.floor(Math.random() * 24);
+          ctx.fillRect(px, py, 2, 2);
+        }
+        ctx.fillStyle = '#9e7e55';
+        ctx.fillRect(x + 2, y + 2, 4, 2);
+        ctx.fillRect(x + 20, y + 12, 6, 2);
+      } else if (itemId === 'rock') {
+        ctx.fillStyle = '#5e5e5e';
+        ctx.fillRect(x + 6, y + 4, 10, 6);
+        ctx.fillRect(x + 16, y + 18, 10, 8);
+        ctx.fillStyle = '#9e9e9e';
+        ctx.fillRect(x + 4, y + 6, 4, 4);
+      } else if (itemId === 'grass') {
+        ctx.fillStyle = '#3e7a2b';
+        for (let i = 0; i < 8; i++) {
+          ctx.fillRect(x + i * 4, y + 2, 2, 6);
+        }
+        ctx.fillStyle = '#7ec850';
+        ctx.fillRect(x + 6, y + 4, 4, 4);
+        ctx.fillRect(x + 18, y + 10, 4, 4);
+      } else if (itemId === 'water') {
+        ctx.fillStyle = '#2a5f8a';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#5a9fd0';
+        for (let i = 0; i < 5; i++) {
+          ctx.fillRect(x + 4 + (i * 7) % 24, y + 4 + (i * 5) % 20, 6, 2);
+        }
+        // animation shimmer
+        const t = Date.now() / 400;
+        ctx.fillStyle = '#8ad0ff';
+        ctx.fillRect(x + 8 + Math.sin(t) * 6, y + 12 + Math.cos(t * 1.3) * 4, 4, 2);
+      } else if (itemId === 'lava') {
+        ctx.fillStyle = '#8a1a0a';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#ff6b2b';
+        ctx.fillRect(x + 4, y + 8, 8, 6);
+        ctx.fillRect(x + 18, y + 2, 6, 4);
+        ctx.fillStyle = '#ffcc40';
+        ctx.fillRect(x + 12, y + 16, 6, 4);
+      } else if (itemId === 'wood') {
+        ctx.fillStyle = '#5e3a1a';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#8b5a2b';
+        for (let i = 0; i < 4; i++) {
+          ctx.fillRect(x + 2 + i * 7, y + 2, 4, 28);
+        }
+        ctx.fillStyle = '#b87c4a';
+        ctx.fillRect(x + 8, y + 6, 2, 20);
+      } else if (itemId === 'leaf') {
+        ctx.fillStyle = '#2b6e2b';
+        for (let i = 0; i < 12; i++) {
+          ctx.fillRect(x + 2 + (i * 5) % 28, y + 2 + (i * 7) % 28, 6, 4);
+        }
+        ctx.fillStyle = '#5ec85e';
+        ctx.fillRect(x + 8, y + 8, 6, 6);
+      } else if (itemId === 'sand') {
+        ctx.fillStyle = '#c4a05a';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#e0c080';
+        for (let i = 0; i < 8; i++) {
+          ctx.fillRect(x + 2 + (i * 11) % 28, y + 2 + (i * 7) % 28, 3, 3);
+        }
+      } else if (itemId === 'glass') {
+        ctx.fillStyle = '#7ab8d4';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#c0e8ff';
+        ctx.fillRect(x + 4, y + 4, 10, 8);
+        ctx.fillStyle = '#ffffff80';
+        ctx.fillRect(x + 18, y + 18, 8, 6);
+      } else if (itemId === 'flower') {
+        ctx.fillStyle = '#3a6e2b';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#c75b8c';
+        ctx.fillRect(x + 12, y + 4, 8, 8);
+        ctx.fillStyle = '#f0a0c0';
+        ctx.fillRect(x + 14, y + 6, 4, 4);
+      } else if (itemId === 'stone') {
+        ctx.fillStyle = '#4e4e4e';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#7e7e7e';
+        ctx.fillRect(x + 4, y + 6, 8, 8);
+        ctx.fillRect(x + 18, y + 18, 8, 6);
+      } else if (itemId === 'sandstone') {
+        ctx.fillStyle = '#a07a3a';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#c4a05a';
+        ctx.fillRect(x + 2, y + 2, 10, 4);
+        ctx.fillRect(x + 16, y + 12, 12, 4);
+      } else if (itemId === 'rose') {
+        ctx.fillStyle = '#2b5e2b';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#d43f5a';
+        ctx.fillRect(x + 10, y + 4, 12, 12);
+        ctx.fillStyle = '#ff6b8a';
+        ctx.fillRect(x + 14, y + 8, 4, 4);
+      } else if (itemId === 'crystal') {
+        ctx.fillStyle = '#5a2b8a';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#b87cff';
+        ctx.fillRect(x + 8, y + 4, 8, 20);
+        ctx.fillStyle = '#e0b0ff';
+        ctx.fillRect(x + 10, y + 8, 4, 6);
+      } else if (itemId === 'ember') {
+        ctx.fillStyle = '#5a2a0a';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#e66b1e';
+        ctx.fillRect(x + 4, y + 12, 10, 8);
+        ctx.fillStyle = '#ffb040';
+        ctx.fillRect(x + 16, y + 4, 6, 6);
+      } else if (itemId === 'obsidian') {
+        ctx.fillStyle = '#1a1a2a';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#3a3a5a';
+        ctx.fillRect(x + 6, y + 8, 8, 8);
+        ctx.fillRect(x + 18, y + 18, 6, 6);
+      } else if (itemId === 'gold') {
+        ctx.fillStyle = '#b08a20';
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#f0d050';
+        ctx.fillRect(x + 4, y + 4, 10, 8);
+        ctx.fillRect(x + 16, y + 16, 10, 8);
+      } else {
+        // fallback
+        ctx.fillStyle = item.color;
+        ctx.fillRect(x, y, size, size);
+        ctx.fillStyle = '#ffffff40';
+        ctx.fillRect(x + 4, y + 4, size - 8, size - 8);
+      }
+    }
+
+    // ---------- DRAW PLAYER (16x24) ----------
+    function drawPlayer() {
+      const p = state.player;
+      const px = Math.round(p.x - state.camera.x);
+      const py = Math.round(p.y - state.camera.y);
+      const w = 16, h = 24;
+      const facing = p.facing;
+      const walkFrame = p.animFrame;
+      const isPunching = p.punchTimer > 0;
+
+      ctx.save();
+      // shadow
+      ctx.fillStyle = '#00000040';
+      ctx.beginPath();
+      ctx.ellipse(px + w / 2, py + h - 2, 8, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // body colors
+      const skin = '#f0c8a0';
+      const shirt = '#3a7ca5';
+      const pants = '#2d4a6e';
+      const hair = '#6b3a1a';
+
+      // legs animation
+      const legOffset = (p.onGround && (p.vx !== 0)) ? Math.sin(walkFrame * Math.PI / 2) * 2 : 0;
+
+      // draw legs
+      ctx.fillStyle = pants;
+      ctx.fillRect(px + 4, py + 16 + (legOffset > 0 ? 0 : 1), 3, 8);
+      ctx.fillRect(px + 9, py + 16 + (legOffset < 0 ? 0 : 1), 3, 8);
+
+      // body
+      ctx.fillStyle = shirt;
+      ctx.fillRect(px + 3, py + 10, 10, 8);
+
+      // arms
+      ctx.fillStyle = shirt;
+      if (isPunching) {
+        // extend arm forward
+        const armX = facing > 0 ? px + 12 : px - 4;
+        ctx.fillRect(armX, py + 12, 8, 3);
+        ctx.fillStyle = skin;
+        ctx.fillRect(armX + (facing > 0 ? 6 : 0), py + 12, 3, 3);
+      } else {
+        ctx.fillRect(facing > 0 ? px + 12 : px - 2, py + 12, 6, 3);
+        ctx.fillStyle = skin;
+        ctx.fillRect(facing > 0 ? px + 16 : px - 2, py + 12, 2, 3);
+      }
+
+      // head
+      ctx.fillStyle = skin;
+      ctx.fillRect(px + 4, py + 2, 8, 8);
+
+      // hair
+      ctx.fillStyle = hair;
+      ctx.fillRect(px + 3, py, 10, 4);
+      ctx.fillRect(px + (facing > 0 ? 2 : 12), py + 2, 2, 4);
+
+      // eyes
+      ctx.fillStyle = '#222';
+      const eyeX = facing > 0 ? px + 9 : px + 5;
+      ctx.fillRect(eyeX, py + 5, 2, 2);
+      ctx.fillRect(eyeX + (facing > 0 ? -3 : 3), py + 5, 2, 2);
+
+      // if jumping, adjust legs
+      if (!p.onGround) {
+        ctx.fillStyle = pants;
+        ctx.fillRect(px + 4, py + 14, 3, 6);
+        ctx.fillRect(px + 9, py + 14, 3, 6);
+      }
+
+      ctx.restore();
+    }
+
+    // ---------- RENDER ----------
+    function render() {
+      const camX = state.camera.x;
+      const camY = state.camera.y;
+
+      // sky gradient
+      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      grad.addColorStop(0, '#1a2e4a');
+      grad.addColorStop(0.6, '#2a4a6a');
+      grad.addColorStop(1, '#4a6a8a');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // parallax clouds
+      const time = Date.now() / 1000;
+      for (let i = 0; i < 8; i++) {
+        const cloudX = ((i * 180 + time * 12) % (canvas.width + 300)) - 150;
+        const cloudY = 40 + i * 18;
+        ctx.fillStyle = '#ffffff15';
+        ctx.beginPath();
+        ctx.ellipse(cloudX, cloudY, 60, 22, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(cloudX + 40, cloudY - 10, 40, 18, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // apply screen shake
+      ctx.save();
+      if (state.screenShake > 0.5) {
+        const sx = (Math.random() - 0.5) * state.screenShake * 2;
+        const sy = (Math.random() - 0.5) * state.screenShake * 2;
+        ctx.translate(sx, sy);
+        state.screenShake *= 0.9;
+        if (state.screenShake < 0.5) state.screenShake = 0;
+      }
+
+      // tiles
+      const startX = Math.floor(camX / TILE);
+      const endX = Math.ceil((camX + canvas.width) / TILE);
+      const startY = Math.floor(camY / TILE);
+      const endY = Math.ceil((camY + canvas.height) / TILE);
+
+      for (let ty = startY; ty <= endY; ty++) {
+        for (let tx = startX; tx <= endX; tx++) {
+          if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) continue;
+          const tile = state.tiles[ty]?.[tx];
+          if (!tile || !tile.itemId) continue;
+          const screenX = tx * TILE - camX;
+          const screenY = ty * TILE - camY;
+          drawTileSprite(tile.itemId, screenX, screenY, TILE);
+
+          // draw growth indicator for trees
+          const tree = state.trees.find(t => t.x === tx && t.y === ty);
+          if (tree && !tree.ready && tree.growth > 0) {
+            ctx.fillStyle = '#ffffff80';
+            ctx.fillRect(screenX + 4, screenY - 4, TILE - 8, 4);
+            ctx.fillStyle = '#80ff80';
+            ctx.fillRect(screenX + 4, screenY - 4, (TILE - 8) * tree.growth, 4);
+          }
+        }
+      }
+
+      // player
+      drawPlayer();
+
+      // particles
+      for (const p of state.particles) {
+        const alpha = p.life / p.maxLife;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x - camX, p.y - camY, p.size, p.size);
+      }
+      ctx.globalAlpha = 1;
+
+      // float texts
+      for (const ft of state.floatTexts) {
+        const alpha = ft.life / ft.maxLife;
+        ctx.globalAlpha = alpha;
+        ctx.font = 'bold 14px "Courier New", monospace';
+        ctx.fillStyle = ft.color;
+        ctx.shadowColor = '#000';
+        ctx.shadowBlur = 4;
+        ctx.fillText(ft.text, ft.x - camX, ft.y - camY);
+        ctx.shadowBlur = 0;
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.restore();
+
+      // ---------- UI ----------
+      drawUI();
+    }
+
+    // ---------- DRAW UI ----------
+    function drawUI() {
+      // hotbar
+      const hbX = 20;
+      const hbY = canvas.height - 70;
+      for (let i = 0; i < 8; i++) {
+        const x = hbX + i * 52;
+        const selected = i === state.selectedSlot;
+        ctx.fillStyle = selected ? '#4a7a9a' : '#1e2e3e';
+        ctx.fillRect(x, hbY, 48, 48);
+        ctx.strokeStyle = selected ? '#f0d050' : '#3e5e7a';
+        ctx.lineWidth = selected ? 3 : 1;
+        ctx.strokeRect(x, hbY, 48, 48);
+
+        const itemId = state.hotbar[i];
+        if (itemId && ITEMS[itemId]) {
+          drawTileSprite(itemId, x + 8, hbY + 4, 32);
+          // count
+          const count = state.inventory[itemId] || 0;
+          ctx.font = 'bold 12px "Courier New"';
+          ctx.fillStyle = '#fff';
+          ctx.shadowColor = '#000';
+          ctx.shadowBlur = 3;
+          ctx.fillText(count, x + 36, hbY + 44);
+          ctx.shadowBlur = 0;
+        }
+        // slot number
+        ctx.font = '10px "Courier New"';
+        ctx.fillStyle = '#6a8a9a';
+        ctx.fillText(i + 1, x + 4, hbY + 14);
+      }
+
+      // toast
+      if (state.toast.timer > 0) {
+        const alpha = Math.min(1, state.toast.timer * 2);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#000000aa';
+        ctx.fillRect(canvas.width / 2 - 150, 30, 300, 36);
+        ctx.strokeStyle = '#f0d050';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(canvas.width / 2 - 150, 30, 300, 36);
+        ctx.font = 'bold 16px "Courier New"';
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.fillText(state.toast.text, canvas.width / 2, 54);
+        ctx.textAlign = 'left';
+        ctx.globalAlpha = 1;
+      }
+
+      // chat messages
+      const chatY = canvas.height - 180;
+      for (let i = 0; i < Math.min(state.chatMessages.length, 5); i++) {
+        const msg = state.chatMessages[state.chatMessages.length - 1 - i];
+        ctx.font = '14px "Courier New"';
+        ctx.fillStyle = '#ffffffcc';
+        ctx.shadowColor = '#000';
+        ctx.shadowBlur = 4;
+        ctx.fillText(msg, 20, chatY + i * 20);
+        ctx.shadowBlur = 0;
+      }
+
+      // chat input
+      if (state.chatOpen) {
+        ctx.fillStyle = '#000000cc';
+        ctx.fillRect(10, canvas.height - 60, canvas.width - 20, 40);
+        ctx.strokeStyle = '#f0d050';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(10, canvas.height - 60, canvas.width - 20, 40);
+        ctx.font = 'bold 16px "Courier New"';
+        ctx.fillStyle = '#fff';
+        ctx.fillText('> ' + state.chatText + (Math.floor(Date.now() / 400) % 2 ? '|' : ''), 24, canvas.height - 34);
+      }
+
+      // inventory overlay
+      if (state.inventoryOpen) {
+        ctx.fillStyle = '#0e1a2be0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#1e2e3e';
+        ctx.fillRect(100, 60, canvas.width - 200, canvas.height - 180);
+        ctx.strokeStyle = '#f0d050';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(100, 60, canvas.width - 200, canvas.height - 180);
+        ctx.font = 'bold 24px "Courier New"';
+        ctx.fillStyle = '#f0d050';
+        ctx.fillText('INVENTORY (I to close)', 140, 110);
+
+        const items = Object.entries(state.inventory);
+        let col = 0, row = 0;
+        for (const [itemId, count] of items) {
+          const x = 140 + col * 130;
+          const y = 140 + row * 100;
+          const item = ITEMS[itemId];
+          ctx.fillStyle = '#1a2a3a';
+          ctx.fillRect(x, y, 110, 80);
+          ctx.strokeStyle = RARITY_COLORS[item?.rarity] || '#555';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x, y, 110, 80);
+          if (item) {
+            drawTileSprite(itemId, x + 35, y + 10, 40);
+            ctx.font = 'bold 14px "Courier New"';
+            ctx.fillStyle = RARITY_COLORS[item.rarity] || '#fff';
+            ctx.fillText(item.name, x + 8, y + 70);
+            ctx.fillStyle = '#fff';
+            ctx.fillText('x' + count, x + 80, y + 70);
+          }
+          col++;
+          if (col >= 5) { col = 0; row++; }
+        }
+      }
+
+      // recipe overlay
+      if (state.recipeOpen) {
+        ctx.fillStyle = '#0e1a2be0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#1e2e3e';
+        ctx.fillRect(60, 30, canvas.width - 120, canvas.height - 60);
+        ctx.strokeStyle = '#f0d050';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(60, 30, canvas.width - 120, canvas.height - 60);
+        ctx.font = 'bold 22px "Courier New"';
+        ctx.fillStyle = '#f0d050';
+        ctx.fillText('SPLICING RECIPES (R to close)', 100, 80);
+
+        ctx.font = '14px "Courier New"';
+        let line = 0;
+        for (const [a, b, result] of SPLICE_RECIPES) {
+          const y = 110 + line * 22;
+          if (y > canvas.height - 80) break;
+          ctx.fillStyle = RARITY_COLORS[ITEMS[a]?.rarity] || '#fff';
+          ctx.fillText(`${ITEMS[a]?.name} + `, 100, y);
+          ctx.fillStyle = RARITY_COLORS[ITEMS[b]?.rarity] || '#fff';
+          ctx.fillText(`${ITEMS[b]?.name} → `, 240, y);
+          ctx.fillStyle = RARITY_COLORS[ITEMS[result]?.rarity] || '#fff';
+          ctx.fillText(ITEMS[result]?.name, 400, y);
+          line++;
+        }
+      }
+
+      // shop overlay
+      if (state.shopOpen) {
+        ctx.fillStyle = '#0e1a2be0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#1e2e3e';
+        ctx.fillRect(200, 120, canvas.width - 400, 400);
+        ctx.strokeStyle = '#f0d050';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(200, 120, canvas.width - 400, 400);
+        ctx.font = 'bold 24px "Courier New"';
+        ctx.fillStyle = '#f0d050';
+        ctx.fillText('TOKO (B to close)', 250, 170);
+
+        ctx.font = '18px "Courier New"';
+        ctx.fillStyle = '#fff';
+        ctx.fillText('Beli Seed Pack (10 💎)', 250, 230);
+        ctx.fillStyle = '#a0d0ff';
+        ctx.fillText('[ klik untuk beli ]', 500, 230);
+
+        ctx.fillStyle = '#fff';
+        ctx.fillText('Jual item dari inventory:', 250, 290);
+        const sellable = Object.entries(state.inventory).slice(0, 6);
+        let sy = 320;
+        for (const [itemId, count] of sellable) {
+          const item = ITEMS[itemId];
+          if (!item) continue;
+          ctx.fillStyle = RARITY_COLORS[item.rarity] || '#fff';
+          ctx.fillText(`${item.name} x${count}`, 280, sy);
+          ctx.fillStyle = '#a0d0ff';
+          ctx.fillText('[ jual ]', 560, sy);
+          sy += 30;
+        }
+        // click handling below
+      }
+
+      // coordinates & fps
+      ctx.font = '12px "Courier New"';
+      ctx.fillStyle = '#a0c0d0';
+      ctx.fillText(`x:${Math.floor(state.player.x / TILE)} y:${Math.floor(state.player.y / TILE)}`, canvas.width - 140, 20);
+      ctx.fillText(`FPS:${state.fps}`, canvas.width - 80, 20);
+    }
+
+    // ---------- GAME LOOP ----------
+    let lastTimestamp = 0;
+    let fpsAccum = 0;
+    let fpsFrames = 0;
+
+    function gameLoop(timestamp) {
+      const dt = Math.min(0.05, (timestamp - lastTimestamp) / 1000) || 0.016;
+      lastTimestamp = timestamp;
+
+      // FPS counter
+      fpsAccum += dt;
+      fpsFrames++;
+      if (fpsAccum >= 0.5) {
+        state.fps = Math.round(fpsFrames / fpsAccum);
+        fpsAccum = 0;
+        fpsFrames = 0;
+        document.getElementById('fpsDisplay').textContent = state.fps;
+      }
+
+      // toast timer
+      if (state.toast.timer > 0) state.toast.timer -= dt;
+
+      // physics
+      updatePhysics(dt);
+      updateCamera();
+      updateTrees(dt);
+      updateParticles(dt);
+
+      // update HUD
+      document.getElementById('gemsDisplay').textContent = state.gems;
+      document.getElementById('locksDisplay').textContent = state.worldLocks;
+
+      // render
+      render();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // ---------- INPUT HANDLERS ----------
+    function setupInput() {
+      window.addEventListener('keydown', (e) => {
+        const key = e.key.toLowerCase();
+        state.keys[key] = true;
+        if (e.key === ' ') state.keys[' '] = true;
+
+        // prevent default for arrows/space
+        if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) {
+          e.preventDefault();
+        }
+
+        // hotbar 1-8
+        if (key >= '1' && key <= '8') {
+          state.selectedSlot = parseInt(key) - 1;
+        }
+
+        // inventory
+        if (key === 'i') {
+          state.inventoryOpen = !state.inventoryOpen;
+          state.recipeOpen = false;
+          state.shopOpen = false;
+        }
+        // recipe
+        if (key === 'r') {
+          state.recipeOpen = !state.recipeOpen;
+          state.inventoryOpen = false;
+          state.shopOpen = false;
+        }
+        // shop
+        if (key === 'b') {
+          state.shopOpen = !state.shopOpen;
+          state.inventoryOpen = false;
+          state.recipeOpen = false;
+        }
+        // chat
+        if (key === 't' && !state.chatOpen) {
+          state.chatOpen = true;
+          state.chatText = '';
+          e.preventDefault();
+        }
+        if (state.chatOpen && key === 'escape') {
+          state.chatOpen = false;
+        }
+        if (state.chatOpen && key === 'enter') {
+          const msg = state.chatText.trim();
+          if (msg) {
+            if (msg.startsWith('/give ')) {
+              const parts = msg.split(' ');
+              const itemId = parts[1];
+              const amount = parseInt(parts[2]) || 1;
+              if (ITEMS[itemId]) {
+                addItem(itemId, amount);
+                state.chatMessages.push(`[DEV] +${amount} ${ITEMS[itemId].name}`);
+              } else {
+                state.chatMessages.push(`[DEV] Unknown item: ${itemId}`);
+              }
+            } else if (msg === '/help') {
+              state.chatMessages.push('Commands: /give <item> <n>, /help');
+            } else {
+              state.chatMessages.push('You: ' + msg);
+            }
+            if (state.chatMessages.length > 20) state.chatMessages.shift();
+          }
+          state.chatOpen = false;
+          state.chatText = '';
+          e.preventDefault();
+        }
+        if (state.chatOpen) {
+          if (key === 'backspace') {
+            state.chatText = state.chatText.slice(0, -1);
+            e.preventDefault();
+          } else if (key.length === 1 && !e.ctrlKey && !e.metaKey) {
+            state.chatText += e.key;
+            e.preventDefault();
+          }
+        }
+
+        // reset world (dev)
+        if (key === 'f5') {
+          // let browser handle refresh; we do autosave
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        const key = e.key.toLowerCase();
+        state.keys[key] = false;
+        if (e.key === ' ') state.keys[' '] = false;
+      });
+
+      // Mouse
+      canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mx = (e.clientX - rect.left) * scaleX;
+        const my = (e.clientY - rect.top) * scaleY;
+        state.mouse.x = mx;
+        state.mouse.y = my;
+        state.mouse.worldX = mx + state.camera.x;
+        state.mouse.worldY = my + state.camera.y;
+      });
+
+      canvas.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        if (state.chatOpen) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mx = (e.clientX - rect.left) * scaleX;
+        const my = (e.clientY - rect.top) * scaleY;
+        const worldX = mx + state.camera.x;
+        const worldY = my + state.camera.y;
+
+        // handle UI clicks
+        if (state.inventoryOpen) {
+          // check if clicking inventory item to move to hotbar
+          const items = Object.entries(state.inventory);
+          let col = 0, row = 0;
+          for (const [itemId] of items) {
+            const ix = 140 + col * 130;
+            const iy = 140 + row * 100;
+            if (mx >= ix && mx <= ix + 110 && my >= iy && my <= iy + 80) {
+              // add to hotbar
+              for (let s = 0; s < 8; s++) {
+                if (!state.hotbar[s]) {
+                  state.hotbar[s] = itemId;
+                  break;
+                }
+              }
+              saveGame();
+              break;
+            }
+            col++;
+            if (col >= 5) { col = 0; row++; }
+          }
+          return;
+        }
+        if (state.recipeOpen) return;
+
+        if (state.shopOpen) {
+          // buy seed pack area
+          if (mx >= 240 && mx <= 600 && my >= 205 && my <= 245) {
+            buySeedPack();
+            return;
+          }
+          // sell items
+          const sellable = Object.entries(state.inventory).slice(0, 6);
+          let sy = 320;
+          for (const [itemId] of sellable) {
+            if (mx >= 540 && mx <= 600 && my >= sy - 18 && my <= sy + 4) {
+              sellItem(itemId);
+              return;
+            }
+            sy += 30;
+          }
+          return;
+        }
+
+        // punch / harvest / place
+        if (e.button === 0) { // left click: harvest or punch
+          // try harvest first
+          if (tryHarvest(worldX, worldY)) return;
+          // otherwise punch
+          punchAt(worldX, worldY);
+        } else if (e.button === 2) { // right click: place or plant
+          e.preventDefault();
+          const slot = state.selectedSlot;
+          const itemId = state.hotbar[slot];
+          if (itemId && ITEMS[itemId] && ITEMS[itemId].type === 'seed') {
+            tryPlantSeed(worldX, worldY);
+          } else {
+            placeBlock(worldX, worldY);
+          }
+        }
+      });
+
+      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      // Scroll for hotbar
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        if (e.deltaY > 0) {
+          state.selectedSlot = (state.selectedSlot + 1) % 8;
+        } else {
+          state.selectedSlot = (state.selectedSlot + 7) % 8;
         }
       });
     }
 
-    // ---------- GAME LOOP ----------
-    let lastTime = performance.now();
-    function gameLoop(now) {
-      const delta = Math.min((now - lastTime) / 1000, 0.1); // cap delta
-      lastTime = now;
-
-      updatePlayerMovement(delta);
-      updateSplices(delta);
-      drawWorld();
-
-      // auto-save occasionally (every ~10 sec handled by events, but also periodic)
-      requestAnimationFrame(gameLoop);
-    }
-
     // ---------- INIT ----------
     function init() {
-      const loaded = loadGame();
-      if (!loaded) {
-        generateWorld();
-        initStartingInventory();
+      if (!loadGame()) {
+        resetWorld();
+      } else {
+        // ensure trees are consistent with tiles
+        state.trees = state.trees.filter(t => {
+          const tile = getTile(t.x, t.y);
+          return tile && (tile.growth > 0 || tile.seedA || tile.seedB);
+        });
       }
-      // ensure inventory has something
-      if (Object.keys(inventory).length === 0) initStartingInventory();
-      if (gems === 0 && !loaded) gems = 15;
-      updateGemDisplay();
-      renderHotbar();
-      renderRecipeList();
-      autoSave();
+
+      // ensure hotbar has items
+      if (state.hotbar.every(h => h === null) && Object.keys(state.inventory).length > 0) {
+        const items = Object.keys(state.inventory);
+        for (let i = 0; i < 8 && i < items.length; i++) {
+          state.hotbar[i] = items[i];
+        }
+      }
+
+      state.camera.x = state.player.x - canvas.width / 2;
+      state.camera.y = state.player.y - canvas.height / 2;
+      state.camera.x = Math.max(0, Math.min(WORLD_W - canvas.width, state.camera.x));
+      state.camera.y = Math.max(0, Math.min(WORLD_H - canvas.height, state.camera.y));
+
+      setupInput();
+      lastTimestamp = performance.now();
       requestAnimationFrame(gameLoop);
+
+      // reset world button on menu (extra: double tap F5 to reset? not needed)
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'F5') {
+          // autosave before refresh
+          saveGame();
+        }
+      });
+
+      // autosave every 15 seconds
+      setInterval(saveGame, 15000);
+
+      showToast('PixelSplice — A/D move, W jump, LMB punch, RMB place, I inventory, R recipes, B shop, T chat');
     }
 
-    // Add extra recipe adjustment: ensure leaf_seed not needed. We already have wood_block from grass+wood.
-    // Fix recipe list to remove leaf_seed reference
-    SPLICE_RECIPES[5] = { a: 'grass_seed', b: 'wood_seed', result: 'wood_block', count: 1 };
-    SPLICE_RECIPES.splice(6, 1); // remove duplicate maybe
-
+    // start
     init();
-
   })();
 </script>
 </body>
