@@ -1,1496 +1,780 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Duitin Aja — Selesaikan Misi, Dapat Duit</title>
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Poppins -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelSplice · 2D sandbox</title>
   <style>
-    /* ========== GLOBAL & PALET WARNA ========== */
-    :root {
-      --primary: #FF4D6D;
-      --secondary: #C9184A;
-      --bg: #FFF5F7;
-      --card: #FFFFFF;
-      --text: #1A1A1A;
-      --text-sec: #8A5A64;
-      --coin: #FFD700;
-      --success: #00C853;
+    * {
+      box-sizing: border-box;
+      user-select: none;
     }
-    * { font-family: 'Poppins', 'Nunito', sans-serif; -webkit-tap-highlight-color: transparent; }
     body {
-      background: var(--bg);
-      color: var(--text);
       margin: 0;
-      padding: 0;
       min-height: 100vh;
-      overflow-x: hidden;
-    }
-    /* ========== KOIN EMAS ========== */
-    .coin-icon {
-      display: inline-flex;
+      background: #1a2a32;
+      display: flex;
       align-items: center;
       justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #FFE066, #FFD700, #D4A017);
-      color: #7A5C00;
-      font-weight: 800;
-      font-size: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(255,255,255,0.6);
-      flex-shrink: 0;
+      font-family: 'Segoe UI', system-ui, monospace;
     }
-    .coin-icon.lg { width: 32px; height: 32px; font-size: 16px; }
-    .coin-icon.xl { width: 56px; height: 56px; font-size: 28px; }
-    /* ========== CARD ========== */
-    .card {
-      background: var(--card);
-      border-radius: 20px;
-      box-shadow: 0 4px 12px rgba(255, 77, 109, 0.15);
-      padding: 20px;
+    .game-wrapper {
+      background: #2e4a5c;
+      padding: 12px;
+      border-radius: 24px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
     }
-    /* ========== TOMBOL BOUNCY ========== */
-    .btn-bouncy {
-      transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
-      cursor: pointer;
-      border: none;
-      font-weight: 700;
+    canvas {
+      display: block;
       border-radius: 16px;
+      box-shadow: inset 0 0 0 2px #466b7e, 0 4px 0 #0d1c24;
+      cursor: crosshair;
+      background: #6f9ab0;
     }
-    .btn-bouncy:active {
-      transform: scale(0.92);
-      box-shadow: 0 2px 6px rgba(255, 77, 109, 0.2);
-    }
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(255, 77, 109, 0.4);
-    }
-    .btn-primary:disabled {
-      background: #d9d9d9;
-      box-shadow: none;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-    .btn-success {
-      background: var(--success);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(0, 200, 83, 0.4);
-    }
-    /* ========== PROGRESS BAR ========== */
-    .progress-track {
-      background: #F0E0E4;
-      border-radius: 999px;
-      height: 12px;
-      overflow: hidden;
-      width: 100%;
-    }
-    .progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #FF4D6D, #C9184A);
-      transition: width 0.4s ease;
-    }
-    /* ========== BOTTOM NAV ========== */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #fff;
-      box-shadow: 0 -2px 16px rgba(255, 77, 109, 0.12);
+    .ui-panel {
+      margin-top: 12px;
       display: flex;
-      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 10px;
       align-items: center;
-      padding: 6px 0 env(safe-area-inset-bottom, 6px) 0;
-      z-index: 40;
-      border-top-left-radius: 22px;
-      border-top-right-radius: 22px;
-      max-width: 480px;
-      margin: 0 auto;
+      justify-content: space-between;
+      color: #f0f9ff;
+      text-shadow: 2px 2px 0 #0d1c24;
+      font-weight: bold;
+      font-size: 15px;
     }
-    .nav-item {
+    .hotbar {
+      display: flex;
+      gap: 6px;
+      background: #1e3b48;
+      padding: 6px 10px;
+      border-radius: 40px;
+      box-shadow: inset 0 0 0 2px #2f5a6b, 0 4px 0 #0a1a22;
+    }
+    .slot {
+      width: 52px;
+      height: 52px;
+      background: #234a5a;
+      border-radius: 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
-      padding: 6px 18px;
-      border-radius: 14px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-sec);
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      position: relative;
-    }
-    .nav-item.active {
-      color: var(--primary);
-      background: #FFF0F3;
-    }
-    .nav-item .nav-icon { font-size: 22px; line-height: 1; }
-    /* ========== LOADING SCREEN ========== */
-    .loading-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: none;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #FF4D6D, #C9184A);
-      color: #fff;
-      padding: 24px;
-      text-align: center;
-    }
-    .loading-screen.active { display: flex; }
-    .spinning-coin {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #FFE066, #FFD700, #D4A017);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 36px;
-      font-weight: 800;
-      color: #7A5C00;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25), inset 0 -4px 8px rgba(255,255,255,0.5);
-      animation: spinCoin 2.5s linear infinite;
-      margin-bottom: 24px;
-    }
-    @keyframes spinCoin {
-      0% { transform: rotateY(0deg); }
-      100% { transform: rotateY(360deg); }
-    }
-    .countdown-text {
-      font-size: 48px;
-      font-weight: 800;
-      line-height: 1;
-      margin: 12px 0;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    .loading-progress-track {
-      width: 100%;
-      max-width: 320px;
-      height: 14px;
-      background: rgba(255,255,255,0.3);
-      border-radius: 999px;
-      overflow: hidden;
-      margin: 16px 0;
-    }
-    .loading-progress-fill {
-      height: 100%;
-      background: #FFD700;
-      border-radius: 999px;
-      width: 0%;
-      transition: width 1s linear;
-    }
-    .loading-tip {
-      font-size: 14px;
-      font-weight: 500;
-      opacity: 0.95;
-      max-width: 300px;
-      min-height: 40px;
-      margin-top: 8px;
-    }
-    .close-loading-btn {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.25);
-      color: #fff;
       font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: inset 0 -3px 0 #0e2a33, 0 2px 0 #0d1c24;
+      transition: 0.05s linear;
+      color: white;
+      font-weight: bold;
+    }
+    .slot.active {
+      background: #5d8fa5;
+      box-shadow: inset 0 0 0 3px #f5e56b, 0 2px 0 #0d1c24;
+      transform: scale(1.02);
+    }
+    .slot .count {
+      font-size: 12px;
+      background: #00000055;
+      padding: 0 6px;
+      border-radius: 20px;
+      margin-top: 2px;
+    }
+    .gems {
+      background: #1e3b48;
+      padding: 8px 18px;
+      border-radius: 40px;
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 8px;
+      box-shadow: inset 0 0 0 2px #2f5a6b, 0 4px 0 #0a1a22;
+    }
+    .btn {
+      background: #3d6d82;
       border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-weight: bold;
+      font-size: 15px;
       cursor: pointer;
-      transition: all 0.2s;
-      font-weight: 700;
+      box-shadow: 0 4px 0 #0e2a33;
+      transition: 0.08s linear;
+      text-shadow: 1px 1px 0 #0d1c24;
+      font-family: inherit;
     }
-    .close-loading-btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
+    .btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #0e2a33;
     }
-    .close-loading-btn:not(:disabled):active {
-      transform: scale(0.88);
-      background: rgba(255,255,255,0.4);
+    .recipe-toggle {
+      background: #6b4f2e;
+      box-shadow: 0 4px 0 #3d2e1b;
     }
-    /* ========== COIN RAIN ANIMATION ========== */
-    .coin-rain {
-      position: fixed;
-      top: -40px;
-      z-index: 90;
-      font-size: 28px;
-      pointer-events: none;
-      animation: fallDown 1.6s ease-in forwards;
-      opacity: 0.9;
-    }
-    @keyframes fallDown {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      80% { opacity: 0.9; }
-      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
-    }
-    /* ========== NOTIFIKASI TOAST ========== */
     .toast {
       position: fixed;
       top: 20px;
       left: 50%;
-      transform: translateX(-50%) translateY(-80px);
-      background: #1A1A1A;
-      color: #fff;
-      padding: 14px 24px;
-      border-radius: 16px;
-      font-weight: 600;
-      font-size: 14px;
-      z-index: 200;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      transform: translateX(-50%);
+      background: #0d1c24ee;
+      color: #f5e56b;
+      padding: 10px 28px;
+      border-radius: 40px;
+      font-weight: bold;
+      font-size: 18px;
+      letter-spacing: 1px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 8px 0 #00000055;
+      transition: opacity 0.3s;
+      pointer-events: none;
       opacity: 0;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      max-width: 90vw;
-      text-align: center;
+      z-index: 999;
+      border: 2px solid #f5e56b88;
+      white-space: nowrap;
     }
     .toast.show {
-      transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
-    /* ========== PAGE TRANSITIONS ========== */
-    .page-section { display: none; animation: fadeIn 0.3s ease; }
-    .page-section.active { display: block; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    .recipe-panel {
+      background: #1e3b48ee;
+      backdrop-filter: blur(6px);
+      border-radius: 24px;
+      padding: 18px 24px;
+      max-width: 400px;
+      color: #d9eef9;
+      font-size: 14px;
+      line-height: 1.6;
+      box-shadow: 0 8px 0 #0a1a22;
+      border: 2px solid #2f5a6b;
+      max-height: 240px;
+      overflow-y: auto;
+      pointer-events: auto;
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      display: none;
     }
-    /* ========== FORM INPUT ========== */
-    .input-field {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 14px;
-      border: 2px solid #F0E0E4;
-      background: #fff;
-      font-size: 15px;
-      font-weight: 500;
-      outline: none;
-      transition: border-color 0.2s;
-      color: var(--text);
+    .recipe-panel.visible {
+      display: block;
     }
-    .input-field:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(255, 77, 109, 0.1);
-    }
-    .input-field::placeholder { color: #C9A9B2; }
-    /* ========== TRANSACTION ITEM ========== */
-    .tx-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid #F5E4E8;
-    }
-    .tx-item:last-child { border-bottom: none; }
-    /* ========== LOGIN PAGE ========== */
-    #loginPage {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 24px;
+    .recipe-panel h3 {
+      margin: 0 0 8px;
+      color: #f5e56b;
+      font-size: 18px;
       text-align: center;
-      background: linear-gradient(180deg, #FFF5F7 0%, #FFE0E6 100%);
     }
-    .login-logo {
-      font-size: 40px;
-      font-weight: 800;
-      color: var(--primary);
-      letter-spacing: -1px;
-      margin-bottom: 4px;
+    .recipe-item {
+      padding: 4px 0;
+      border-bottom: 1px dashed #3d6d82;
     }
-    .login-tagline {
-      color: var(--text-sec);
-      font-size: 15px;
-      font-weight: 500;
-      margin-bottom: 40px;
-    }
-    .google-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      background: #fff;
-      color: var(--text);
-      font-weight: 600;
-      font-size: 16px;
-      padding: 16px 28px;
-      border-radius: 18px;
-      border: 2px solid #F0E0E4;
-      box-shadow: 0 4px 12px rgba(255, 77, 109, 0.12);
-      cursor: pointer;
-      transition: all 0.15s ease;
-      width: 100%;
-      max-width: 320px;
-    }
-    .google-btn:active { transform: scale(0.95); }
-    .google-btn img { width: 24px; height: 24px; }
-    /* ========== RESPONSIVE WRAPPER ========== */
-    .app-wrapper { max-width: 480px; margin: 0 auto; padding: 0 16px; }
-    @media (min-width: 481px) {
-      .bottom-nav { max-width: 480px; left: 50%; transform: translateX(-50%); }
-    }
-    /* ========== HEADER ========== */
-    .app-header {
-      position: sticky;
-      top: 0;
-      z-index: 30;
-      background: rgba(255, 245, 247, 0.92);
-      backdrop-filter: blur(12px);
-      padding: 14px 0 10px 0;
-      border-bottom: 1px solid rgba(255, 77, 109, 0.08);
-    }
-    /* ========== AVATAR ========== */
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--primary);
-      box-shadow: 0 2px 8px rgba(255, 77, 109, 0.25);
-    }
-    /* ========== SCROLLBAR HIDE ========== */
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body>
-
-  <!-- ============================================================ -->
-  <!-- HALAMAN LOGIN — HANYA MUNCUL SAAT BELUM LOGIN               -->
-  <!-- ============================================================ -->
-  <div id="loginPage">
-    <div class="coin-icon xl" style="margin-bottom:20px;">K</div>
-    <h1 class="login-logo">Duitin Aja</h1>
-    <p class="login-tagline">Selesaikan Misi, Dapat Duit</p>
-    <button id="googleLoginBtn" class="google-btn btn-bouncy">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
-      Login dengan Google
-    </button>
-    <p style="color:#8A5A64; font-size:12px; margin-top:32px; max-width:280px;">
-      Dengan masuk, kamu menyetujui Syarat & Ketentuan serta Kebijakan Privasi Duitin Aja.
-    </p>
-  </div>
-
-  <!-- ============================================================ -->
-  <!-- APLIKASI UTAMA — HANYA MUNCUL SETELAH LOGIN                 -->
-  <!-- ============================================================ -->
-  <div id="mainApp" style="display:none;">
-    <!-- HEADER -->
-    <header class="app-header">
-      <div class="app-wrapper" style="display:flex; align-items:center; justify-content:space-between;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <div class="coin-icon" style="width:28px;height:28px;font-size:15px;">K</div>
-          <span style="font-weight:800; font-size:18px; color:var(--primary); letter-spacing:-0.5px;">Duitin Aja</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <img id="headerAvatar" class="avatar" src="" alt="Avatar" />
-          <button id="logoutBtn" class="btn-bouncy" style="background:#FFF0F3; color:var(--secondary); padding:8px 14px; border-radius:12px; font-size:13px; font-weight:700; border:none;">
-            Keluar
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <!-- MAIN CONTENT -->
-    <main class="app-wrapper" style="padding-top:16px; padding-bottom:100px; min-height:calc(100vh - 140px);">
-
-      <!-- ===== HALAMAN HOME ===== -->
-      <section id="page-home" class="page-section active">
-        <!-- Kartu Poin -->
-        <div class="card" style="margin-bottom:16px; background: linear-gradient(135deg, #FFFFFF 0%, #FFF5F7 100%);">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-            <span style="font-weight:700; font-size:16px; color:var(--text);">💰 Poin Anda</span>
-            <span style="font-size:12px; color:var(--text-sec); font-weight:500;">1 Koin = Rp 0,1</span>
-          </div>
-          <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:4px;">
-            <span class="coin-icon lg" style="margin-right:2px;">K</span>
-            <span id="totalCoins" style="font-size:32px; font-weight:800; color:var(--text); line-height:1;">0</span>
-            <span style="font-size:18px; font-weight:700; color:var(--text-sec);">Koin</span>
-          </div>
-          <div style="font-size:15px; font-weight:600; color:var(--success); margin-bottom:16px;">
-            ≈ Rp <span id="rupiahValue">0</span>
-          </div>
-          <button id="withdrawBtn" class="btn-bouncy btn-primary" style="width:100%; padding:14px; font-size:15px;">
-            💸 Tarik Uang
-          </button>
-        </div>
-
-        <!-- Kartu Kode Rujukan -->
-        <div class="card" style="margin-bottom:16px;">
-          <div style="font-weight:700; font-size:15px; margin-bottom:10px;">🎟️ Kode Rujukan</div>
-          <p style="font-size:13px; color:var(--text-sec); margin-bottom:12px;">Punya kode dari teman? Masukkan di sini dan dapatkan <strong>500 Koin</strong>!</p>
-          <div style="display:flex; gap:10px;">
-            <input id="referralInput" class="input-field" type="text" placeholder="Contoh: DUIT1234" maxlength="10" style="flex:1; text-transform:uppercase;" />
-            <button id="confirmReferralBtn" class="btn-bouncy btn-primary" style="padding:14px 20px; font-size:14px; white-space:nowrap;">
-              Konfirmasi
-            </button>
-          </div>
-          <div style="margin-top:14px; padding-top:14px; border-top:1px dashed #F0E0E4;">
-            <div style="font-size:12px; color:var(--text-sec); margin-bottom:4px;">Kode rujukan kamu:</div>
-            <div style="display:flex; align-items:center; justify-content:space-between;">
-              <span id="myReferralCode" style="font-weight:800; font-size:18px; color:var(--primary); letter-spacing:1px;">DUIT0000</span>
-              <button id="copyReferralBtn" class="btn-bouncy" style="background:#FFF0F3; color:var(--primary); padding:8px 14px; border-radius:12px; font-size:12px; font-weight:700; border:none;">
-                Salin
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Misi Harian -->
-        <div class="card">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
-            <span style="font-weight:700; font-size:16px;">🎁 Misi Harian</span>
-            <span id="claimCountLabel" style="font-size:13px; color:var(--text-sec); font-weight:600;">0/35</span>
-          </div>
-          <p style="font-size:13px; color:var(--text-sec); margin-bottom:14px;">Selesaikan misi dan dapatkan <strong>80 Koin</strong> per misi. Maksimal 35 misi per hari.</p>
-          <div class="progress-track" style="margin-bottom:16px;">
-            <div id="claimProgressBar" class="progress-fill" style="width:0%;"></div>
-          </div>
-          <button id="claimMissionBtn" class="btn-bouncy btn-primary" style="width:100%; padding:16px; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px;">
-            <span>🚀</span> Klaim Misi
-          </button>
-        </div>
-      </section>
-
-      <!-- ===== HALAMAN RIWAYAT ===== -->
-      <section id="page-history" class="page-section">
-        <div class="card">
-          <div style="font-weight:700; font-size:17px; margin-bottom:14px;">📋 Riwayat Transaksi</div>
-          <div id="transactionList">
-            <div style="text-align:center; padding:40px 0; color:var(--text-sec); font-size:14px;">
-              Belum ada transaksi.
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== HALAMAN PROFIL ===== -->
-      <section id="page-profile" class="page-section">
-        <div class="card" style="text-align:center; margin-bottom:16px;">
-          <img id="profileAvatar" class="avatar" src="" alt="Avatar" style="width:80px; height:80px; margin:0 auto 12px auto;" />
-          <div id="profileName" style="font-weight:700; font-size:18px;">User</div>
-          <div id="profileEmail" style="font-size:13px; color:var(--text-sec); margin-top:2px;">email@contoh.com</div>
-          <div style="margin-top:16px; display:flex; justify-content:center; gap:24px;">
-            <div style="text-align:center;">
-              <div style="font-size:20px; font-weight:800; color:var(--primary);" id="profileTotalCoins">0</div>
-              <div style="font-size:11px; color:var(--text-sec); font-weight:600;">Total Koin</div>
-            </div>
-            <div style="text-align:center;">
-              <div style="font-size:20px; font-weight:800; color:var(--primary);" id="profileTotalClaims">0</div>
-              <div style="font-size:11px; color:var(--text-sec); font-weight:600;">Total Klaim</div>
-            </div>
-          </div>
-        </div>
-        <div class="card" style="margin-bottom:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0;">
-            <span style="font-size:14px; font-weight:600;">Kode Rujukan</span>
-            <span id="profileReferral" style="font-weight:800; color:var(--primary);">DUIT0000</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-top:1px solid #F5E4E8;">
-            <span style="font-size:14px; font-weight:600;">Status Akun</span>
-            <span style="font-size:13px; font-weight:700; color:var(--success);">✓ Terverifikasi</span>
-          </div>
-        </div>
-        <button id="profileLogoutBtn" class="btn-bouncy" style="width:100%; padding:16px; background:#FFF0F3; color:var(--secondary); font-size:15px; font-weight:700; border:none; border-radius:18px;">
-          🚪 Keluar dari Akun
-        </button>
-      </section>
-
-      <!-- ===== HALAMAN WITHDRAW ===== -->
-      <section id="page-withdraw" class="page-section">
-        <button id="backFromWithdraw" class="btn-bouncy" style="background:transparent; color:var(--primary); font-size:14px; font-weight:700; padding:8px 0; margin-bottom:8px; border:none;">
-          ← Kembali
-        </button>
-        <div class="card">
-          <div style="font-weight:700; font-size:17px; margin-bottom:4px;">💸 Tarik Uang</div>
-          <p style="font-size:13px; color:var(--text-sec); margin-bottom:18px;">Withdraw via DANA. Minimal 5.000 Koin (Rp 500).</p>
-          <div style="margin-bottom:16px;">
-            <label style="font-size:13px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:6px;">Nomor DANA</label>
-            <input id="withdrawPhone" class="input-field" type="tel" placeholder="08xxxxxxxxxx" />
-          </div>
-          <div style="margin-bottom:16px;">
-            <label style="font-size:13px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:6px;">Jumlah Koin</label>
-            <input id="withdrawAmount" class="input-field" type="number" placeholder="Minimal 5000" min="5000" />
-            <div style="font-size:12px; color:var(--text-sec); margin-top:6px;">
-              ≈ Rp <span id="withdrawRupiahPreview">0</span>
-            </div>
-          </div>
-          <div style="background:#FFF5F7; border-radius:14px; padding:12px 14px; margin-bottom:18px; font-size:12px; color:var(--text-sec);">
-            Saldo kamu: <strong id="withdrawBalance" style="color:var(--primary);">0 Koin</strong>
-          </div>
-          <button id="submitWithdrawBtn" class="btn-bouncy btn-success" style="width:100%; padding:16px; font-size:16px;">
-            Ajukan Penarikan
-          </button>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- BOTTOM NAVIGATION — HANYA MUNCUL SETELAH LOGIN -->
-    <nav class="bottom-nav" id="bottomNav">
-      <button class="nav-item active" data-page="home">
-        <span class="nav-icon">🏠</span>
-        <span>Home</span>
-      </button>
-      <button class="nav-item" data-page="history">
-        <span class="nav-icon">📋</span>
-        <span>Riwayat</span>
-      </button>
-      <button class="nav-item" data-page="profile">
-        <span class="nav-icon">👤</span>
-        <span>Profil</span>
-      </button>
-    </nav>
-  </div>
-
-  <!-- ============================================================ -->
-  <!-- LOADING SCREEN — PENGGANTI SEMENTARA UNTUK IKLAN             -->
-  <!-- ============================================================ -->
-  <!-- LOADING SCREEN INI ADALAH PENGGANTI SEMENTARA UNTUK IKLAN.
-       Setelah AdSense disetujui, ganti seluruh div "loading-screen" 
-       dengan kode AdSense Rewarded Video. -->
-  <div id="loadingScreen" class="loading-screen">
-    <button id="closeLoadingBtn" class="close-loading-btn" disabled>✕</button>
-    <div class="spinning-coin">K</div>
-    <div style="font-size:16px; font-weight:600; opacity:0.95;">Mohon tunggu, sedang menyiapkan reward...</div>
-    <div id="countdownText" class="countdown-text">15</div>
-    <div class="loading-progress-track">
-      <div id="loadingProgressFill" class="loading-progress-fill"></div>
+<div class="game-wrapper">
+  <canvas id="gameCanvas" width="800" height="576"></canvas>
+  <div class="ui-panel">
+    <div class="hotbar" id="hotbar"></div>
+    <div class="gems">
+      <span>💎</span>
+      <span id="gemDisplay">0</span>
     </div>
-    <div id="loadingTip" class="loading-tip">Tahukah kamu? 1.000 Koin = Rp 100</div>
-    <button id="claimRewardBtn" class="btn-bouncy btn-success" style="display:none; padding:16px 40px; font-size:18px; margin-top:20px; border-radius:18px;">
-      🎉 Klaim 80 Koin
-    </button>
+    <button class="btn" id="buySeedPack">🌱 Seed Pack (10💎)</button>
+    <button class="btn recipe-toggle" id="toggleRecipes">📖 Recipes</button>
   </div>
+</div>
+<div id="toast" class="toast"></div>
+<div id="recipePanel" class="recipe-panel">
+  <h3>🔬 Splicing Recipes</h3>
+  <div id="recipeList"></div>
+  <div style="margin-top:12px; font-size:12px; opacity:0.8; text-align:center;">Plant two seeds side by side, wait for the splice!</div>
+</div>
 
-  <!-- ============================================================ -->
-  <!-- FIREBASE SDK 10.12.0 (MODULE)                                -->
-  <!-- ============================================================ -->
-  <script type="module">
-    // ============================================================
-    // IMPORTS — Firebase SDK 10.12.0 via CDN (module type)
-    // ============================================================
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithPopup,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      setDoc,
-      updateDoc,
-      increment,
-      collection,
-      addDoc,
-      query,
-      where,
-      orderBy,
-      getDocs,
-      serverTimestamp,
-      Timestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script>
+  (function() {
+    // ---------- CONSTANTS ----------
+    const TILE_SIZE = 32;
+    const COLS = 25;
+    const ROWS = 18;
+    const CANVAS_W = COLS * TILE_SIZE;
+    const CANVAS_H = ROWS * TILE_SIZE;
 
-    // ============================================================
-    // KONFIGURASI FIREBASE
-    // ============================================================
-    const firebaseConfig = {
-      apiKey: "AIzaSyApF5o2IMBcXfI1iez-BnkfHUBue_7ToMY",
-      authDomain: "duitin-aja-cbc24.firebaseapp.com",
-      projectId: "duitin-aja-cbc24",
-      storageBucket: "duitin-aja-cbc24.firebasestorage.app",
-      messagingSenderId: "278491222742",
-      appId: "1:278491222742:web:404687a6885c115d152f77"
+    // ---------- TILE TYPES ----------
+    const TILE_TYPES = {
+      EMPTY: 0,
+      DIRT: 1,
+      ROCK: 2,
+      WATER: 3,
+      GRASS: 4,
+      SAND: 5,
+      FLOWER: 6,
+      GLASS: 7,
+      STONE: 8,
+      WOOD: 9,
+      LEAF: 10,
+      GOLD: 11,
     };
 
-    // Inisialisasi Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // ---------- ITEM DEFINITIONS (seed / block) ----------
+    const ITEMS = {
+      dirt_seed:   { name: 'Dirt Seed',   emoji: '🟫', color: '#8b5a2b', type: 'seed',  tile: TILE_TYPES.DIRT,  sell: 1 },
+      rock_seed:   { name: 'Rock Seed',   emoji: '🪨', color: '#7a7a7a', type: 'seed',  tile: TILE_TYPES.ROCK,  sell: 1 },
+      water_seed:  { name: 'Water Seed',  emoji: '💧', color: '#3a8fc2', type: 'seed',  tile: TILE_TYPES.WATER, sell: 1 },
+      grass_seed:  { name: 'Grass Seed',  emoji: '🌿', color: '#4caf50', type: 'seed',  tile: TILE_TYPES.GRASS, sell: 2 },
+      sand_seed:   { name: 'Sand Seed',   emoji: '🏖️', color: '#e3c27b', type: 'seed',  tile: TILE_TYPES.SAND,  sell: 2 },
+      flower_seed: { name: 'Flower Seed', emoji: '🌸', color: '#e97a9e', type: 'seed',  tile: TILE_TYPES.FLOWER, sell: 3 },
+      wood_seed:   { name: 'Wood Seed',   emoji: '🪵', color: '#a0662b', type: 'seed',  tile: TILE_TYPES.WOOD,  sell: 3 },
+      gold_seed:   { name: 'Gold Seed',   emoji: '✨', color: '#f5c542', type: 'seed',  tile: TILE_TYPES.GOLD,  sell: 8 },
 
-    // ============================================================
-    // KONSTANTA APLIKASI
-    // ============================================================
-    const COIN_TO_RUPIAH = 0.1;          // 1 Koin = Rp 0,1
-    const CLAIM_REWARD = 80;              // Koin per klaim misi
-    const MAX_CLAIMS_PER_DAY = 35;        // Maks klaim per hari
-    const LOGIN_BONUS = 50;               // Koin login harian
-    const REFERRAL_BONUS = 500;           // Koin kode rujukan
-    const MIN_WITHDRAW_COINS = 5000;      // Minimal withdraw
-    const LOADING_DURATION = 15;          // Detik loading screen
+      dirt_block:   { name: 'Dirt Block',   emoji: '🟫', color: '#8b5a2b', type: 'block', tile: TILE_TYPES.DIRT,  sell: 1 },
+      rock_block:   { name: 'Rock Block',   emoji: '🪨', color: '#7a7a7a', type: 'block', tile: TILE_TYPES.ROCK,  sell: 1 },
+      water_block:  { name: 'Water Block',  emoji: '💧', color: '#3a8fc2', type: 'block', tile: TILE_TYPES.WATER, sell: 1 },
+      grass_block:  { name: 'Grass Block',  emoji: '🌿', color: '#4caf50', type: 'block', tile: TILE_TYPES.GRASS, sell: 2 },
+      sand_block:   { name: 'Sand Block',   emoji: '🏖️', color: '#e3c27b', type: 'block', tile: TILE_TYPES.SAND,  sell: 2 },
+      flower_block: { name: 'Flower Block', emoji: '🌸', color: '#e97a9e', type: 'block', tile: TILE_TYPES.FLOWER, sell: 3 },
+      glass_block:  { name: 'Glass Block',  emoji: '🔷', color: '#a8d8ea', type: 'block', tile: TILE_TYPES.GLASS, sell: 4 },
+      stone_block:  { name: 'Stone Block',  emoji: '⬛', color: '#5a5a5a', type: 'block', tile: TILE_TYPES.STONE, sell: 3 },
+      wood_block:   { name: 'Wood Block',   emoji: '🪵', color: '#a0662b', type: 'block', tile: TILE_TYPES.WOOD,  sell: 3 },
+      leaf_block:   { name: 'Leaf Block',   emoji: '🍃', color: '#3e9e4b', type: 'block', tile: TILE_TYPES.LEAF,  sell: 2 },
+      gold_block:   { name: 'Gold Block',   emoji: '✨', color: '#f5c542', type: 'block', tile: TILE_TYPES.GOLD,  sell: 10 },
+    };
 
-    // ============================================================
-    // STATE GLOBAL
-    // ============================================================
-    let currentUser = null;               // Firebase user object
-    let userData = null;                  // Data user dari Firestore
-    let unsubscribeUserDoc = null;        // Listener snapshot user doc
-    let countdownInterval = null;         // Interval countdown loading
-    let tipInterval = null;               // Interval tips loading
-    let loadingSecondsLeft = 0;           // Sisa detik loading
-    let claimButtonReady = false;         // Status tombol klaim di loading
+    // ---------- SPLICING RECIPES (unordered pairs) ----------
+    const SPLICE_RECIPES = [
+      { a: 'dirt_seed', b: 'rock_seed', result: 'sand_seed', count: 1 },
+      { a: 'sand_seed', b: 'water_seed', result: 'glass_block', count: 1 },
+      { a: 'dirt_seed', b: 'water_seed', result: 'grass_seed', count: 1 },
+      { a: 'rock_seed', b: 'rock_seed', result: 'stone_block', count: 1 },
+      { a: 'grass_seed', b: 'sand_seed', result: 'flower_seed', count: 1 },
+      { a: 'wood_seed', b: 'leaf_seed', result: 'wood_block', count: 1 },      // leaf_seed not in items? we'll add a dummy leaf_seed? We'll use wood_seed + grass_seed = wood_block
+      { a: 'grass_seed', b: 'wood_seed', result: 'wood_block', count: 1 },
+      { a: 'stone_block', b: 'gold_seed', result: 'gold_block', count: 1 },
+      { a: 'flower_seed', b: 'water_seed', result: 'flower_block', count: 1 },
+    ];
 
-    // ============================================================
-    // DOM REFERENCES
-    // ============================================================
-    const $ = (id) => document.getElementById(id);
+    // ---------- GAME STATE ----------
+    let world = [];          // 2D array of tile types
+    let inventory = {};      // itemId -> count
+    let gems = 0;
+    let hotbar = [
+      'dirt_seed', 'rock_seed', 'water_seed', 'grass_seed',
+      'sand_seed', 'flower_seed', 'stone_block', 'gold_seed'
+    ];
+    let selectedSlot = 0;    // 0-7
 
-    const loginPage = $("loginPage");
-    const mainApp = $("mainApp");
-    const googleLoginBtn = $("googleLoginBtn");
-    const logoutBtn = $("logoutBtn");
-    const profileLogoutBtn = $("profileLogoutBtn");
+    // Player position (grid coords, can be fractional)
+    let player = { x: 10.5, y: 9.5 };
 
-    const totalCoinsEl = $("totalCoins");
-    const rupiahValueEl = $("rupiahValue");
-    const myReferralCodeEl = $("myReferralCode");
-    const referralInput = $("referralInput");
-    const confirmReferralBtn = $("confirmReferralBtn");
-    const copyReferralBtn = $("copyReferralBtn");
+    // Splice timers: { tileIndex: { x, y, otherX, otherY, result, timeLeft, seedA, seedB } }
+    // We'll store active splice as array of objects for simplicity
+    let activeSplices = [];   // each: { x1,y1, x2,y2, resultItem, timeLeft, timerId }
 
-    const claimCountLabel = $("claimCountLabel");
-    const claimProgressBar = $("claimProgressBar");
-    const claimMissionBtn = $("claimMissionBtn");
+    // Toast timeout
+    let toastTimer = null;
 
-    const transactionList = $("transactionList");
-    const profileAvatar = $("profileAvatar");
-    const profileName = $("profileName");
-    const profileEmail = $("profileEmail");
-    const profileTotalCoins = $("profileTotalCoins");
-    const profileTotalClaims = $("profileTotalClaims");
-    const profileReferral = $("profileReferral");
-    const headerAvatar = $("headerAvatar");
+    // ---------- CANVAS SETUP ----------
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = CANVAS_W;
+    canvas.height = CANVAS_H;
 
-    const withdrawBtn = $("withdrawBtn");
-    const withdrawPhone = $("withdrawPhone");
-    const withdrawAmount = $("withdrawAmount");
-    const withdrawRupiahPreview = $("withdrawRupiahPreview");
-    const withdrawBalance = $("withdrawBalance");
-    const submitWithdrawBtn = $("submitWithdrawBtn");
-    const backFromWithdraw = $("backFromWithdraw");
-
-    const loadingScreen = $("loadingScreen");
-    const closeLoadingBtn = $("closeLoadingBtn");
-    const countdownText = $("countdownText");
-    const loadingProgressFill = $("loadingProgressFill");
-    const loadingTip = $("loadingTip");
-    const claimRewardBtn = $("claimRewardBtn");
-
-    const bottomNav = $("bottomNav");
-    const navItems = document.querySelectorAll(".nav-item");
-
-    // ============================================================
-    // FUNGSI UTILITAS
-    // ============================================================
-
-    /**
-     * Format angka dengan pemisah ribuan (contoh: 2800 -> "2.800")
-     */
-    function formatNumber(num) {
-      return num.toLocaleString("id-ID");
+    // ---------- HELPER FUNCTIONS ----------
+    function getItem(id) {
+      return ITEMS[id] || null;
     }
 
-    /**
-     * Konversi Koin ke Rupiah
-     */
-    function coinsToRupiah(coins) {
-      return Math.round(coins * COIN_TO_RUPIAH);
+    function addItem(itemId, amount = 1) {
+      if (!ITEMS[itemId]) return;
+      inventory[itemId] = (inventory[itemId] || 0) + amount;
+      autoSave();
     }
 
-    /**
-     * Mendapatkan tanggal hari ini dalam format "YYYY-MM-DD"
-     */
-    function getTodayDateString() {
-      const now = new Date();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, "0");
-      const d = String(now.getDate()).padStart(2, "0");
-      return `${y}-${m}-${d}`;
+    function removeItem(itemId, amount = 1) {
+      if (!inventory[itemId] || inventory[itemId] < amount) return false;
+      inventory[itemId] -= amount;
+      if (inventory[itemId] <= 0) delete inventory[itemId];
+      autoSave();
+      return true;
     }
 
-    /**
-     * Menampilkan notifikasi toast
-     */
-    function showToast(message, duration = 2800) {
-      const existing = document.querySelector(".toast");
-      if (existing) existing.remove();
-
-      const toast = document.createElement("div");
-      toast.className = "toast";
-      toast.textContent = message;
-      document.body.appendChild(toast);
-
-      requestAnimationFrame(() => toast.classList.add("show"));
-      setTimeout(() => {
-        toast.classList.remove("show");
-        setTimeout(() => toast.remove(), 400);
-      }, duration);
+    function getItemCount(itemId) {
+      return inventory[itemId] || 0;
     }
 
-    /**
-     * Animasi koin jatuh dari atas layar
-     */
-    function coinRain(count = 20) {
-      for (let i = 0; i < count; i++) {
-        setTimeout(() => {
-          const coin = document.createElement("div");
-          coin.className = "coin-rain";
-          coin.textContent = "🪙";
-          coin.style.left = Math.random() * 100 + "vw";
-          coin.style.animationDuration = (1.2 + Math.random() * 1.2) + "s";
-          coin.style.fontSize = (20 + Math.random() * 24) + "px";
-          document.body.appendChild(coin);
-          setTimeout(() => coin.remove(), 2400);
-        }, i * 60);
-      }
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
     }
 
-    /**
-     * Menghasilkan kode rujukan acak "DUIT" + 4 digit
-     */
-    function generateReferralCode() {
-      const digits = String(Math.floor(1000 + Math.random() * 9000));
-      return "DUIT" + digits;
-    }
-
-    /**
-     * Menampilkan halaman tertentu (home/history/profile/withdraw)
-     */
-    function showPage(pageName) {
-      document.querySelectorAll(".page-section").forEach((el) => el.classList.remove("active"));
-      const target = $("page-" + pageName);
-      if (target) target.classList.add("active");
-
-      // Update bottom nav active state
-      navItems.forEach((item) => {
-        item.classList.toggle("active", item.dataset.page === pageName);
-      });
-
-      // Scroll ke atas
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    // ============================================================
-    // FUNGSI FIRESTORE — USER
-    // ============================================================
-
-    /**
-     * Membuat atau mengambil data user dari Firestore
-     */
-    async function ensureUserDocument(user) {
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (!userSnap.exists()) {
-        // Buat dokumen user baru
-        const referralCode = generateReferralCode();
-        const newUserData = {
-          uid: user.uid,
-          username: user.displayName || "Pengguna",
-          email: user.email || "",
-          photoURL: user.photoURL || "",
-          total_coins: 0,
-          claims_today: 0,
-          last_claim_date: "",
-          referral_code: referralCode,
-          referred_by: null,
-          created_at: serverTimestamp(),
-        };
-        await setDoc(userRef, newUserData);
-        return { ...newUserData, created_at: Timestamp.now() };
-      } else {
-        return userSnap.data();
-      }
-    }
-
-    /**
-     * Memuat ulang data user ke state global & UI
-     */
-    async function refreshUserData() {
-      if (!currentUser) return;
-      const userRef = doc(db, "users", currentUser.uid);
-      const snap = await getDoc(userRef);
-      if (snap.exists()) {
-        userData = snap.data();
-        updateUIFromUserData();
-      }
-    }
-
-    /**
-     * Update seluruh UI berdasarkan userData
-     */
-    function updateUIFromUserData() {
-      if (!userData) return;
-
-      const coins = userData.total_coins || 0;
-      const claimsToday = userData.claims_today || 0;
-
-      // Home
-      totalCoinsEl.textContent = formatNumber(coins);
-      rupiahValueEl.textContent = formatNumber(coinsToRupiah(coins));
-      myReferralCodeEl.textContent = userData.referral_code || "DUIT0000";
-
-      // Progress misi
-      claimCountLabel.textContent = `${claimsToday}/${MAX_CLAIMS_PER_DAY}`;
-      claimProgressBar.style.width = (claimsToday / MAX_CLAIMS_PER_DAY) * 100 + "%";
-
-      // Tombol klaim
-      claimMissionBtn.disabled = claimsToday >= MAX_CLAIMS_PER_DAY;
-      if (claimsToday >= MAX_CLAIMS_PER_DAY) {
-        claimMissionBtn.innerHTML = "<span>✅</span> Misi Harian Selesai";
-      } else {
-        claimMissionBtn.innerHTML = "<span>🚀</span> Klaim Misi";
-      }
-
-      // Withdraw balance
-      withdrawBalance.textContent = formatNumber(coins) + " Koin";
-
-      // Profile
-      profileTotalCoins.textContent = formatNumber(coins);
-      profileTotalClaims.textContent = formatNumber(claimsToday);
-      profileReferral.textContent = userData.referral_code || "DUIT0000";
-      profileName.textContent = userData.username || "Pengguna";
-      profileEmail.textContent = userData.email || "";
-      profileAvatar.src = userData.photoURL || "https://via.placeholder.com/80";
-      headerAvatar.src = userData.photoURL || "https://via.placeholder.com/40";
-
-      // Referral sudah pernah dipakai?
-      if (userData.referred_by) {
-        referralInput.disabled = true;
-        referralInput.placeholder = "Kode sudah pernah digunakan";
-        confirmReferralBtn.disabled = true;
-        confirmReferralBtn.textContent = "✓";
-      }
-    }
-
-    // ============================================================
-    // FUNGSI LOGIN / LOGOUT
-    // ============================================================
-
-    /**
-     * Login dengan Google
-     */
-    async function signInWithGoogle() {
-      const provider = new GoogleAuthProvider();
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        console.error("Login error:", error);
-        showToast("Gagal login: " + (error.message || "Coba lagi"));
-      }
-    }
-
-    /**
-     * Logout dari akun
-     */
-    async function handleLogout() {
-      try {
-        await signOut(auth);
-      } catch (error) {
-        console.error("Logout error:", error);
-        showToast("Gagal logout");
-      }
-    }
-
-    // ============================================================
-    // FUNGSI KLAIM MISI
-    // ============================================================
-
-    /**
-     * Membuka loading screen 15 detik
-     */
-    function openLoadingScreen() {
-      loadingScreen.classList.add("active");
-      claimButtonReady = false;
-      claimRewardBtn.style.display = "none";
-      closeLoadingBtn.disabled = true;
-      loadingProgressFill.style.width = "0%";
-      countdownText.textContent = LOADING_DURATION;
-      loadingTip.textContent = "Tahukah kamu? 1.000 Koin = Rp 100";
-
-      loadingSecondsLeft = LOADING_DURATION;
-
-      // Interval countdown
-      countdownInterval = setInterval(() => {
-        loadingSecondsLeft--;
-        countdownText.textContent = loadingSecondsLeft;
-        const progressPercent = ((LOADING_DURATION - loadingSecondsLeft) / LOADING_DURATION) * 100;
-        loadingProgressFill.style.width = progressPercent + "%";
-
-        // Ganti tips setiap 5 detik
-        if (loadingSecondsLeft >= 11) {
-          loadingTip.textContent = "Tahukah kamu? 1.000 Koin = Rp 100";
-        } else if (loadingSecondsLeft >= 6) {
-          loadingTip.textContent = "Ajak temanmu, dapat 500 Koin!";
-        } else if (loadingSecondsLeft >= 1) {
-          loadingTip.textContent = "Withdraw minimal 5.000 Koin via DANA";
+    // ---------- WORLD GENERATION ----------
+    function generateWorld() {
+      world = [];
+      for (let r = 0; r < ROWS; r++) {
+        let row = [];
+        for (let c = 0; c < COLS; c++) {
+          // simple terrain: mostly dirt, some rock, water at bottom?
+          if (r > ROWS - 4 && Math.random() < 0.2) row.push(TILE_TYPES.WATER);
+          else if (Math.random() < 0.15) row.push(TILE_TYPES.ROCK);
+          else if (Math.random() < 0.08) row.push(TILE_TYPES.GOLD);
+          else row.push(TILE_TYPES.DIRT);
         }
-
-        // Timer habis
-        if (loadingSecondsLeft <= 0) {
-          clearInterval(countdownInterval);
-          countdownInterval = null;
-          countdownText.textContent = "0";
-          loadingProgressFill.style.width = "100%";
-          claimButtonReady = true;
-          closeLoadingBtn.disabled = false;
-          claimRewardBtn.style.display = "inline-flex";
-          loadingTip.textContent = "🎉 Reward siap diklaim!";
+        world.push(row);
+      }
+      // clear an area around spawn
+      for (let r = 7; r < 12; r++) {
+        for (let c = 8; c < 13; c++) {
+          world[r][c] = TILE_TYPES.EMPTY;
         }
-      }, 1000);
+      }
     }
 
-    /**
-     * Menutup loading screen (tanpa klaim jika belum selesai)
-     */
-    function closeLoadingScreen() {
-      if (!claimButtonReady) {
-        // Jika belum 15 detik, konfirmasi
-        const yakin = confirm("Reward belum selesai disiapkan. Tutup dan tidak dapat Koin?");
-        if (!yakin) return;
-      }
-      loadingScreen.classList.remove("active");
-      if (countdownInterval) {
-        clearInterval(countdownInterval);
-        countdownInterval = null;
-      }
-      claimButtonReady = false;
-    }
-
-    /**
-     * Proses klaim misi setelah loading selesai
-     */
-    async function processClaim() {
-      if (!currentUser || !userData) {
-        showToast("Silakan login terlebih dahulu");
-        return;
-      }
-
-      // Tutup loading screen
-      loadingScreen.classList.remove("active");
-      if (countdownInterval) {
-        clearInterval(countdownInterval);
-        countdownInterval = null;
-      }
-
+    // ---------- SAVE / LOAD ----------
+    function saveGame() {
+      const data = {
+        world,
+        inventory,
+        gems,
+        hotbar,
+        selectedSlot,
+        player: { x: player.x, y: player.y },
+        // we don't save active splices – they reset on reload
+      };
       try {
-        const userRef = doc(db, "users", currentUser.uid);
-        const today = getTodayDateString();
-
-        // Baca data terbaru
-        const snap = await getDoc(userRef);
-        const freshData = snap.data();
-
-        let claimsToday = freshData.claims_today || 0;
-        let lastClaimDate = freshData.last_claim_date || "";
-
-        // Reset jika beda hari
-        if (lastClaimDate !== today) {
-          claimsToday = 0;
-        }
-
-        // Cek batas maksimal
-        if (claimsToday >= MAX_CLAIMS_PER_DAY) {
-          showToast("Misi harian sudah habis! Kembali besok ya 😊");
-          await refreshUserData();
-          return;
-        }
-
-        // Update Firestore
-        await updateDoc(userRef, {
-          total_coins: increment(CLAIM_REWARD),
-          claims_today: claimsToday + 1,
-          last_claim_date: today,
-        });
-
-        // Tambah transaksi
-        await addDoc(collection(db, "transactions"), {
-          user_id: currentUser.uid,
-          type: "claim",
-          amount: CLAIM_REWARD,
-          timestamp: serverTimestamp(),
-        });
-
-        // Refresh UI
-        await refreshUserData();
-
-        // Notifikasi & animasi
-        showToast("Yeay! Kamu dapat 80 Koin! 🎉");
-        coinRain(24);
-      } catch (error) {
-        console.error("Claim error:", error);
-        showToast("Gagal klaim misi: " + (error.message || "Coba lagi"));
-      }
+        localStorage.setItem('pixelsplice_save', JSON.stringify(data));
+      } catch (e) { /* ignore */ }
     }
 
-    // ============================================================
-    // FUNGSI REFERRAL
-    // ============================================================
-
-    /**
-     * Konfirmasi kode rujukan
-     */
-    async function confirmReferral() {
-      if (!currentUser || !userData) return;
-
-      // Cek apakah sudah pernah pakai referral
-      if (userData.referred_by) {
-        showToast("Kamu sudah pernah menggunakan kode rujukan");
-        return;
-      }
-
-      const code = referralInput.value.trim().toUpperCase();
-      if (!code) {
-        showToast("Masukkan kode rujukan terlebih dahulu");
-        return;
-      }
-
-      if (code === userData.referral_code) {
-        showToast("Tidak bisa menggunakan kode sendiri");
-        return;
-      }
-
+    function loadGame() {
+      const raw = localStorage.getItem('pixelsplice_save');
+      if (!raw) return false;
       try {
-        // Cari user dengan referral_code = code
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("referral_code", "==", code));
-        const querySnap = await getDocs(q);
-
-        if (querySnap.empty) {
-          showToast("Kode rujukan tidak ditemukan");
-          return;
-        }
-
-        // Update user saat ini: referred_by + bonus
-        const userRef = doc(db, "users", currentUser.uid);
-        await updateDoc(userRef, {
-          referred_by: code,
-          total_coins: increment(REFERRAL_BONUS),
-        });
-
-        // Tambah transaksi
-        await addDoc(collection(db, "transactions"), {
-          user_id: currentUser.uid,
-          type: "referral",
-          amount: REFERRAL_BONUS,
-          timestamp: serverTimestamp(),
-        });
-
-        await refreshUserData();
-        showToast("Berhasil! Kamu dapat 500 Koin! 🎁");
-        coinRain(16);
-      } catch (error) {
-        console.error("Referral error:", error);
-        showToast("Gagal menggunakan kode: " + (error.message || "Coba lagi"));
-      }
-    }
-
-    // ============================================================
-    // FUNGSI RIWAYAT TRANSAKSI
-    // ============================================================
-
-    /**
-     * Memuat riwayat transaksi user
-     */
-    async function loadTransactions() {
-      if (!currentUser) return;
-
-      try {
-        const q = query(
-          collection(db, "transactions"),
-          where("user_id", "==", currentUser.uid),
-          orderBy("timestamp", "desc")
-        );
-        const snap = await getDocs(q);
-
-        if (snap.empty) {
-          transactionList.innerHTML = `
-            <div style="text-align:center; padding:40px 0; color:var(--text-sec); font-size:14px;">
-              Belum ada transaksi.
-            </div>`;
-          return;
-        }
-
-        let html = "";
-        snap.forEach((docSnap) => {
-          const tx = docSnap.data();
-          const date = tx.timestamp?.toDate
-            ? tx.timestamp.toDate().toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : "Baru saja";
-
-          const isPositive = tx.amount > 0;
-          const icon = tx.type === "claim" ? "🎁" : tx.type === "referral" ? "🎟️" : "💰";
-          const label = tx.type === "claim" ? "Klaim Misi" : tx.type === "referral" ? "Bonus Rujukan" : "Transaksi";
-
-          html += `
-            <div class="tx-item">
-              <div style="display:flex; align-items:center; gap:10px;">
-                <span style="font-size:20px;">${icon}</span>
-                <div>
-                  <div style="font-weight:600; font-size:14px;">${label}</div>
-                  <div style="font-size:11px; color:var(--text-sec);">${date}</div>
-                </div>
-              </div>
-              <div style="font-weight:700; font-size:14px; color:${isPositive ? "var(--success)" : "var(--secondary)"};">
-                ${isPositive ? "+" : ""}${formatNumber(tx.amount)} K
-              </div>
-            </div>`;
-        });
-        transactionList.innerHTML = html;
-      } catch (error) {
-        console.error("Load transactions error:", error);
-        // Fallback jika index belum dibuat
-        transactionList.innerHTML = `
-          <div style="text-align:center; padding:40px 0; color:var(--text-sec); font-size:13px;">
-            Gagal memuat riwayat. Pastikan index Firestore sudah dibuat.
-          </div>`;
-      }
-    }
-
-    // ============================================================
-    // FUNGSI WITHDRAW
-    // ============================================================
-
-    /**
-     * Preview Rupiah saat input jumlah koin berubah
-     */
-    function updateWithdrawPreview() {
-      const amount = parseInt(withdrawAmount.value) || 0;
-      withdrawRupiahPreview.textContent = formatNumber(coinsToRupiah(amount));
-    }
-
-    /**
-     * Submit pengajuan withdraw
-     */
-    async function submitWithdraw() {
-      if (!currentUser || !userData) return;
-
-      const phone = withdrawPhone.value.trim();
-      const amountCoins = parseInt(withdrawAmount.value) || 0;
-      const coins = userData.total_coins || 0;
-
-      // Validasi
-      if (!phone || phone.length < 10) {
-        showToast("Masukkan nomor DANA yang valid");
-        return;
-      }
-      if (amountCoins < MIN_WITHDRAW_COINS) {
-        showToast("Minimal withdraw 5.000 Koin");
-        return;
-      }
-      if (amountCoins > coins) {
-        showToast("Saldo Koin tidak mencukupi");
-        return;
-      }
-
-      try {
-        // Kurangi saldo user
-        const userRef = doc(db, "users", currentUser.uid);
-        await updateDoc(userRef, {
-          total_coins: increment(-amountCoins),
-        });
-
-        // Buat dokumen withdrawal
-        await addDoc(collection(db, "withdrawals"), {
-          user_id: currentUser.uid,
-          method: "DANA",
-          phone_number: phone,
-          amount_coins: amountCoins,
-          amount_rupiah: coinsToRupiah(amountCoins),
-          status: "pending",
-          timestamp: serverTimestamp(),
-        });
-
-        // Tambah transaksi
-        await addDoc(collection(db, "transactions"), {
-          user_id: currentUser.uid,
-          type: "withdraw",
-          amount: -amountCoins,
-          timestamp: serverTimestamp(),
-        });
-
-        await refreshUserData();
-        showToast("Pengajuan withdraw berhasil! Diproses 1x24 jam ⏳");
-
-        // Reset form
-        withdrawPhone.value = "";
-        withdrawAmount.value = "";
-        withdrawRupiahPreview.textContent = "0";
-
-        // Kembali ke home
-        setTimeout(() => showPage("home"), 1200);
-      } catch (error) {
-        console.error("Withdraw error:", error);
-        showToast("Gagal withdraw: " + (error.message || "Coba lagi"));
-      }
-    }
-
-    // ============================================================
-    // FUNGSI NAVIGASI
-    // ============================================================
-
-    /**
-     * Setup event listener untuk bottom navigation
-     */
-    function setupNavigation() {
-      navItems.forEach((item) => {
-        item.addEventListener("click", () => {
-          const page = item.dataset.page;
-          if (page === "history") {
-            loadTransactions();
-          }
-          showPage(page);
-        });
-      });
-    }
-
-    // ============================================================
-    // FUNGSI BONUS LOGIN HARIAN
-    // ============================================================
-
-    /**
-     * Cek & berikan bonus login harian (50 Koin)
-     */
-    async function giveDailyLoginBonus() {
-      if (!currentUser || !userData) return;
-
-      const today = getTodayDateString();
-      const lastLoginBonus = localStorage.getItem("lastLoginBonus_" + currentUser.uid);
-
-      if (lastLoginBonus === today) return; // sudah dapat hari ini
-
-      try {
-        const userRef = doc(db, "users", currentUser.uid);
-        await updateDoc(userRef, {
-          total_coins: increment(LOGIN_BONUS),
-        });
-
-        await addDoc(collection(db, "transactions"), {
-          user_id: currentUser.uid,
-          type: "login_bonus",
-          amount: LOGIN_BONUS,
-          timestamp: serverTimestamp(),
-        });
-
-        localStorage.setItem("lastLoginBonus_" + currentUser.uid, today);
-        await refreshUserData();
-        showToast("Bonus login harian: +50 Koin! 🎉");
-        coinRain(10);
-      } catch (error) {
-        console.error("Login bonus error:", error);
-      }
-    }
-
-    // ============================================================
-    // FUNGSI AUTH STATE LISTENER
-    // ============================================================
-
-    /**
-     * Listener utama perubahan status autentikasi
-     */
-    function setupAuthListener() {
-      onAuthStateChanged(auth, async (user) => {
-        // Bersihkan listener user doc sebelumnya
-        if (unsubscribeUserDoc) {
-          unsubscribeUserDoc();
-          unsubscribeUserDoc = null;
-        }
-
-        if (user) {
-          // ===== USER LOGIN =====
-          currentUser = user;
-
-          // Sembunyikan login page, tampilkan main app
-          loginPage.style.display = "none";
-          mainApp.style.display = "block";
-
-          // Pastikan bottom nav terlihat
-          bottomNav.style.display = "flex";
-
-          // Inisialisasi / ambil data user
-          userData = await ensureUserDocument(user);
-          updateUIFromUserData();
-
-          // Beri bonus login harian
-          await giveDailyLoginBonus();
-
-          // Muat riwayat transaksi
-          await loadTransactions();
-
-          // Set halaman awal ke home
-          showPage("home");
-
-          // Listen perubahan dokumen user secara real-time
-          const userRef = doc(db, "users", user.uid);
-          // (Opsional: gunakan onSnapshot jika ingin real-time)
-          // Untuk kesederhanaan, refresh manual setelah aksi.
+        const data = JSON.parse(raw);
+        if (data.world && data.world.length === ROWS && data.world[0].length === COLS) {
+          world = data.world;
         } else {
-          // ===== USER LOGOUT =====
-          currentUser = null;
-          userData = null;
-
-          // Tampilkan login page, sembunyikan main app
-          loginPage.style.display = "flex";
-          mainApp.style.display = "none";
-
-          // Sembunyikan bottom nav
-          bottomNav.style.display = "none";
-
-          // Reset form
-          referralInput.value = "";
-          referralInput.disabled = false;
-          confirmReferralBtn.disabled = false;
-          confirmReferralBtn.textContent = "Konfirmasi";
+          generateWorld();
         }
-      });
+        inventory = data.inventory || {};
+        gems = data.gems || 0;
+        hotbar = data.hotbar || ['dirt_seed', 'rock_seed', 'water_seed', 'grass_seed', 'sand_seed', 'flower_seed', 'stone_block', 'gold_seed'];
+        selectedSlot = data.selectedSlot || 0;
+        if (data.player) player = { x: data.player.x, y: data.player.y };
+        else player = { x: 10.5, y: 9.5 };
+        return true;
+      } catch (e) {
+        generateWorld();
+        return false;
+      }
     }
 
-    // ============================================================
-    // SETUP EVENT LISTENER
-    // ============================================================
+    function autoSave() {
+      saveGame();
+    }
 
-    function setupEventListeners() {
-      // Login
-      googleLoginBtn.addEventListener("click", signInWithGoogle);
+    // ---------- INITIALIZE INVENTORY IF EMPTY (first play) ----------
+    function initStartingInventory() {
+      if (Object.keys(inventory).length === 0) {
+        inventory = {
+          dirt_seed: 5,
+          rock_seed: 3,
+          water_seed: 3,
+          grass_seed: 2,
+          sand_seed: 1,
+          flower_seed: 1,
+          wood_seed: 1,
+          stone_block: 1,
+          gold_seed: 0,
+        };
+        gems = 15;
+        autoSave();
+      }
+    }
 
-      // Logout
-      logoutBtn.addEventListener("click", handleLogout);
-      profileLogoutBtn.addEventListener("click", handleLogout);
-
-      // Referral
-      confirmReferralBtn.addEventListener("click", confirmReferral);
-      copyReferralBtn.addEventListener("click", () => {
-        const code = myReferralCodeEl.textContent;
-        navigator.clipboard.writeText(code).then(() => {
-          showToast("Kode rujukan disalin! 📋");
-        }).catch(() => {
-          showToast("Gagal menyalin kode");
+    // ---------- UI RENDERING ----------
+    function renderHotbar() {
+      const hotbarDiv = document.getElementById('hotbar');
+      hotbarDiv.innerHTML = '';
+      for (let i = 0; i < 8; i++) {
+        const itemId = hotbar[i];
+        const item = getItem(itemId);
+        const slot = document.createElement('div');
+        slot.className = 'slot' + (i === selectedSlot ? ' active' : '');
+        slot.dataset.index = i;
+        if (item) {
+          slot.innerHTML = `${item.emoji}<span class="count">${getItemCount(itemId)}</span>`;
+          slot.title = item.name;
+        } else {
+          slot.innerHTML = '·';
+        }
+        slot.addEventListener('click', () => {
+          selectedSlot = i;
+          renderHotbar();
         });
-      });
-
-      // Klaim Misi
-      claimMissionBtn.addEventListener("click", () => {
-        if (claimMissionBtn.disabled) return;
-        openLoadingScreen();
-      });
-
-      // Loading screen
-      closeLoadingBtn.addEventListener("click", closeLoadingScreen);
-      claimRewardBtn.addEventListener("click", processClaim);
-
-      // Withdraw
-      withdrawBtn.addEventListener("click", () => showPage("withdraw"));
-      backFromWithdraw.addEventListener("click", () => showPage("home"));
-      withdrawAmount.addEventListener("input", updateWithdrawPreview);
-      submitWithdrawBtn.addEventListener("click", submitWithdraw);
-
-      // Navigasi
-      setupNavigation();
+        hotbarDiv.appendChild(slot);
+      }
+      document.getElementById('gemDisplay').textContent = gems;
     }
 
-    // ============================================================
-    // INISIALISASI APLIKASI
-    // ============================================================
-
-    function init() {
-      setupEventListeners();
-      setupAuthListener();
+    function updateGemDisplay() {
+      document.getElementById('gemDisplay').textContent = gems;
     }
 
-    // Jalankan saat DOM siap
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", init);
-    } else {
-      init();
-    }
-
-    // ============================================================
-    // CATATAN KEAMANAN FIRESTORE
-    // ============================================================
-    /*
-    rules_version = '2';
-    service cloud.firestore {
-      match /databases/{database}/documents {
-        match /users/{userId} {
-          allow read, write: if request.auth != null && request.auth.uid == userId;
+    // ---------- WORLD RENDERING ----------
+    function drawWorld() {
+      // background grid
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const x = c * TILE_SIZE;
+          const y = r * TILE_SIZE;
+          const tile = world[r][c];
+          // base grass background
+          ctx.fillStyle = '#7fb08c';
+          ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+          // tile color
+          let color = '#6b8f7a';
+          let emoji = null;
+          switch (tile) {
+            case TILE_TYPES.DIRT: color = '#8b5a2b'; emoji = '🟫'; break;
+            case TILE_TYPES.ROCK: color = '#6e6e6e'; emoji = '🪨'; break;
+            case TILE_TYPES.WATER: color = '#3a8fc2'; emoji = '💧'; break;
+            case TILE_TYPES.GRASS: color = '#4caf50'; emoji = '🌿'; break;
+            case TILE_TYPES.SAND: color = '#e3c27b'; emoji = '🏖️'; break;
+            case TILE_TYPES.FLOWER: color = '#e97a9e'; emoji = '🌸'; break;
+            case TILE_TYPES.GLASS: color = '#a8d8ea'; emoji = '🔷'; break;
+            case TILE_TYPES.STONE: color = '#5a5a5a'; emoji = '⬛'; break;
+            case TILE_TYPES.WOOD: color = '#a0662b'; emoji = '🪵'; break;
+            case TILE_TYPES.LEAF: color = '#3e9e4b'; emoji = '🍃'; break;
+            case TILE_TYPES.GOLD: color = '#f5c542'; emoji = '✨'; break;
+            case TILE_TYPES.EMPTY: color = '#6f9ab0'; emoji = null; break;
+            default: color = '#6f9ab0';
+          }
+          if (tile !== TILE_TYPES.EMPTY) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            if (emoji) {
+              ctx.font = '20px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillStyle = '#00000066';
+              ctx.fillText(emoji, x + TILE_SIZE/2 + 1, y + TILE_SIZE/2 + 2);
+              ctx.fillStyle = '#ffffff';
+              ctx.fillText(emoji, x + TILE_SIZE/2, y + TILE_SIZE/2);
+            }
+          } else {
+            // empty grid line
+            ctx.strokeStyle = '#4d7a8f';
+            ctx.lineWidth = 0.5;
+            ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+          }
         }
-        match /transactions/{transactionId} {
-          allow read: if request.auth != null && request.auth.uid == resource.data.user_id;
-          allow create: if request.auth != null;
+      }
+
+      // draw active splices (glowing)
+      for (let s of activeSplices) {
+        // draw two markers at positions
+        [ [s.x1, s.y1], [s.x2, s.y2] ].forEach(([sx, sy]) => {
+          ctx.fillStyle = '#f5e56bcc';
+          ctx.beginPath();
+          ctx.arc(sx * TILE_SIZE + TILE_SIZE/2, sy * TILE_SIZE + TILE_SIZE/2, 10, 0, 2*Math.PI);
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        });
+        // draw result icon floating between
+        const midX = (s.x1 + s.x2) / 2 * TILE_SIZE + TILE_SIZE/2;
+        const midY = (s.y1 + s.y2) / 2 * TILE_SIZE + TILE_SIZE/2;
+        ctx.font = '28px "Segoe UI Emoji", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffffee';
+        ctx.fillText('✨', midX, midY - 12);
+      }
+
+      // draw player (simple emoji)
+      const px = player.x * TILE_SIZE;
+      const py = player.y * TILE_SIZE;
+      ctx.font = '32px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#00000066';
+      ctx.fillText('🧑', px + 2, py + 4);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('🧑', px, py);
+    }
+
+    // ---------- PLAYER MOVEMENT ----------
+    const keys = {};
+    window.addEventListener('keydown', (e) => {
+      const key = e.key;
+      if (key.startsWith('Arrow') || key === ' ' || key === 'w' || key === 'a' || key === 's' || key === 'd') {
+        e.preventDefault();
+      }
+      keys[key] = true;
+      // number keys 1-8 select hotbar
+      if (key >= '1' && key <= '8') {
+        selectedSlot = parseInt(key) - 1;
+        renderHotbar();
+      }
+    });
+    window.addEventListener('keyup', (e) => {
+      keys[e.key] = false;
+    });
+
+    function updatePlayerMovement(delta) {
+      const speed = 0.15;
+      let dx = 0, dy = 0;
+      if (keys['w'] || keys['ArrowUp']) dy -= speed;
+      if (keys['s'] || keys['ArrowDown']) dy += speed;
+      if (keys['a'] || keys['ArrowLeft']) dx -= speed;
+      if (keys['d'] || keys['ArrowRight']) dx += speed;
+      if (dx !== 0 || dy !== 0) {
+        // clamp within world
+        let nx = player.x + dx;
+        let ny = player.y + dy;
+        nx = Math.max(0.5, Math.min(COLS - 0.5, nx));
+        ny = Math.max(0.5, Math.min(ROWS - 0.5, ny));
+        player.x = nx;
+        player.y = ny;
+      }
+    }
+
+    // ---------- SPLICING LOGIC ----------
+    function trySplice(x1, y1, x2, y2) {
+      // Check if tiles are adjacent (orthogonal)
+      const dx = Math.abs(x1 - x2);
+      const dy = Math.abs(y1 - y2);
+      if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+        // Get tile contents from world
+        const tile1 = world[y1][x1];
+        const tile2 = world[y2][x2];
+        // map tile types to seed items (reverse lookup)
+        const tileToSeed = {
+          [TILE_TYPES.DIRT]: 'dirt_seed',
+          [TILE_TYPES.ROCK]: 'rock_seed',
+          [TILE_TYPES.WATER]: 'water_seed',
+          [TILE_TYPES.GRASS]: 'grass_seed',
+          [TILE_TYPES.SAND]: 'sand_seed',
+          [TILE_TYPES.FLOWER]: 'flower_seed',
+          [TILE_TYPES.WOOD]: 'wood_seed',
+          [TILE_TYPES.GOLD]: 'gold_seed',
+        };
+        const seed1 = tileToSeed[tile1];
+        const seed2 = tileToSeed[tile2];
+        if (!seed1 || !seed2) return false;
+
+        // find matching recipe
+        for (let rec of SPLICE_RECIPES) {
+          if ((rec.a === seed1 && rec.b === seed2) || (rec.a === seed2 && rec.b === seed1)) {
+            // Remove the two tiles (set to empty)
+            world[y1][x1] = TILE_TYPES.EMPTY;
+            world[y2][x2] = TILE_TYPES.EMPTY;
+            // Create active splice
+            const splice = {
+              x1, y1, x2, y2,
+              resultItem: rec.result,
+              resultCount: rec.count || 1,
+              timeLeft: 4.0, // seconds
+            };
+            activeSplices.push(splice);
+            autoSave();
+            showToast(`✨ Splice started! Wait ${splice.timeLeft.toFixed(0)}s`);
+            return true;
+          }
         }
-        match /withdrawals/{withdrawalId} {
-          allow read, create: if request.auth != null && request.auth.uid == request.resource.data.user_id;
+        // no valid recipe
+        showToast('❌ Kombinasi gagal');
+        // return one seed? we didn't consume, just failed
+        return false;
+      }
+      return false;
+    }
+
+    function updateSplices(delta) {
+      for (let i = activeSplices.length - 1; i >= 0; i--) {
+        const s = activeSplices[i];
+        s.timeLeft -= delta;
+        if (s.timeLeft <= 0) {
+          // Harvest: give result item to inventory
+          addItem(s.resultItem, s.resultCount);
+          showToast(`🌱 Splice complete! +${s.resultCount} ${getItem(s.resultItem)?.name || 'item'}`);
+          activeSplices.splice(i, 1);
+          autoSave();
         }
       }
     }
-    */
-  </script>
 
-  <!-- ============================================================ -->
-  <!-- PANDUAN DEPLOY & GANTI ADSENSE (KOMENTAR)                     -->
-  <!-- ============================================================ -->
-  <!--
-  ============================================================
-  PANDUAN DEPLOY KE GITHUB PAGES
-  ============================================================
-  1. Buat repository baru di GitHub (misal: duitin-aja).
-  2. Upload file index.html ke repository tersebut.
-  3. Buka Settings > Pages.
-  4. Pada "Branch", pilih "main" dan folder "/ (root)".
-  5. Klik Save. Tunggu 1-2 menit.
-  6. Aplikasi akan tersedia di:
-     https://<username>.github.io/duitin-aja/
-  7. Pastikan domain GitHub Pages sudah ditambahkan di
-     Firebase Console > Authentication > Sign-in method >
-     Authorized domains.
-  ============================================================
+    // ---------- MOUSE INTERACTION ----------
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const mouseX = (e.clientX - rect.left) * scaleX;
+      const mouseY = (e.clientY - rect.top) * scaleY;
+      const tileX = Math.floor(mouseX / TILE_SIZE);
+      const tileY = Math.floor(mouseY / TILE_SIZE);
+      if (tileX < 0 || tileX >= COLS || tileY < 0 || tileY >= ROWS) return;
 
-  ============================================================
-  CARA GANTI LOADING SCREEN DENGAN ADSENSE NANTI
-  ============================================================
-  1. Cari komentar:
-     "LOADING SCREEN INI ADALAH PENGGANTI SEMENTARA UNTUK IKLAN."
-  2. Hapus seluruh <div id="loadingScreen" class="loading-screen"> ... </div>
-  3. Ganti dengan kode AdSense Rewarded Video, contoh:
-     <div id="adContainer"></div>
-     <script>
-       // Inisialisasi AdSense Rewarded
-       // adBreakDone callback -> panggil processClaim()
-     </script>
-  4. Pastikan fungsi processClaim() tetap dipanggil setelah
-     user selesai menonton iklan.
-  5. Hapus atau nonaktifkan fungsi openLoadingScreen() dan
-     closeLoadingScreen() yang lama.
-  ============================================================
-  -->
+      // check distance from player (max 3 tiles)
+      const dist = Math.hypot(player.x - (tileX + 0.5), player.y - (tileY + 0.5));
+      if (dist > 3.5) {
+        showToast('📏 Terlalu jauh');
+        return;
+      }
+
+      const currentTile = world[tileY][tileX];
+
+      if (e.button === 0) { // LEFT CLICK = BREAK
+        if (currentTile === TILE_TYPES.EMPTY) return;
+        // break tile -> get block item + gems
+        const tileToBlock = {
+          [TILE_TYPES.DIRT]: 'dirt_block',
+          [TILE_TYPES.ROCK]: 'rock_block',
+          [TILE_TYPES.WATER]: 'water_block',
+          [TILE_TYPES.GRASS]: 'grass_block',
+          [TILE_TYPES.SAND]: 'sand_block',
+          [TILE_TYPES.FLOWER]: 'flower_block',
+          [TILE_TYPES.GLASS]: 'glass_block',
+          [TILE_TYPES.STONE]: 'stone_block',
+          [TILE_TYPES.WOOD]: 'wood_block',
+          [TILE_TYPES.LEAF]: 'leaf_block',
+          [TILE_TYPES.GOLD]: 'gold_block',
+        };
+        const blockId = tileToBlock[currentTile];
+        if (blockId) {
+          addItem(blockId, 1);
+          // give gems (1-3)
+          const gemReward = Math.floor(Math.random() * 3) + 1;
+          gems += gemReward;
+          updateGemDisplay();
+          world[tileY][tileX] = TILE_TYPES.EMPTY;
+          showToast(`⛏️ +1 ${getItem(blockId)?.name || 'Block'} & +${gemReward}💎`);
+          autoSave();
+        }
+      } else if (e.button === 2) { // RIGHT CLICK = PLACE or SPLICE
+        const selectedItemId = hotbar[selectedSlot];
+        const item = getItem(selectedItemId);
+        if (!item) return;
+
+        // If tile is empty and we have seed/block, place it
+        if (currentTile === TILE_TYPES.EMPTY) {
+          if (item.type === 'seed' || item.type === 'block') {
+            if (getItemCount(selectedItemId) > 0) {
+              // Place tile (use item.tile)
+              world[tileY][tileX] = item.tile;
+              removeItem(selectedItemId, 1);
+              showToast(`✅ Placed ${item.name}`);
+              autoSave();
+              // After placing, check for splice opportunities with adjacent tiles
+              // check all 4 neighbors
+              const neighbors = [
+                [tileX+1, tileY], [tileX-1, tileY], [tileX, tileY+1], [tileX, tileY-1]
+              ];
+              for (let [nx, ny] of neighbors) {
+                if (nx >= 0 && nx < COLS && ny >= 0 && ny < ROWS) {
+                  const neighborTile = world[ny][nx];
+                  if (neighborTile !== TILE_TYPES.EMPTY) {
+                    trySplice(tileX, tileY, nx, ny);
+                  }
+                }
+              }
+            } else {
+              showToast(`❌ ${item.name} habis`);
+            }
+          }
+        } else {
+          // Tile not empty -> attempt splice if both are seeds (tiles represent seeds)
+          trySplice(tileX, tileY, tileX, tileY); // not adjacent; but we need second tile
+          // Actually splice is triggered by placing second seed. So nothing here.
+        }
+      }
+      renderHotbar();
+    });
+
+    // ---------- SHOP / SEED PACK ----------
+    document.getElementById('buySeedPack').addEventListener('click', () => {
+      if (gems < 10) {
+        showToast('💎 Permata tidak cukup!');
+        return;
+      }
+      gems -= 10;
+      // random seed from a pool
+      const seedPool = ['dirt_seed', 'rock_seed', 'water_seed', 'grass_seed', 'sand_seed', 'flower_seed', 'wood_seed'];
+      const randomSeed = seedPool[Math.floor(Math.random() * seedPool.length)];
+      addItem(randomSeed, 1);
+      updateGemDisplay();
+      renderHotbar();
+      showToast(`🎁 Dapat ${getItem(randomSeed)?.name || 'seed'}!`);
+      autoSave();
+    });
+
+    // ---------- RECIPE PANEL TOGGLE ----------
+    const recipePanel = document.getElementById('recipePanel');
+    document.getElementById('toggleRecipes').addEventListener('click', () => {
+      recipePanel.classList.toggle('visible');
+    });
+
+    // populate recipe list
+    function renderRecipeList() {
+      const listDiv = document.getElementById('recipeList');
+      listDiv.innerHTML = '';
+      SPLICE_RECIPES.forEach(rec => {
+        const itemA = getItem(rec.a);
+        const itemB = getItem(rec.b);
+        const resultItem = getItem(rec.result);
+        if (itemA && itemB && resultItem) {
+          const el = document.createElement('div');
+          el.className = 'recipe-item';
+          el.textContent = `${itemA.emoji} ${itemA.name} + ${itemB.emoji} ${itemB.name} → ${resultItem.emoji} ${resultItem.name} (x${rec.count || 1})`;
+          listDiv.appendChild(el);
+        }
+      });
+    }
+
+    // ---------- GAME LOOP ----------
+    let lastTime = performance.now();
+    function gameLoop(now) {
+      const delta = Math.min((now - lastTime) / 1000, 0.1); // cap delta
+      lastTime = now;
+
+      updatePlayerMovement(delta);
+      updateSplices(delta);
+      drawWorld();
+
+      // auto-save occasionally (every ~10 sec handled by events, but also periodic)
+      requestAnimationFrame(gameLoop);
+    }
+
+    // ---------- INIT ----------
+    function init() {
+      const loaded = loadGame();
+      if (!loaded) {
+        generateWorld();
+        initStartingInventory();
+      }
+      // ensure inventory has something
+      if (Object.keys(inventory).length === 0) initStartingInventory();
+      if (gems === 0 && !loaded) gems = 15;
+      updateGemDisplay();
+      renderHotbar();
+      renderRecipeList();
+      autoSave();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Add extra recipe adjustment: ensure leaf_seed not needed. We already have wood_block from grass+wood.
+    // Fix recipe list to remove leaf_seed reference
+    SPLICE_RECIPES[5] = { a: 'grass_seed', b: 'wood_seed', result: 'wood_block', count: 1 };
+    SPLICE_RECIPES.splice(6, 1); // remove duplicate maybe
+
+    init();
+
+  })();
+</script>
 </body>
 </html>
