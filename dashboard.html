@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Panel - Klik</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #f8f9fb; color: #111;
+    max-width: 720px; margin: 0 auto; padding: 16px 16px 60px;
+  }
+  h1 { font-size: 20px; font-weight: 700; }
+  .sub { font-size: 13px; color: #666; }
+  .card {
+    background: #fff; border-radius: 12px; padding: 16px;
+    margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .label {
+    font-size: 11px; color: #666; text-transform: uppercase;
+    letter-spacing: .5px; margin-bottom: 6px; font-weight: 600;
+  }
+  button {
+    font-family: inherit; font-size: 14px; font-weight: 600;
+    border: none; border-radius: 8px; cursor: pointer;
+    padding: 10px 14px; transition: opacity .15s;
+  }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-primary { background: #0a7c3a; color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: #08662f; }
+  .btn-green { background: #0a7c3a; color: #fff; }
+  .btn-red { background: #dc2626; color: #fff; }
+  .btn-gray { background: #e5e7eb; color: #111; }
+  .btn-sm { padding: 6px 12px; font-size: 13px; }
+  .btn-full { width: 100%; padding: 12px; }
+  .hidden { display: none !important; }
+
+  /* Layout */
+  .header {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 16px; gap: 8px;
+  }
+  .header-text { flex: 1; min-width: 0; }
+  .header-text h1 { font-size: 18px; }
+  .header-text .sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 6px; margin-bottom: 16px;
+    overflow-x: auto; padding-bottom: 4px;
+  }
+  .tabs button {
+    background: #fff; color: #444;
+    border: 1px solid #e5e7eb; white-space: nowrap;
+    padding: 8px 14px; font-size: 13px;
+  }
+  .tabs button.active {
+    background: #0a7c3a; color: #fff; border-color: #0a7c3a;
+  }
+
+  /* Summary boxes */
+  .summary {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 12px;
+  }
+  .summary-box {
+    background: #fff; border-radius: 10px; padding: 12px 8px;
+    text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .summary-box .label { margin-bottom: 4px; }
+  .summary-box .num {
+    font-size: 18px; font-weight: 700; color: #0a7c3a;
+    word-break: break-all;
+  }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; margin: 0 -8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px; color: #666; font-weight: 600; border-bottom: 2px solid #eee; white-space: nowrap; font-size: 12px; text-transform: uppercase; letter-spacing: .3px; }
+  td { padding: 10px 8px; border-bottom: 1px solid #eee; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td b { color: #0a7c3a; }
+  tr:last-child td { border-bottom: none; }
+
+  /* Payout cards */
+  .filter-bar { display: flex; gap: 6px; margin-bottom: 12px; }
+  .filter-bar button {
+    flex: 1; background: #fff; color: #444;
+    border: 1px solid #e5e7eb; padding: 8px; font-size: 13px;
+  }
+  .filter-bar button.active {
+    background: #0a7c3a; color: #fff; border-color: #0a7c3a;
+  }
+  .payout-card {
+    background: #fafafa; border-radius: 10px; padding: 12px;
+    margin-bottom: 10px; border: 1px solid #eee;
+  }
+  .payout-card:last-child { margin-bottom: 0; }
+  .payout-head {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 8px; gap: 8px;
+  }
+  .payout-amount { font-size: 18px; font-weight: 700; color: #0a7c3a; }
+  .payout-date { font-size: 11px; color: #888; }
+  .payout-meta { font-size: 13px; color: #444; line-height: 1.6; }
+  .payout-meta b { color: #111; }
+  .payout-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .payout-actions button { flex: 1; }
+  .badge {
+    display: inline-block; padding: 4px 10px; border-radius: 6px;
+    font-size: 12px; font-weight: 600;
+  }
+  .badge-approved { background: #d1fae5; color: #065f46; }
+  .badge-rejected { background: #fee2e2; color: #991b1b; }
+  .badge-pending { background: #fef3c7; color: #92400e; }
+
+  /* Settings form */
+  .setting-row {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 10px 0; border-bottom: 1px solid #eee;
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-key {
+    font-family: monospace; font-size: 12px; color: #0a7c3a;
+    font-weight: 600;
+  }
+  .setting-row input, .setting-row textarea {
+    width: 100%; padding: 8px 10px; font-size: 13px;
+    font-family: inherit; border: 1px solid #ddd; border-radius: 6px;
+    background: #fff;
+  }
+  .setting-row textarea { min-height: 60px; resize: vertical; }
+  .setting-row input:focus, .setting-row textarea:focus {
+    outline: 2px solid #0a7c3a; outline-offset: -1px;
+  }
+
+  /* Guide */
+  .guide { font-size: 14px; line-height: 1.8; }
+  .guide b { color: #0a7c3a; }
+  .guide ul { padding-left: 20px; margin: 8px 0; }
+
+  /* Center states */
+  .empty { text-align: center; padding: 32px 16px; color: #888; font-size: 14px; }
+  .error { color: #dc2626; }
+  .loading { color: #888; font-style: italic; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: #111; color: #fff; padding: 12px 20px;
+    border-radius: 10px; font-size: 14px; z-index: 99;
+    opacity: 0; transition: opacity .3s; pointer-events: none;
+    max-width: calc(100vw - 40px); text-align: center;
+  }
+  .toast.show { opacity: 1; }
+  .toast.error { background: #dc2626; }
+  .toast.success { background: #0a7c3a; }
+
+  /* Login / Denied */
+  .login-view {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 80vh; text-align: center;
+  }
+  .login-card { max-width: 360px; width: 100%; }
+
+  @media (max-width: 480px) {
+    body { padding: 12px 12px 60px; }
+    .summary { grid-template-columns: 1fr; }
+    .summary-box { display: flex; justify-content: space-between; align-items: center; text-align: left; padding: 12px; }
+    .summary-box .label { margin-bottom: 0; }
+    .summary-box .num { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ VIEW: LOGIN ============ -->
+<div id="login-view" class="login-view hidden">
+  <div class="card login-card">
+    <h1>🛡️ Admin Panel</h1>
+    <p class="sub" style="margin: 8px 0 20px;">Klik Penghasil Saldo Dana</p>
+    <button id="btn-login" class="btn-primary btn-full">🔑 Login Google</button>
+  </div>
+</div>
+
+<!-- ============ VIEW: DENIED ============ -->
+<div id="denied-view" class="login-view hidden">
+  <div class="card login-card">
+    <h1>🚫 Akses Ditolak</h1>
+    <p class="sub" style="margin: 12px 0;">
+      Akun <b id="denied-email">-</b> bukan admin.
+    </p>
+    <button id="btn-logout-denied" class="btn-gray btn-full">Logout</button>
+  </div>
+</div>
+
+<!-- ============ VIEW: APP ============ -->
+<div id="app-view" class="hidden">
+  <div class="header">
+    <div class="header-text">
+      <h1>🛡️ Admin Panel</h1>
+      <p class="sub" id="admin-email"></p>
+    </div>
+    <button id="btn-logout" class="btn-gray btn-sm">Logout</button>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button data-tab="users" class="active">👥 User</button>
+    <button data-tab="payout">💸 Payout</button>
+    <button data-tab="settings">⚙️ Settings</button>
+    <button data-tab="guide">📖 Panduan</button>
+  </div>
+
+  <!-- TAB: USER -->
+  <div id="tab-users">
+    <div class="summary">
+      <div class="summary-box">
+        <div class="label">Total User</div>
+        <div class="num" id="stat-users">-</div>
+      </div>
+      <div class="summary-box">
+        <div class="label">Total Koin</div>
+        <div class="num" id="stat-coins">-</div>
+      </div>
+      <div class="summary-box">
+        <div class="label">Estimasi Rp</div>
+        <div class="num" id="stat-rupiah">-</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="label" style="margin:0;">Daftar User</div>
+        <button id="btn-refresh-users" class="btn-gray btn-sm">🔄 Refresh</button>
+      </div>
+      <div id="users-list" class="loading">Memuat...</div>
+    </div>
+  </div>
+
+  <!-- TAB: PAYOUT -->
+  <div id="tab-payout" class="hidden">
+    <div class="filter-bar" id="payout-filter">
+      <button data-status="pending" class="active">Pending</button>
+      <button data-status="approved">Approved</button>
+      <button data-status="rejected">Rejected</button>
+    </div>
+    <div class="card">
+      <div id="payout-list" class="loading">Memuat...</div>
+    </div>
+  </div>
+
+  <!-- TAB: SETTINGS -->
+  <div id="tab-settings" class="hidden">
+    <div class="card">
+      <div class="label">Konfigurasi Aplikasi</div>
+      <div id="settings-form" class="loading">Memuat...</div>
+      <button id="btn-save-settings" class="btn-primary btn-full" style="margin-top:12px;">💾 Simpan Semua</button>
+    </div>
+  </div>
+
+  <!-- TAB: PANDUAN -->
+  <div id="tab-guide" class="hidden">
+    <div class="card">
+      <div class="label">Panduan Admin</div>
+      <div class="guide">
+        <p>Klik adalah web app reward: user menonton iklan untuk dapat koin, lalu menukar koin ke saldo DANA/OVO/GoPay/ShopeePay/pulsa.</p>
+        <ul>
+          <li>Login wajib via Google.</li>
+          <li>Reward per iklan: <b>100 koin</b>, batas <b>100 iklan/hari</b>.</li>
+          <li>Check-in harian: <b>5–20 koin</b> (sekali per hari).</li>
+          <li>Nilai tukar: <b>10.000 koin = Rp1.000</b>.</li>
+          <li>Potongan konversi: <b>5%</b> (user terima Rp950 dari Rp1.000).</li>
+          <li>Minimum tukar: <b>5.000 koin</b>, kelipatan 5.000.</li>
+          <li>Koin kadaluarsa 30 hari tanpa login.</li>
+        </ul>
+        <p style="margin-top:12px;"><b>Alur:</b> user menonton iklan → saldo koin bertambah (tabel <code>balances</code>) → user klik "Tukar ke DANA" → data masuk ke tabel <code>payouts</code> (status <b>pending</b>) → admin buka tab <b>Payout</b> → approve (transfer manual ke DANA user) atau reject (koin dikembalikan otomatis).</p>
+        <p style="margin-top:12px;"><b>Tab User</b> menampilkan semua user, total koin yang beredar, dan estimasi rupiah.</p>
+        <p style="margin-top:12px;"><b>Tab Settings</b> untuk edit konfigurasi (link iklan, reward, limit, dll).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<script>
+// ============ KONFIG SUPABASE ============
+const SUPABASE_URL = "https://xyzbxersmhvexcycnrcu.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_lHQScOcYKDi4zuailh-mVQ_4Hf72L4w";
+// =========================================
+
+// Email admin. Ubah di sini kalau perlu.
+const ADMIN_EMAIL = "aldispdi.75@gmail.com";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ---------- Utility ----------
+const $ = (id) => document.getElementById(id);
+
+let toastTimer = null;
+function toast(msg, type = "") {
+  const el = $("toast");
+  el.textContent = msg;
+  el.className = "toast show" + (type ? " " + type : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = "toast"; }, 2500);
+}
+
+function formatRp(n) {
+  return "Rp" + Number(n || 0).toLocaleString("id-ID");
+}
+function formatNum(n) {
+  return Number(n || 0).toLocaleString("id-ID");
+}
+function formatTanggal(t) {
+  if (!t) return "-";
+  try {
+    return new Date(t).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
+  } catch { return "-"; }
+}
+function formatTanggalWaktu(t) {
+  if (!t) return "-";
+  try {
+    return new Date(t).toLocaleString("id-ID", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  } catch { return "-"; }
+}
+function escapeHtml(s) {
+  return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// ---------- State ----------
+let currentUser = null;
+let activeTab = "users";
+let payoutStatus = "pending";
+const COIN_RATE = 10000;
+const FEE_PERCENT = 5;
+
+// ---------- Auth ----------
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  currentUser = session?.user ?? null;
+  checkAdmin();
+
+  sb.auth.onAuthStateChange((_e, s) => {
+    currentUser = s?.user ?? null;
+    checkAdmin();
+  });
+}
+
+function checkAdmin() {
+  if (!currentUser) {
+    $("login-view").classList.remove("hidden");
+    $("app-view").classList.add("hidden");
+    $("denied-view").classList.add("hidden");
+    return;
+  }
+  if (currentUser.email !== ADMIN_EMAIL) {
+    $("login-view").classList.add("hidden");
+    $("app-view").classList.add("hidden");
+    $("denied-view").classList.remove("hidden");
+    $("denied-email").textContent = currentUser.email ?? "-";
+    return;
+  }
+  $("login-view").classList.add("hidden");
+  $("denied-view").classList.add("hidden");
+  $("app-view").classList.remove("hidden");
+  $("admin-email").textContent = currentUser.email;
+  loadTab(activeTab);
+}
+
+$("btn-login").onclick = async () => {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.href.split("#")[0].split("?")[0] },
+  });
+  if (error) toast("Gagal login: " + error.message, "error");
+};
+$("btn-logout").onclick = async () => { await sb.auth.signOut(); };
+$("btn-logout-denied").onclick = async () => { await sb.auth.signOut(); };
+
+// ---------- Tabs ----------
+document.querySelectorAll("#tabs button").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll("#tabs button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeTab = btn.dataset.tab;
+    loadTab(activeTab);
+  };
+});
+
+function loadTab(tab) {
+  ["users", "payout", "settings", "guide"].forEach(t => {
+    $("tab-" + t).classList.toggle("hidden", t !== tab);
+  });
+  if (tab === "users") loadUsers();
+  if (tab === "payout") loadPayouts(payoutStatus);
+  if (tab === "settings") loadSettings();
+}
+
+// ---------- TAB: USER ----------
+async function loadUsers() {
+  const listEl = $("users-list");
+  listEl.className = "loading";
+  listEl.textContent = "Memuat...";
+
+  try {
+    const { data, error } = await sb.from("balances")
+      .select("user_id,email,coins,ads_today,last_checkin,updated_at")
+      .order("coins", { ascending: false });
+
+    if (error) throw error;
+
+    const users = data ?? [];
+    const totalCoins = users.reduce((s, u) => s + Number(u.coins || 0), 0);
+    const estimasiRp = Math.floor(totalCoins / COIN_RATE * 1000 * (1 - FEE_PERCENT / 100));
+
+    $("stat-users").textContent = formatNum(users.length);
+    $("stat-coins").textContent = formatNum(totalCoins);
+    $("stat-rupiah").textContent = formatRp(estimasiRp);
+
+    if (!users.length) {
+      listEl.className = "empty";
+      listEl.textContent = "Belum ada user.";
+      return;
+    }
+
+    const rows = users.map(u => {
+      const rp = Math.floor(Number(u.coins || 0) / COIN_RATE * 1000 * (1 - FEE_PERCENT / 100));
+      return `<tr>
+        <td>${escapeHtml(u.email || "-")}</td>
+        <td class="num"><b>${formatNum(u.coins)}</b></td>
+        <td class="num">${formatRp(rp)}</td>
+        <td class="num">${formatNum(u.ads_today)}</td>
+        <td class="num">${formatTanggal(u.last_checkin)}</td>
+      </tr>`;
+    }).join("");
+
+    listEl.className = "";
+    listEl.innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th style="text-align:right;">Koin</th>
+              <th style="text-align:right;">≈Rp</th>
+              <th style="text-align:right;">Iklan</th>
+              <th style="text-align:right;">Check-in</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  } catch (e) {
+    console.error(e);
+    listEl.className = "empty error";
+    listEl.textContent = e?.code === "42501"
+      ? "Akses ditolak oleh RLS — pastikan policy admin sudah dibuat."
+      : "Gagal memuat data user: " + (e?.message ?? "unknown");
+  }
+}
+
+$("btn-refresh-users").onclick = () => loadUsers();
+
+// ---------- TAB: PAYOUT ----------
+document.querySelectorAll("#payout-filter button").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll("#payout-filter button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    payoutStatus = btn.dataset.status;
+    loadPayouts(payoutStatus);
+  };
+});
+
+async function loadPayouts(status) {
+  const listEl = $("payout-list");
+  listEl.className = "loading";
+  listEl.textContent = "Memuat...";
+
+  try {
+    const { data, error } = await sb.from("payouts")
+      .select("*").eq("status", status)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const list = data ?? [];
+    if (!list.length) {
+      listEl.className = "empty";
+      listEl.textContent = "Tidak ada payout " + status + ".";
+      return;
+    }
+
+    listEl.className = "";
+    listEl.innerHTML = list.map(p => {
+      const actions = status === "pending"
+        ? `<div class="payout-actions">
+             <button class="btn-green btn-sm" data-approve="${p.id}">✅ Approve</button>
+             <button class="btn-red btn-sm" data-reject="${p.id}">❌ Reject</button>
+           </div>`
+        : `<div style="margin-top:10px;">
+             <span class="badge badge-${status}">${status === "approved" ? "✅ Approved" : "❌ Rejected"}</span>
+             ${p.processed_at ? `<span class="payout-date" style="margin-left:8px;">${formatTanggalWaktu(p.processed_at)}</span>` : ""}
+           </div>`;
+
+      return `<div class="payout-card">
+        <div class="payout-head">
+          <div class="payout-amount">${formatRp(p.rupiah_amount)}</div>
+          <div class="payout-date">${formatTanggalWaktu(p.created_at)}</div>
+        </div>
+        <div class="payout-meta">
+          <b>${escapeHtml((p.method || "").toUpperCase())}</b> → ${escapeHtml(p.account_number || "-")}<br>
+          ${formatNum(p.coins_used)} koin${p.email ? " · " + escapeHtml(p.email) : ""}
+        </div>
+        ${actions}
+      </div>`;
+    }).join("");
+
+    listEl.querySelectorAll("[data-approve]").forEach(b => {
+      b.onclick = () => processPayout(b.dataset.approve, "approved", list);
+    });
+    listEl.querySelectorAll("[data-reject]").forEach(b => {
+      b.onclick = () => processPayout(b.dataset.reject, "rejected", list);
+    });
+  } catch (e) {
+    console.error(e);
+    listEl.className = "empty error";
+    listEl.textContent = e?.code === "42501"
+      ? "Akses ditolak oleh RLS — pastikan policy admin sudah dibuat."
+      : "Gagal memuat payout: " + (e?.message ?? "unknown");
+  }
+}
+
+async function processPayout(id, action, list) {
+  const payout = (list ?? []).find(p => p.id === id);
+  if (!payout) return;
+
+  const konfirm = action === "approved"
+    ? `Approve payout ${formatRp(payout.rupiah_amount)} ke ${payout.method.toUpperCase()} ${payout.account_number}?\n\nPastikan kamu sudah transfer dana ke user.`
+    : `Reject payout ${formatRp(payout.rupiah_amount)}?\n\nKoin ${formatNum(payout.coins_used)} akan dikembalikan ke user.`;
+  if (!window.confirm(konfirm)) return;
+
+  try {
+    // 1. Update status payout
+    const { error: upErr } = await sb.from("payouts").update({
+      status: action,
+      processed_at: new Date().toISOString(),
+    }).eq("id", id);
+    if (upErr) throw upErr;
+
+    // 2. Kalau reject → refund koin + log transaksi
+    if (action === "rejected") {
+      // Baca saldo dulu untuk update yang aman
+      const { data: bal, error: balErr } = await sb.from("balances")
+        .select("coins").eq("user_id", payout.user_id).single();
+      if (balErr) throw balErr;
+
+      const newCoins = Number(bal.coins || 0) + Number(payout.coins_used || 0);
+
+      const { error: refErr } = await sb.from("balances")
+        .update({ coins: newCoins, updated_at: new Date().toISOString() })
+        .eq("user_id", payout.user_id);
+      if (refErr) throw refErr;
+
+      await sb.from("transactions").insert({
+        user_id: payout.user_id,
+        email: payout.email,
+        amount: Number(payout.coins_used),
+        kind: "payout",
+        note: "Refund payout ditolak",
+      });
+    }
+
+    toast(action === "approved" ? "✅ Payout di-approve" : "❌ Payout ditolak & koin dikembalikan", "success");
+    loadPayouts(payoutStatus);
+  } catch (e) {
+    console.error(e);
+    toast("Gagal: " + (e?.message ?? "unknown"), "error");
+  }
+}
+
+// ---------- TAB: SETTINGS ----------
+let settingsRows = [];
+
+async function loadSettings() {
+  const formEl = $("settings-form");
+  formEl.className = "loading";
+  formEl.textContent = "Memuat...";
+
+  try {
+    const { data, error } = await sb.from("settings")
+      .select("key,value,updated_at").order("key");
+    if (error) throw error;
+
+    settingsRows = data ?? [];
+    if (!settingsRows.length) {
+      formEl.className = "empty";
+      formEl.textContent = "Tabel settings kosong.";
+      return;
+    }
+
+    formEl.className = "";
+    formEl.innerHTML = settingsRows.map((r, i) => {
+      const isLong = /link/i.test(r.key);
+      const field = isLong
+        ? `<textarea data-idx="${i}">${escapeHtml(r.value)}</textarea>`
+        : `<input type="text" data-idx="${i}" value="${escapeHtml(r.value)}" />`;
+      return `<div class="setting-row">
+        <div class="setting-key">${escapeHtml(r.key)}</div>
+        ${field}
+      </div>`;
+    }).join("");
+  } catch (e) {
+    console.error(e);
+    formEl.className = "empty error";
+    formEl.textContent = "Gagal memuat settings: " + (e?.message ?? "unknown");
+  }
+}
+
+$("btn-save-settings").onclick = async () => {
+  const fields = $("settings-form").querySelectorAll("[data-idx]");
+  if (!fields.length) { toast("Tidak ada data untuk disimpan", "error"); return; }
+
+  const rows = [];
+  fields.forEach(f => {
+    const idx = parseInt(f.dataset.idx, 10);
+    const row = settingsRows[idx];
+    if (!row) return;
+    rows.push({
+      key: row.key,
+      value: f.value,
+      updated_at: new Date().toISOString(),
+    });
+  });
+
+  try {
+    const { error } = await sb.from("settings").upsert(rows, { onConflict: "key" });
+    if (error) throw error;
+    toast("✅ Settings tersimpan", "success");
+    loadSettings();
+  } catch (e) {
+    console.error(e);
+    toast("Gagal simpan: " + (e?.message ?? "unknown"), "error");
+  }
+};
+
+// ---------- Start ----------
+initAuth();
+</script>
+</body>
+</html>
