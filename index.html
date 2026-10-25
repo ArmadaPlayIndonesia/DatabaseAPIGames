@@ -1,553 +1,433 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>“Klik” Penghasil Saldo Dana</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🟡</text></svg>">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>"Klik" Penghasil Saldo Dana</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🟡</text></svg>" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
-    body {
+    html, body {
+      height: 100%;
       background: #0f172a;
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       color: #e2e8f0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 0 12px;
+      -webkit-tap-highlight-color: transparent;
     }
-
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
     #app {
       width: 100%;
       max-width: 420px;
-      min-height: 100vh;
-      padding: 16px 0 32px;
+      padding: 16px;
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 0;
-      position: relative;
     }
-
-    /* HEADER */
+    .page {
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.2s ease;
+    }
+    .page.hidden {
+      display: none !important;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
     .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 4px 16px;
       gap: 8px;
-      flex-wrap: wrap;
+      margin-bottom: 4px;
     }
-
     .header-left {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       font-weight: 700;
-      font-size: 16px;
-      letter-spacing: -0.3px;
-      color: #f1f5f9;
+      font-size: 15px;
+      line-height: 1.2;
     }
-
-    .header-left .logo-coin {
+    .header-left .logo {
       font-size: 22px;
     }
-
     .header-right {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-
-    .lang-toggle {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #e2e8f0;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: 0.2s;
-      user-select: none;
-      letter-spacing: 0.3px;
-    }
-
-    .lang-toggle:hover {
-      background: #2d3a4f;
-    }
-
-    .profile-btn {
-      background: #1e293b;
+    .lang-toggle, .icon-btn {
+      background: #334155;
       border: none;
       color: #e2e8f0;
-      font-size: 20px;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
       cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+    .lang-toggle:hover, .icon-btn:hover {
+      background: #475569;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0f172a;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      font-family: inherit;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+    .btn-primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .btn-secondary {
+      background: #334155;
+      color: #e2e8f0;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+    .btn-danger {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      font-family: inherit;
+    }
+    .btn-danger:active {
+      opacity: 0.85;
+    }
+    .btn-google {
+      background: #ffffff;
+      color: #1e293b;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      width: 100%;
+      font-family: inherit;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: 0.2s;
+      gap: 10px;
+      transition: background 0.15s;
     }
-
-    .profile-btn:hover {
-      background: #2d3a4f;
+    .btn-google:hover {
+      background: #f1f5f9;
     }
-
-    /* CARDS */
-    .card {
-      background: #1e293b;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-      margin-bottom: 16px;
+    .btn-google:active {
+      transform: scale(0.98);
     }
-
-    .card-title {
+    .btn-google:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .login-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 24px;
+      padding-top: 24px;
+    }
+    .login-logo {
+      font-size: 64px;
+      text-align: center;
+      line-height: 1;
+    }
+    .login-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: #f8fafc;
+      line-height: 1.25;
+    }
+    .login-tagline {
+      text-align: center;
       font-size: 15px;
-      font-weight: 600;
       color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
+      margin-top: -8px;
     }
-
-    /* BALANCE */
+    .login-terms {
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.5;
+      padding: 0 8px;
+    }
+    .login-terms a {
+      color: #f59e0b;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .error-box {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .error-box.hidden {
+      display: none;
+    }
     .balance-row {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding: 6px 0;
+      margin-bottom: 8px;
     }
-
     .balance-label {
-      font-size: 16px;
-      color: #94a3b8;
-    }
-
-    .balance-value {
-      font-size: 22px;
-      font-weight: 700;
-      color: #f59e0b;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .balance-value .coin {
-      font-size: 18px;
-    }
-
-    .expiry-text {
-      font-size: 14px;
-      color: #94a3b8;
-      margin-top: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .expiry-warning {
-      color: #ef4444;
-      font-weight: 600;
       font-size: 13px;
-    }
-
-    /* PROGRESS */
-    .progress-label {
-      font-size: 15px;
       color: #94a3b8;
+      font-weight: 500;
+    }
+    .balance-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: #f59e0b;
+    }
+    .balance-sub {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 8px;
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 2px;
     }
-
-    .progress-bar-bg {
-      background: #0f172a;
-      border-radius: 20px;
-      height: 14px;
-      width: 100%;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #f59e0b, #d97706);
-      border-radius: 20px;
-      width: 0%;
-      transition: width 0.5s ease;
-    }
-
-    /* BUTTONS */
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-      text-align: center;
-      font-family: inherit;
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: #0f172a;
-      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: scale(1.01);
-      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
-    }
-
-    .btn-secondary {
-      background: #334155;
-      color: #e2e8f0;
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      background: #475569;
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1.5px solid #334155;
-      color: #e2e8f0;
-    }
-
-    .btn-outline:hover:not(:disabled) {
-      background: #1e293b;
-    }
-
-    .btn-danger {
-      background: #dc2626;
-      color: #fff;
-    }
-
-    .btn-danger:hover:not(:disabled) {
-      background: #b91c1c;
-    }
-
-    .btn-google {
-      background: #ffffff;
-      color: #1e293b;
-      border: 1px solid #e2e8f0;
+    .balance-pending {
+      color: #fbbf24;
       font-weight: 600;
-      gap: 12px;
     }
-
-    .btn-google:hover {
-      background: #f1f5f9;
-    }
-
-    .btn-block {
+    .expiry-warning {
+      color: #ef4444;
+      font-size: 12px;
+      font-weight: 600;
       margin-top: 10px;
     }
-
-    /* LOGIN PAGE */
-    .login-container {
+    .quota-label {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 90vh;
-      text-align: center;
-      position: relative;
-      padding: 20px 0;
-    }
-
-    .login-radial {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -60%);
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .login-coin {
-      font-size: 72px;
+      justify-content: space-between;
+      font-size: 13px;
       margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
-      filter: drop-shadow(0 0 30px rgba(245, 158, 11, 0.4));
+      color: #cbd5e1;
     }
-
-    .login-title {
-      font-size: 28px;
-      font-weight: 800;
-      color: #f1f5f9;
-      letter-spacing: -0.5px;
-      margin-bottom: 6px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .login-tagline {
-      font-size: 16px;
-      color: #f59e0b;
-      font-weight: 600;
-      margin-bottom: 32px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .login-btn-wrap {
+    .progress-track {
+      background: #334155;
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
       width: 100%;
-      max-width: 320px;
-      position: relative;
-      z-index: 1;
     }
-
-    .login-terms {
-      font-size: 12px;
-      color: #64748b;
-      margin-top: 18px;
-      position: relative;
-      z-index: 1;
+    .progress-fill {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+      height: 100%;
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.35s ease;
     }
-
-    .login-terms a {
-      color: #f59e0b;
-      text-decoration: underline;
-    }
-
-    /* SECTION & PAGE */
-    section.page {
-      display: none;
-      width: 100%;
-      flex-direction: column;
-      animation: fadeIn 0.25s ease;
-    }
-
-    section.page.active {
-      display: flex;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* WATCH */
-    .watch-card {
-      text-align: center;
-      padding: 32px 20px;
-    }
-
-    .watch-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .watch-status {
-      color: #94a3b8;
+    .spacer-8 { height: 8px; }
+    .spacer-12 { height: 12px; }
+    .section-title {
       font-size: 15px;
-      margin-bottom: 20px;
-      min-height: 24px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 12px;
     }
-
-    .watch-timer {
-      font-size: 40px;
-      font-weight: 800;
-      color: #f59e0b;
-      margin: 12px 0;
-      letter-spacing: 2px;
-    }
-
-    .watch-extra-btn {
-      margin-top: 12px;
-    }
-
-    /* FORM */
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      color: #94a3b8;
-      margin-bottom: 6px;
-    }
-
-    .form-control {
+    .input-field, .select-field {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1.5px solid #334155;
       background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px 14px;
       color: #e2e8f0;
-      font-size: 16px;
+      font-size: 15px;
       font-family: inherit;
       outline: none;
-      transition: border 0.2s;
+      transition: border-color 0.15s;
+      margin-bottom: 12px;
     }
-
-    .form-control:focus {
+    .input-field:focus, .select-field:focus {
       border-color: #f59e0b;
     }
-
-    .summary-box {
+    .input-field::placeholder {
+      color: #64748b;
+    }
+    .select-field {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+    .convert-summary {
       background: #0f172a;
       border-radius: 10px;
-      padding: 14px;
-      margin: 14px 0;
-      font-size: 14px;
-      line-height: 1.8;
-      color: #cbd5e1;
-      border: 1px solid #1e293b;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 12px;
+      min-height: 48px;
     }
-
-    .summary-box .highlight {
+    .convert-summary strong {
       color: #f59e0b;
-      font-weight: 700;
     }
-
-    /* HISTORY */
     .history-list {
-      list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
+      max-height: 58vh;
+      overflow-y: auto;
     }
-
     .history-item {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 8px;
-      border-bottom: 1px solid #1e293b;
+      background: #0f172a;
+      border-radius: 10px;
+      padding: 12px;
     }
-
-    .history-item:last-child {
-      border-bottom: none;
-    }
-
     .history-icon {
       font-size: 22px;
+      flex-shrink: 0;
       width: 32px;
       text-align: center;
     }
-
     .history-info {
       flex: 1;
       min-width: 0;
     }
-
     .history-desc {
-      font-size: 14px;
-      font-weight: 500;
-      word-break: break-word;
+      font-size: 13px;
+      color: #e2e8f0;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-
     .history-date {
-      font-size: 12px;
+      font-size: 11px;
       color: #64748b;
       margin-top: 2px;
     }
-
     .history-amount {
-      font-weight: 700;
-      font-size: 15px;
-      white-space: nowrap;
+      font-weight: 800;
+      font-size: 14px;
+      flex-shrink: 0;
     }
-
-    .history-amount.positive {
-      color: #22c55e;
-    }
-
-    .history-amount.negative {
-      color: #ef4444;
-    }
-
+    .amount-positive { color: #22c55e; }
+    .amount-negative { color: #ef4444; }
     .empty-state {
       text-align: center;
       color: #64748b;
+      font-size: 14px;
       padding: 32px 0;
-      font-size: 15px;
     }
-
-    /* PROFILE */
     .profile-row {
       display: flex;
       justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #1e293b;
       gap: 12px;
-      flex-wrap: wrap;
+      padding: 10px 0;
+      border-bottom: 1px solid #334155;
+      font-size: 14px;
     }
-
     .profile-row:last-child {
       border-bottom: none;
     }
-
-    .profile-label {
+    .profile-key {
       color: #94a3b8;
-      font-size: 14px;
+      flex-shrink: 0;
     }
-
-    .profile-value {
+    .profile-val {
+      color: #e2e8f0;
       font-weight: 600;
-      font-size: 14px;
-      word-break: break-word;
       text-align: right;
-      max-width: 60%;
+      word-break: break-word;
     }
-
-    /* TERMS */
-    .terms-list {
-      list-style: none;
-      counter-reset: term;
-      font-size: 14px;
+    .terms-content {
+      font-size: 13px;
       line-height: 1.7;
       color: #cbd5e1;
     }
-
-    .terms-list li {
-      counter-increment: term;
-      margin-bottom: 16px;
-      padding-left: 32px;
-      position: relative;
+    .terms-content ol {
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-
-    .terms-list li::before {
-      content: counter(term) ".";
-      position: absolute;
-      left: 0;
-      font-weight: 700;
+    .terms-content a {
       color: #f59e0b;
     }
-
-    /* TOAST */
-    .toast-container {
+    .watch-status {
+      font-size: 13px;
+      color: #94a3b8;
+      text-align: center;
+      margin: 8px 0 4px;
+    }
+    .watch-timer {
+      font-size: 34px;
+      font-weight: 800;
+      color: #f59e0b;
+      text-align: center;
+      margin: 12px 0;
+      letter-spacing: 2px;
+    }
+    .watch-timer.hidden {
+      display: none;
+    }
+    #toast-container {
       position: fixed;
       top: 16px;
       left: 50%;
@@ -556,1198 +436,1092 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      align-items: center;
-      width: 100%;
-      max-width: 420px;
-      padding: 0 16px;
+      width: calc(100% - 32px);
+      max-width: 380px;
       pointer-events: none;
     }
-
     .toast {
-      padding: 12px 20px;
-      border-radius: 12px;
-      font-weight: 600;
+      padding: 12px 16px;
+      border-radius: 10px;
       font-size: 14px;
+      font-weight: 600;
       color: #fff;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-      animation: slideDown 0.3s ease;
-      width: 100%;
-      text-align: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      animation: toastIn 0.25s ease;
       pointer-events: auto;
+      word-break: break-word;
+      text-align: center;
     }
-
-    .toast.success {
-      background: #22c55e;
-      color: #0f172a;
-    }
-
-    .toast.error {
-      background: #ef4444;
-      color: #fff;
-    }
-
-    .toast.info {
-      background: #3b82f6;
-      color: #fff;
-    }
-
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-20px); }
+    .toast.success { background: #22c55e; }
+    .toast.error { background: #ef4444; }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-12px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    /* UTIL */
-    .mt-12 { margin-top: 12px; }
-    .mt-16 { margin-top: 16px; }
-    .mt-8 { margin-top: 8px; }
-    .text-center { text-align: center; }
-    .text-sm { font-size: 13px; }
-    .text-muted { color: #94a3b8; }
-    .flex { display: flex; }
-    .gap-8 { gap: 8px; }
-    .flex-col { flex-direction: column; }
-    .w-full { width: 100%; }
-    .link-wa {
-      display: inline-block;
-      color: #22c55e;
-      font-size: 13px;
-      font-weight: 600;
+    .btn-wa {
+      display: block;
+      text-align: center;
+      background: #25d366;
+      color: #0f172a;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 700;
+      font-size: 14px;
       text-decoration: none;
-      margin-top: 8px;
+      transition: opacity 0.15s;
     }
-    .link-wa:hover { text-decoration: underline; }
-
-    /* NAV BOTTOM */
-    .bottom-nav {
+    .btn-wa:active { opacity: 0.85; }
+    .nav-row {
       display: flex;
       gap: 10px;
-      margin-top: 8px;
     }
-
-    .bottom-nav .btn {
-      flex: 1;
-      padding: 12px 8px;
+    .nav-row > * { flex: 1; }
+    .mt-4 { margin-top: 4px; }
+    .mt-8 { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+    .text-center { text-align: center; }
+    .text-muted { color: #94a3b8; font-size: 13px; }
+    .noscript-msg {
+      background: #ef4444;
+      color: #fff;
+      padding: 16px;
+      text-align: center;
+      font-weight: 700;
       font-size: 14px;
+      border-radius: 12px;
+      margin: 16px;
+      max-width: 420px;
     }
-
-    .hidden { display: none !important; }
+    .loading-text {
+      color: #94a3b8;
+      font-size: 13px;
+      text-align: center;
+      padding: 12px 0;
+    }
   </style>
 </head>
 <body>
-  <div id="app">
-    <!-- TOAST CONTAINER -->
-    <div class="toast-container" id="toastContainer"></div>
+  <noscript>
+    <div class="noscript-msg">Aktifkan JavaScript untuk menggunakan aplikasi ini.</div>
+  </noscript>
 
-    <!-- HEADER GLOBAL (muncul di halaman non-login) -->
-    <div class="header" id="globalHeader" style="display:none;">
-      <div class="header-left">
-        <span class="logo-coin">🟡</span>
-        <span data-i18n="appName">"Klik" Penghasil Saldo Dana</span>
-      </div>
-      <div class="header-right">
-        <button class="lang-toggle" id="langToggle" onclick="toggleLang()">ID</button>
-        <button class="profile-btn" id="headerProfileBtn" onclick="location.hash='#profile'" title="Profil">👤</button>
-      </div>
-    </div>
+  <div id="toast-container"></div>
 
-    <!-- ==================== LOGIN ==================== -->
-    <section class="page" id="page-login">
+  <main id="app">
+    <!-- ============ LOGIN PAGE (visible by default, NO hidden class) ============ -->
+    <section id="page-login" class="page">
+      <div class="header">
+        <span></span>
+        <button class="lang-toggle" id="lang-toggle-login" type="button">EN</button>
+      </div>
       <div class="login-container">
-        <div class="login-radial"></div>
-        <div class="login-coin">🟡</div>
-        <div class="login-title" data-i18n="appName">"Klik" Penghasil Saldo Dana</div>
-        <div class="login-tagline" data-i18n="tagline">Klik Doang, Dapet Duit!</div>
-        <div class="login-btn-wrap">
-          <button class="btn btn-google" id="googleLoginBtn" onclick="handleGoogleLogin()">
-            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-            <span data-i18n="loginGoogle">Masuk dengan Google</span>
-          </button>
-        </div>
-        <div class="login-terms">
-          <span data-i18n="loginTerms">Dengan masuk, Anda setuju dengan</span>
-          <a href="#terms" data-i18n="termsLink">Syarat & Ketentuan</a>
-        </div>
+        <div class="login-logo">🟡</div>
+        <h1 class="login-title">"Klik" Penghasil Saldo Dana</h1>
+        <p class="login-tagline">Klik Doang, Dapet Duit!</p>
+        <div id="login-error" class="error-box hidden"></div>
+        <button id="btn-google-login" class="btn-google" type="button">
+          <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          Masuk dengan Google
+        </button>
+        <p class="login-terms">
+          Dengan masuk, Anda setuju dengan <a href="#terms">Syarat &amp; Ketentuan</a>
+        </p>
       </div>
     </section>
 
-    <!-- ==================== DASHBOARD ==================== -->
-    <section class="page" id="page-dashboard">
-      <!-- balance card -->
+    <!-- ============ DASHBOARD ============ -->
+    <section id="page-dashboard" class="page hidden">
+      <div class="header">
+        <div class="header-left">
+          <span class="logo">🟡</span>
+          <span>"Klik" Penghasil Saldo Dana</span>
+        </div>
+        <div class="header-right">
+          <button class="lang-toggle" id="lang-toggle-dash" type="button">EN</button>
+          <button class="icon-btn" id="btn-profile-icon" type="button" aria-label="Profil">👤</button>
+        </div>
+      </div>
+
       <div class="card">
-        <div class="card-title" data-i18n="balanceTitle">Saldo</div>
         <div class="balance-row">
-          <span class="balance-label" data-i18n="availableBalance">Saldo Tersedia</span>
-          <span class="balance-value"><span id="dashCoinBalance">0</span> <span class="coin">🟡</span></span>
+          <span class="balance-label" data-i18n="balance_label">Saldo Tersedia</span>
+          <span class="balance-value"><span id="coin-balance">0</span> 🟡</span>
         </div>
+        <div class="balance-sub">
+          <span data-i18n="pending_label">Pending</span>
+          <span class="balance-pending"><span id="coin-pending">0</span> 🟡</span>
+        </div>
+        <div class="balance-sub">
+          <span data-i18n="expiry_label">Berlaku hingga</span>
+          <span id="coin-expiry">—</span>
+        </div>
+        <div id="expiry-warning" class="expiry-warning hidden"></div>
+      </div>
+
+      <div class="card">
+        <div class="quota-label">
+          <span data-i18n="quota_label">Kuota hari ini</span>
+          <span><span id="quota-used">0</span>/100</span>
+        </div>
+        <div class="progress-track">
+          <div id="quota-progress" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-watch-nav" type="button" data-i18n="watch_ads_btn">🎬 TONTON IKLAN</button>
+      <button class="btn-secondary" id="btn-checkin" type="button" data-i18n="checkin_btn">✅ CHECK-IN HARIAN</button>
+
+      <div class="nav-row">
+        <button class="btn-secondary" id="btn-nav-convert" type="button" data-i18n="convert_nav">Konversi</button>
+        <button class="btn-secondary" id="btn-nav-history" type="button" data-i18n="history_nav">Riwayat</button>
+      </div>
+
+      <a class="btn-wa" href="https://wa.me/6281525742110?text=Halo%20saya%20butuh%20bantuan" target="_blank" rel="noopener" data-i18n="wa_help">💬 Butuh bantuan? Chat WhatsApp</a>
+    </section>
+
+    <!-- ============ WATCH ============ -->
+    <section id="page-watch" class="page hidden">
+      <div class="header">
+        <div class="header-left">
+          <span class="logo">🟡</span>
+          <span>"Klik" Penghasil Saldo Dana</span>
+        </div>
+        <div class="header-right">
+          <button class="lang-toggle" id="lang-toggle-watch" type="button">EN</button>
+          <button class="icon-btn" id="btn-profile-icon-watch" type="button" aria-label="Profil">👤</button>
+        </div>
+      </div>
+
+      <div class="card text-center">
+        <h2 class="section-title" data-i18n="watch_title">Tonton Iklan, Dapat 100 🟡</h2>
+        <p class="watch-status" id="watch-status" data-i18n="watch_status">Tekan tombol di bawah untuk menonton iklan.</p>
+        <div id="watch-timer" class="watch-timer hidden">10</div>
+        <button class="btn-primary" id="btn-watch" type="button" data-i18n="watch_now_btn">TONTON IKLAN SEKARANG</button>
+        <div class="spacer-12"></div>
+        <button class="btn-secondary hidden" id="btn-adsterra" type="button" data-i18n="try_adsterra">Coba Adsterra</button>
+      </div>
+
+      <button class="btn-secondary" id="btn-watch-back" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
+    </section>
+
+    <!-- ============ CONVERT ============ -->
+    <section id="page-convert" class="page hidden">
+      <div class="header">
+        <div class="header-left">
+          <span class="logo">🟡</span>
+          <span>"Klik" Penghasil Saldo Dana</span>
+        </div>
+        <div class="header-right">
+          <button class="lang-toggle" id="lang-toggle-convert" type="button">EN</button>
+          <button class="icon-btn" id="btn-profile-icon-convert" type="button" aria-label="Profil">👤</button>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="balance-row">
-          <span class="balance-label" data-i18n="pendingBalance">Pending</span>
-          <span class="balance-value" style="color:#94a3b8;"><span id="dashCoinPending">0</span> <span class="coin">🟡</span></span>
+          <span class="balance-label" data-i18n="balance_label">Saldo</span>
+          <span class="balance-value"><span id="convert-balance">0</span> 🟡</span>
         </div>
-        <div class="expiry-text">
-          <span data-i18n="validUntil">Berlaku hingga:</span>
-          <span id="dashExpiryDate">—</span>
-          <span id="dashExpiryWarning" class="expiry-warning hidden" data-i18n="expiryWarning">Segera login untuk memperpanjang</span>
-        </div>
+        <div class="spacer-12"></div>
+        <input class="input-field" id="input-coins" type="number" placeholder="5000" step="5000" min="5000" />
+        <select class="select-field" id="select-method">
+          <option value="DANA">DANA</option>
+          <option value="OVO">OVO</option>
+          <option value="GoPay">GoPay</option>
+          <option value="ShopeePay">ShopeePay</option>
+          <option value="Pulsa">Pulsa</option>
+        </select>
+        <input class="input-field" id="input-account" type="text" placeholder="Nomor akun / HP" />
+        <div class="convert-summary" id="convert-summary" data-i18n="convert_summary">Masukkan jumlah koin untuk melihat estimasi.</div>
+        <button class="btn-primary" id="btn-convert" type="button" data-i18n="convert_submit">AJUKAN PENARIKAN</button>
       </div>
 
-      <!-- quota card -->
-      <div class="card">
-        <div class="card-title" data-i18n="quotaTitle">Kuota Hari Ini</div>
-        <div class="progress-label">
-          <span id="quotaText">0/100</span>
-          <span>🟡</span>
-        </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill" id="quotaBar" style="width:0%;"></div>
-        </div>
-      </div>
-
-      <!-- watch button -->
-      <button class="btn btn-primary" style="font-size:18px; padding:16px;" onclick="location.hash='#watch'">
-        🎬 <span data-i18n="watchAd">TONTON IKLAN</span>
-      </button>
-
-      <!-- check-in -->
-      <button class="btn btn-secondary btn-block" id="checkinBtn" onclick="handleCheckin()">
-        ✅ <span data-i18n="dailyCheckin">CHECK-IN HARIAN</span>
-      </button>
-
-      <!-- bottom nav -->
-      <div class="bottom-nav mt-12">
-        <button class="btn btn-outline" onclick="location.hash='#convert'">💸 <span data-i18n="convert">Konversi</span></button>
-        <button class="btn btn-outline" onclick="location.hash='#history'">📋 <span data-i18n="history">Riwayat</span></button>
-      </div>
-
-      <div class="text-center mt-12">
-        <a class="link-wa" href="https://wa.me/6281525742110?text=Halo%20saya%20butuh%20bantuan%20di%20Klik%20Penghasil%20Saldo%20Dana" target="_blank" rel="noopener">
-          💬 <span data-i18n="helpWa">Bantuan? Chat WA</span>
-        </a>
-      </div>
+      <button class="btn-secondary" id="btn-convert-back" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
     </section>
 
-    <!-- ==================== WATCH ==================== -->
-    <section class="page" id="page-watch">
-      <div class="card watch-card">
-        <div class="watch-title" data-i18n="watchTitle">Tonton Iklan, Dapat 100 🟡</div>
-        <div class="watch-status" id="watchStatus" data-i18n="watchStatusDefault">Klik tombol di bawah untuk mulai</div>
-        <div class="watch-timer hidden" id="watchTimer">10</div>
-        <button class="btn btn-primary" id="watchNowBtn" onclick="startWatchAd()">
-          ▶️ <span data-i18n="watchNow">TONTON IKLAN SEKARANG</span>
-        </button>
-        <button class="btn btn-secondary watch-extra-btn hidden" id="adsterraBtn" onclick="startAdsterra()">
-          🔄 <span data-i18n="tryAdsterra">Coba Adsterra</span>
-        </button>
-      </div>
-      <button class="btn btn-outline mt-12" onclick="location.hash='#dashboard'">← <span data-i18n="backToDashboard">Kembali ke Dashboard</span></button>
-    </section>
-
-    <!-- ==================== CONVERT ==================== -->
-    <section class="page" id="page-convert">
-      <div class="card">
-        <div class="card-title" data-i18n="convertTitle">Konversi Koin ke Saldo</div>
-        <div class="balance-row" style="margin-bottom:12px;">
-          <span class="balance-label" data-i18n="balanceLabel">Saldo:</span>
-          <span class="balance-value"><span id="convertCoinBalance">0</span> <span class="coin">🟡</span></span>
+    <!-- ============ HISTORY ============ -->
+    <section id="page-history" class="page hidden">
+      <div class="header">
+        <div class="header-left">
+          <span class="logo">🟡</span>
+          <span>"Klik" Penghasil Saldo Dana</span>
         </div>
-
-        <div class="form-group">
-          <label data-i18n="coinsToConvert">Jumlah koin yang ditukar</label>
-          <input type="number" class="form-control" id="convertAmount" placeholder="5000" step="5000" min="5000" oninput="updateConvertSummary()">
-        </div>
-
-        <div class="form-group">
-          <label data-i18n="method">Metode</label>
-          <select class="form-control" id="convertMethod" onchange="updateConvertSummary()">
-            <option value="DANA">DANA</option>
-            <option value="OVO">OVO</option>
-            <option value="GoPay">GoPay</option>
-            <option value="ShopeePay">ShopeePay</option>
-            <option value="Pulsa">Pulsa</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label data-i18n="accountNumber">Nomor akun / nomor HP</label>
-          <input type="text" class="form-control" id="convertAccount" placeholder="08xxxxxxxxxx">
-        </div>
-
-        <div class="summary-box" id="convertSummary" style="display:none;">
-          <div><span data-i18n="summaryCoins">Koin ditukar:</span> <span class="highlight" id="summaryCoins">0</span> 🟡</div>
-          <div><span data-i18n="summaryRupiah">Rupiah:</span> <span class="highlight" id="summaryRupiah">Rp 0</span></div>
-          <div><span data-i18n="summaryFee">Potongan 5%:</span> <span class="highlight" id="summaryFee">Rp 0</span></div>
-        </div>
-
-        <button class="btn btn-primary mt-16" id="convertSubmitBtn" onclick="handleConvert()">
-          <span data-i18n="submitWithdraw">AJUKAN PENARIKAN</span>
-        </button>
-      </div>
-      <button class="btn btn-outline" onclick="location.hash='#dashboard'">← <span data-i18n="backToDashboard">Kembali ke Dashboard</span></button>
-    </section>
-
-    <!-- ==================== HISTORY ==================== -->
-    <section class="page" id="page-history">
-      <div class="card">
-        <div class="card-title" data-i18n="historyTitle">Riwayat Transaksi</div>
-        <div id="historyListContainer">
-          <div class="empty-state" data-i18n="noHistory">Belum ada riwayat</div>
+        <div class="header-right">
+          <button class="lang-toggle" id="lang-toggle-history" type="button">EN</button>
+          <button class="icon-btn" id="btn-profile-icon-history" type="button" aria-label="Profil">👤</button>
         </div>
       </div>
-      <button class="btn btn-outline" onclick="location.hash='#dashboard'">← <span data-i18n="backToDashboard">Kembali ke Dashboard</span></button>
+
+      <div class="card">
+        <h2 class="section-title" data-i18n="history_title">Riwayat Transaksi</h2>
+        <div class="history-list" id="history-list">
+          <p class="empty-state" data-i18n="history_empty">Belum ada riwayat</p>
+        </div>
+      </div>
+
+      <button class="btn-secondary" id="btn-history-back" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
     </section>
 
-    <!-- ==================== PROFILE ==================== -->
-    <section class="page" id="page-profile">
+    <!-- ============ PROFILE ============ -->
+    <section id="page-profile" class="page hidden">
+      <div class="header">
+        <div class="header-left">
+          <span class="logo">🟡</span>
+          <span>"Klik" Penghasil Saldo Dana</span>
+        </div>
+        <div class="header-right">
+          <button class="lang-toggle" id="lang-toggle-profile" type="button">EN</button>
+        </div>
+      </div>
+
       <div class="card">
-        <div class="card-title" data-i18n="profileTitle">Profil Akun</div>
+        <h2 class="section-title" data-i18n="profile_title">Profil Saya</h2>
         <div class="profile-row">
-          <span class="profile-label" data-i18n="email">Email</span>
-          <span class="profile-value" id="profileEmail">—</span>
+          <span class="profile-key" data-i18n="profile_email">Email</span>
+          <span class="profile-val" id="profile-email">—</span>
         </div>
         <div class="profile-row">
-          <span class="profile-label" data-i18n="role">Role</span>
-          <span class="profile-value" id="profileRole">—</span>
+          <span class="profile-key" data-i18n="profile_role">Role</span>
+          <span class="profile-val" id="profile-role">—</span>
         </div>
         <div class="profile-row">
-          <span class="profile-label" data-i18n="accountStatus">Status Akun</span>
-          <span class="profile-value" id="profileStatus">—</span>
+          <span class="profile-key" data-i18n="profile_status">Status</span>
+          <span class="profile-val" id="profile-status">—</span>
         </div>
         <div class="profile-row">
-          <span class="profile-label" data-i18n="lastLogin">Terakhir Login</span>
-          <span class="profile-value" id="profileLastLogin">—</span>
+          <span class="profile-key" data-i18n="profile_last_login">Login terakhir</span>
+          <span class="profile-val" id="profile-last-login">—</span>
         </div>
         <div class="profile-row">
-          <span class="profile-label" data-i18n="coinExpiry">Masa Berlaku Koin</span>
-          <span class="profile-value" id="profileExpiry">—</span>
+          <span class="profile-key" data-i18n="profile_expiry">Koin berlaku hingga</span>
+          <span class="profile-val" id="profile-expiry">—</span>
         </div>
+        <div class="spacer-12"></div>
+        <button class="btn-danger" id="btn-logout" type="button" data-i18n="logout">Logout</button>
       </div>
-      <button class="btn btn-danger mt-12" onclick="handleLogout()">
-        🚪 <span data-i18n="logout">Logout</span>
-      </button>
-      <button class="btn btn-outline mt-12" onclick="location.hash='#dashboard'">← <span data-i18n="backToDashboard">Kembali ke Dashboard</span></button>
+
+      <button class="btn-secondary" id="btn-profile-back" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
     </section>
 
-    <!-- ==================== TERMS ==================== -->
-    <section class="page" id="page-terms">
+    <!-- ============ TERMS ============ -->
+    <section id="page-terms" class="page hidden">
+      <div class="header">
+        <div class="header-left">
+          <span class="logo">🟡</span>
+          <span>"Klik" Penghasil Saldo Dana</span>
+        </div>
+        <div class="header-right">
+          <button class="lang-toggle" id="lang-toggle-terms" type="button">EN</button>
+        </div>
+      </div>
+
       <div class="card">
-        <div class="card-title" data-i18n="termsTitle">Syarat & Ketentuan</div>
-        <ul class="terms-list">
-          <li data-i18n="terms1">Penggunaan akun: satu akun per orang, login via Google.</li>
-          <li data-i18n="terms2">Larangan: bot, VPN/proxy, akun ganda, manipulasi data.</li>
-          <li data-i18n="terms3">Koin: didapat dari menonton iklan & check-in, pending 24 jam, kadaluarsa 30 hari tanpa login.</li>
-          <li data-i18n="terms4">Konversi: minimum 5.000 koin, potongan 5%, payout manual oleh admin.</li>
-          <li data-i18n="terms5">Perubahan aturan: admin berhak mengubah aturan kapan saja.</li>
-          <li data-i18n="terms6">Kontak: WA +62 81525742110.</li>
-        </ul>
+        <h2 class="section-title" data-i18n="terms_title">Syarat &amp; Ketentuan</h2>
+        <div class="terms-content" id="terms-content">
+          <ol>
+            <li>Satu akun per orang. Dilarang menggunakan akun ganda.</li>
+            <li>Dilarang menggunakan bot, VPN, atau alat otomatis lainnya.</li>
+            <li>Koin pending akan diverifikasi dalam 24 jam.</li>
+            <li>Koin kadaluarsa dalam 30 hari jika tidak ada aktivitas.</li>
+            <li>Konversi minimal 5000 koin dengan potongan 5%.</li>
+            <li>Payout diproses manual oleh admin.</li>
+            <li>Admin berhak mengubah aturan tanpa pemberitahuan.</li>
+            <li>Hubungi kami via <a href="https://wa.me/6281525742110?text=Halo%20saya%20butuh%20bantuan" target="_blank" rel="noopener">WhatsApp</a>.</li>
+          </ol>
+        </div>
       </div>
-      <button class="btn btn-outline" onclick="goBackFromTerms()">← <span data-i18n="back">Kembali</span></button>
-    </section>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    // ======================== KONFIGURASI SUPABASE ========================
+      <button class="btn-secondary" id="btn-terms-back" type="button" data-i18n="back">Kembali</button>
+    </section>
+  </main>
+
+  <script defer>
+    // ============================================================
+    // SUPABASE CREDENTIALS
+    // ============================================================
     const SUPABASE_URL = "https://xyzbxersmhvexcycnrcu.supabase.co";
     const SUPABASE_KEY = "sb_publishable_lHQScOcYKDi4zuailh-mVQ_4Hf72L4w";
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // ======================== STATE GLOBAL ========================
+    // ============================================================
+    // GLOBAL STATE
+    // ============================================================
+    let sb = null;
     let currentUser = null;
-    let currentUserData = null;
-    let lang = localStorage.getItem('lang') || 'id';
-    let watchTimerInterval = null;
-    let watchClickTime = 0;
-    let watchListenersActive = false;
-    let watchFallbackActive = false;
+    let currentLang = localStorage.getItem('lang') || 'id';
+    let adReturnedHandler = null;
+    let adTimerInterval = null;
+    let adBlurHandler = null;
+    let adVisibilityHandler = null;
+    let isAdClaimInProgress = false;
 
-    // ======================== KAMUS BILINGUAL ========================
+    // ============================================================
+    // BILINGUAL DICTIONARY
+    // ============================================================
     const T = {
       id: {
-        appName: '"Klik" Penghasil Saldo Dana',
-        tagline: 'Klik Doang, Dapet Duit!',
-        loginGoogle: 'Masuk dengan Google',
-        loginTerms: 'Dengan masuk, Anda setuju dengan',
-        termsLink: 'Syarat & Ketentuan',
-        balanceTitle: 'Saldo',
-        availableBalance: 'Saldo Tersedia',
-        pendingBalance: 'Pending',
-        validUntil: 'Berlaku hingga:',
-        expiryWarning: 'Segera login untuk memperpanjang',
-        quotaTitle: 'Kuota Hari Ini',
-        watchAd: 'TONTON IKLAN',
-        dailyCheckin: 'CHECK-IN HARIAN',
-        convert: 'Konversi',
-        history: 'Riwayat',
-        helpWa: 'Bantuan? Chat WA',
-        watchTitle: 'Tonton Iklan, Dapat 100 🟡',
-        watchStatusDefault: 'Klik tombol di bawah untuk mulai',
-        watchNow: 'TONTON IKLAN SEKARANG',
-        tryAdsterra: 'Coba Adsterra',
-        backToDashboard: 'Kembali ke Dashboard',
-        convertTitle: 'Konversi Koin ke Saldo',
-        balanceLabel: 'Saldo:',
-        coinsToConvert: 'Jumlah koin yang ditukar',
-        method: 'Metode',
-        accountNumber: 'Nomor akun / nomor HP',
-        summaryCoins: 'Koin ditukar:',
-        summaryRupiah: 'Rupiah:',
-        summaryFee: 'Potongan 5%:',
-        submitWithdraw: 'AJUKAN PENARIKAN',
-        historyTitle: 'Riwayat Transaksi',
-        noHistory: 'Belum ada riwayat',
-        profileTitle: 'Profil Akun',
-        email: 'Email',
-        role: 'Role',
-        accountStatus: 'Status Akun',
-        lastLogin: 'Terakhir Login',
-        coinExpiry: 'Masa Berlaku Koin',
-        logout: 'Logout',
-        termsTitle: 'Syarat & Ketentuan',
-        terms1: 'Penggunaan akun: satu akun per orang, login via Google.',
-        terms2: 'Larangan: bot, VPN/proxy, akun ganda, manipulasi data.',
-        terms3: 'Koin: didapat dari menonton iklan & check-in, pending 24 jam, kadaluarsa 30 hari tanpa login.',
-        terms4: 'Konversi: minimum 5.000 koin, potongan 5%, payout manual oleh admin.',
-        terms5: 'Perubahan aturan: admin berhak mengubah aturan kapan saja.',
-        terms6: 'Kontak: WA +62 81525742110.',
-        back: 'Kembali',
-        errorGeneric: 'Terjadi kesalahan. Coba lagi.',
-        loading: 'Memproses...',
-        successConvert: 'Pengajuan berhasil! Tunggu admin memproses',
-        successCheckin: 'Check-in berhasil!',
-        alreadyCheckin: 'Sudah check-in hari ini',
-        quotaExhausted: 'Kuota harian habis',
-        wait30: 'Tunggu 30 detik sebelum klaim lagi',
-        adTooShort: 'Iklan terlalu singkat, coba lagi',
-        adSuccess: 'Berhasil! +100 🟡 (pending)',
-        adUnavailable: 'Iklan tidak tersedia, coba lagi nanti',
-        waitingReturn: 'Menunggu kamu kembali...',
-        watchTimerLabel: 'Detik',
-        adsterraWaiting: 'Menunggu dari Adsterra...',
-        insufficientBalance: 'Saldo tidak mencukupi',
-        invalidAmount: 'Jumlah harus kelipatan 5000 dan minimal 5000',
-        invalidAccount: 'Nomor akun tidak boleh kosong',
-        loginError: 'Gagal masuk. Coba lagi.',
-        requiredFields: 'Semua field harus diisi',
+        balance_label: "Saldo Tersedia",
+        pending_label: "Pending",
+        expiry_label: "Berlaku hingga",
+        quota_label: "Kuota hari ini",
+        watch_ads_btn: "🎬 TONTON IKLAN",
+        checkin_btn: "✅ CHECK-IN HARIAN",
+        convert_nav: "Konversi",
+        history_nav: "Riwayat",
+        wa_help: "💬 Butuh bantuan? Chat WhatsApp",
+        watch_title: "Tonton Iklan, Dapat 100 🟡",
+        watch_status: "Tekan tombol di bawah untuk menonton iklan.",
+        watch_now_btn: "TONTON IKLAN SEKARANG",
+        try_adsterra: "Coba Adsterra",
+        back_dashboard: "Kembali ke Dashboard",
+        back: "Kembali",
+        convert_summary: "Masukkan jumlah koin untuk melihat estimasi.",
+        convert_submit: "AJUKAN PENARIKAN",
+        history_title: "Riwayat Transaksi",
+        history_empty: "Belum ada riwayat",
+        profile_title: "Profil Saya",
+        profile_email: "Email",
+        profile_role: "Role",
+        profile_status: "Status",
+        profile_last_login: "Login terakhir",
+        profile_expiry: "Koin berlaku hingga",
+        logout: "Logout",
+        terms_title: "Syarat & Ketentuan",
+        expiry_warning: "Segera login untuk memperpanjang",
+        login_btn: "Masuk dengan Google",
+        login_terms: "Dengan masuk, Anda setuju dengan Syarat & Ketentuan",
+        toast_quota_habis: "Kuota harian habis",
+        toast_wait_30: "Tunggu 30 detik sebelum menonton lagi",
+        toast_too_short: "Iklan terlalu singkat, coba lagi",
+        toast_checkin_done: "Sudah check-in hari ini",
+        toast_checkin_ok: "Check-in berhasil!",
+        toast_convert_ok: "Pengajuan penarikan berhasil!",
+        toast_convert_invalid: "Jumlah koin tidak valid",
+        toast_convert_balance: "Saldo tidak cukup",
+        toast_convert_account: "Nomor akun wajib diisi",
+        toast_error_prefix: "Gagal: ",
+        toast_lib_fail: "Gagal memuat library Supabase. Periksa koneksi.",
+        reward_pending_suffix: " (pending)",
+        loading: "Memuat...",
+        ad_waiting: "Menunggu kamu kembali...",
+        ad_returned_too_short: "Iklan terlalu singkat, coba lagi",
+        ad_timer_label: "Kembali dalam",
       },
       en: {
-        appName: '"Klik" Penghasil Saldo Dana',
-        tagline: 'Just Click, Get Money!',
-        loginGoogle: 'Sign in with Google',
-        loginTerms: 'By signing in, you agree to the',
-        termsLink: 'Terms & Conditions',
-        balanceTitle: 'Balance',
-        availableBalance: 'Available Balance',
-        pendingBalance: 'Pending',
-        validUntil: 'Valid until:',
-        expiryWarning: 'Login soon to extend',
-        quotaTitle: "Today's Quota",
-        watchAd: 'WATCH ADS',
-        dailyCheckin: 'DAILY CHECK-IN',
-        convert: 'Convert',
-        history: 'History',
-        helpWa: 'Need help? Chat WA',
-        watchTitle: 'Watch Ads, Get 100 🟡',
-        watchStatusDefault: 'Click the button below to start',
-        watchNow: 'WATCH AD NOW',
-        tryAdsterra: 'Try Adsterra',
-        backToDashboard: 'Back to Dashboard',
-        convertTitle: 'Convert Coins to Balance',
-        balanceLabel: 'Balance:',
-        coinsToConvert: 'Coins to convert',
-        method: 'Method',
-        accountNumber: 'Account number / phone number',
-        summaryCoins: 'Coins converted:',
-        summaryRupiah: 'Rupiah:',
-        summaryFee: '5% Fee:',
-        submitWithdraw: 'SUBMIT WITHDRAWAL',
-        historyTitle: 'Transaction History',
-        noHistory: 'No history yet',
-        profileTitle: 'Account Profile',
-        email: 'Email',
-        role: 'Role',
-        accountStatus: 'Account Status',
-        lastLogin: 'Last Login',
-        coinExpiry: 'Coin Validity',
-        logout: 'Logout',
-        termsTitle: 'Terms & Conditions',
-        terms1: 'Account usage: one account per person, sign in via Google.',
-        terms2: 'Prohibited: bots, VPN/proxy, multiple accounts, data manipulation.',
-        terms3: 'Coins: earned from watching ads & check-in, pending 24 hours, expires after 30 days without login.',
-        terms4: 'Conversion: minimum 5,000 coins, 5% fee, manual payout by admin.',
-        terms5: 'Rule changes: admin reserves the right to change rules at any time.',
-        terms6: 'Contact: WA +62 81525742110.',
-        back: 'Back',
-        errorGeneric: 'An error occurred. Please try again.',
-        loading: 'Processing...',
-        successConvert: 'Submission successful! Wait for admin processing',
-        successCheckin: 'Check-in successful!',
-        alreadyCheckin: 'Already checked in today',
-        quotaExhausted: 'Daily quota exhausted',
-        wait30: 'Wait 30 seconds before claiming again',
-        adTooShort: 'Ad too short, try again',
-        adSuccess: 'Success! +100 🟡 (pending)',
-        adUnavailable: 'Ad not available, try again later',
-        waitingReturn: 'Waiting for you to return...',
-        watchTimerLabel: 'Seconds',
-        adsterraWaiting: 'Waiting for Adsterra...',
-        insufficientBalance: 'Insufficient balance',
-        invalidAmount: 'Amount must be a multiple of 5000 and at least 5000',
-        invalidAccount: 'Account number cannot be empty',
-        loginError: 'Login failed. Try again.',
-        requiredFields: 'All fields must be filled',
+        balance_label: "Available Balance",
+        pending_label: "Pending",
+        expiry_label: "Valid until",
+        quota_label: "Today's quota",
+        watch_ads_btn: "🎬 WATCH ADS",
+        checkin_btn: "✅ DAILY CHECK-IN",
+        convert_nav: "Convert",
+        history_nav: "History",
+        wa_help: "💬 Need help? Chat WhatsApp",
+        watch_title: "Watch Ads, Earn 100 🟡",
+        watch_status: "Press the button below to watch an ad.",
+        watch_now_btn: "WATCH AD NOW",
+        try_adsterra: "Try Adsterra",
+        back_dashboard: "Back to Dashboard",
+        back: "Back",
+        convert_summary: "Enter coin amount to see estimate.",
+        convert_submit: "SUBMIT WITHDRAWAL",
+        history_title: "Transaction History",
+        history_empty: "No history yet",
+        profile_title: "My Profile",
+        profile_email: "Email",
+        profile_role: "Role",
+        profile_status: "Status",
+        profile_last_login: "Last login",
+        profile_expiry: "Coins valid until",
+        logout: "Logout",
+        terms_title: "Terms & Conditions",
+        expiry_warning: "Login soon to extend",
+        login_btn: "Sign in with Google",
+        login_terms: "By signing in, you agree to the Terms & Conditions",
+        toast_quota_habis: "Daily quota exceeded",
+        toast_wait_30: "Wait 30 seconds before watching again",
+        toast_too_short: "Ad too short, please try again",
+        toast_checkin_done: "Already checked in today",
+        toast_checkin_ok: "Check-in successful!",
+        toast_convert_ok: "Withdrawal request submitted!",
+        toast_convert_invalid: "Invalid coin amount",
+        toast_convert_balance: "Insufficient balance",
+        toast_convert_account: "Account number is required",
+        toast_error_prefix: "Error: ",
+        toast_lib_fail: "Failed to load Supabase library. Check your connection.",
+        reward_pending_suffix: " (pending)",
+        loading: "Loading...",
+        ad_waiting: "Waiting for you to return...",
+        ad_returned_too_short: "Ad too short, please try again",
+        ad_timer_label: "Return in",
       }
     };
 
+    // ============================================================
+    // HELPERS
+    // ============================================================
     function t(key) {
-      return T[lang]?.[key] ?? T.id[key] ?? key;
+      return (T[currentLang] && T[currentLang][key]) || T.id[key] || key;
     }
 
-    // ======================== UTILITY ========================
-    function showToast(message, type = 'info', duration = 3000) {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      toast.textContent = message;
-      container.appendChild(toast);
+    function hariIniWIB() {
+      const now = new Date();
+      const wib = new Date(now.getTime() + (7 * 60 + now.getTimezoneOffset()) * 60000);
+      const y = wib.getFullYear();
+      const m = String(wib.getMonth() + 1).padStart(2, '0');
+      const d = String(wib.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatTanggal(iso) {
+      if (!iso) return '—';
+      try {
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return '—';
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        return `${String(d.getDate()).padStart(2,'0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+      } catch { return '—'; }
+    }
+
+    function formatTanggalWaktu(iso) {
+      if (!iso) return '—';
+      try {
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return '—';
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const datePart = `${String(d.getDate()).padStart(2,'0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        const timePart = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        return `${datePart} ${timePart}`;
+      } catch { return '—'; }
+    }
+
+    function toast(msg, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const el = document.createElement('div');
+      el.className = 'toast ' + (type === 'error' ? 'error' : 'success');
+      el.textContent = msg;
+      container.appendChild(el);
       setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.3s';
-        setTimeout(() => toast.remove(), 300);
-      }, duration);
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 3000);
     }
 
-    function setLoading(btn, isLoading, loadingText) {
-      if (!btn) return;
-      if (isLoading) {
-        btn.disabled = true;
-        btn.dataset.originalHtml = btn.innerHTML;
-        btn.innerHTML = loadingText || t('loading');
-      } else {
-        btn.disabled = false;
-        if (btn.dataset.originalHtml) {
-          btn.innerHTML = btn.dataset.originalHtml;
-          delete btn.dataset.originalHtml;
-        }
+    function showLoginError(msg) {
+      const el = document.getElementById('login-error');
+      if (el) {
+        el.textContent = msg;
+        el.classList.remove('hidden');
       }
     }
 
-    function formatDate(dateStr) {
-      if (!dateStr) return '—';
-      try {
-        const d = new Date(dateStr);
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        return `${d.getDate().toString().padStart(2,'0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
-      } catch { return '—'; }
-    }
-
-    function formatDateTime(dateStr) {
-      if (!dateStr) return '—';
-      try {
-        const d = new Date(dateStr);
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        return `${d.getDate().toString().padStart(2,'0')} ${months[d.getMonth()]} ${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-      } catch { return '—'; }
-    }
-
-    function getWIBDate() {
-      const now = new Date();
-      const wibOffset = 7 * 60;
-      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-      const wib = new Date(utc + wibOffset * 60000);
-      return wib.toISOString().split('T')[0];
-    }
-
-    function daysUntil(dateStr) {
-      if (!dateStr) return Infinity;
-      const now = new Date();
-      const target = new Date(dateStr);
-      const diff = target.getTime() - now.getTime();
-      return Math.ceil(diff / (1000 * 60 * 60 * 24));
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    // ======================== BAHASA ========================
-    function setLang(newLang) {
-      lang = newLang;
-      localStorage.setItem('lang', lang);
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (key && T[lang]?.[key]) {
-          el.textContent = T[lang][key];
-        }
-      });
-      document.getElementById('langToggle').textContent = lang === 'id' ? 'EN' : 'ID';
-      // refresh dynamic content
-      if (currentUser) {
-        refreshDashboard().catch(() => {});
+    function hideLoginError() {
+      const el = document.getElementById('login-error');
+      if (el) {
+        el.textContent = '';
+        el.classList.add('hidden');
       }
     }
 
-    function toggleLang() {
-      setLang(lang === 'id' ? 'en' : 'id');
-    }
-
-    // ======================== ROUTING ========================
+    // ============================================================
+    // ROUTING
+    // ============================================================
     function showPage(name) {
-      document.querySelectorAll('section.page').forEach(s => s.classList.remove('active'));
-      const page = document.getElementById('page-' + name);
-      if (page) page.classList.add('active');
-
-      const isLoginPage = name === 'login';
-      document.getElementById('globalHeader').style.display = isLoginPage ? 'none' : 'flex';
-
-      // refresh data for pages
-      if (currentUser) {
-        if (name === 'dashboard') refreshDashboard().catch(console.error);
-        if (name === 'history') refreshHistory().catch(console.error);
-        if (name === 'convert') refreshConvertPage().catch(console.error);
-        if (name === 'profile') refreshProfilePage().catch(console.error);
-      }
-    }
-
-    function goBackFromTerms() {
-      if (currentUser) {
-        location.hash = '#dashboard';
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+      const target = document.getElementById('page-' + name);
+      if (target) {
+        target.classList.remove('hidden');
       } else {
-        location.hash = '#login';
+        const loginPage = document.getElementById('page-login');
+        if (loginPage) loginPage.classList.remove('hidden');
       }
+      // Update hash without triggering hashchange loop
+      if (window.location.hash !== '#' + name) {
+        history.replaceState(null, '', '#' + name);
+      }
+      // Close any open ad listeners
+      cleanupAdListeners();
     }
 
-    function handleHashChange() {
-      const hash = location.hash.replace('#', '') || '';
-      const publicPages = ['login', 'terms'];
-      const protectedPages = ['dashboard', 'watch', 'convert', 'history', 'profile'];
+    function getRoute() {
+      const hash = window.location.hash.replace('#', '').trim();
+      const valid = ['login', 'dashboard', 'watch', 'convert', 'history', 'profile', 'terms'];
+      return valid.includes(hash) ? hash : 'login';
+    }
 
-      if (!hash || hash === 'login') {
-        if (currentUser) {
-          location.hash = '#dashboard';
-        } else {
+    // ============================================================
+    // AUTH
+    // ============================================================
+    async function checkAuth() {
+      if (!sb) {
+        showPage('login');
+        return;
+      }
+      try {
+        const { data: { session }, error: sessionError } = await sb.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!session) {
+          currentUser = null;
           showPage('login');
+          return;
         }
-        return;
-      }
-
-      if (protectedPages.includes(hash) && !currentUser) {
-        location.hash = '#login';
-        return;
-      }
-
-      if (hash === 'login' && currentUser) {
-        location.hash = '#dashboard';
-        return;
-      }
-
-      if (hash === 'terms') {
-        showPage('terms');
-        return;
-      }
-
-      if (protectedPages.includes(hash)) {
-        showPage(hash);
-        return;
-      }
-
-      // fallback
-      if (currentUser) location.hash = '#dashboard';
-      else location.hash = '#login';
-    }
-
-    // ======================== AUTH ========================
-    async function handleGoogleLogin() {
-      const btn = document.getElementById('googleLoginBtn');
-      setLoading(btn, true);
-      try {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: window.location.origin + window.location.pathname,
-          },
-        });
-        if (error) throw error;
-      } catch (err) {
-        showToast(err.message || t('loginError'), 'error');
-        setLoading(btn, false);
-      }
-    }
-
-    async function handleLogout() {
-      try {
-        await supabase.auth.signOut();
-        currentUser = null;
-        currentUserData = null;
-        location.hash = '#login';
-        showToast('Logged out', 'info');
-      } catch (err) {
-        showToast(err.message || t('errorGeneric'), 'error');
-      }
-    }
-
-    async function ensureUserProfile(user) {
-      try {
-        const { data, error } = await supabase
+        // Fetch user row
+        let { data: userRow, error: userError } = await sb
           .from('users')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', session.user.id)
           .maybeSingle();
 
-        if (error) throw error;
-
-        if (!data) {
-          // insert manual jika trigger belum jalan
-          const { error: insertError } = await supabase.from('users').insert({
-            id: user.id,
-            email: user.email,
-          });
-          if (insertError && insertError.code !== '23505') throw insertError;
-          // fetch ulang
-          const { data: newData, error: fetchErr } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-          if (fetchErr) throw fetchErr;
-          return newData;
-        }
-        return data;
-      } catch (err) {
-        console.error('ensureUserProfile error:', err);
-        showToast(err.message || t('errorGeneric'), 'error');
-        return null;
-      }
-    }
-
-    async function handleAuthState(session) {
-      if (session?.user) {
-        currentUser = session.user;
-        const profile = await ensureUserProfile(session.user);
-        if (profile) {
-          currentUserData = profile;
-          if (profile.role === 'admin') {
-            window.location.href = 'database.html';
-            return;
+        if (userError) {
+          console.warn('Fetch user error:', userError.message);
+          // Try insert if row missing
+          if (userError.code === 'PGRST116' || !userRow) {
+            const { error: insertError } = await sb.from('users').insert({
+              id: session.user.id,
+              email: session.user.email,
+            });
+            if (insertError) {
+              console.warn('Insert user error:', insertError.message);
+              // Still try to fetch again
+            }
+            const { data: retryRow, error: retryError } = await sb
+              .from('users')
+              .select('*')
+              .eq('id', session.user.id)
+              .maybeSingle();
+            if (!retryError && retryRow) userRow = retryRow;
           }
         }
-        if (!location.hash || location.hash === '#login' || location.hash === '') {
-          location.hash = '#dashboard';
-        } else {
-          handleHashChange();
-        }
-        updateDynamicLangTexts();
-      } else {
-        currentUser = null;
-        currentUserData = null;
-        if (location.hash !== '#terms') {
-          location.hash = '#login';
-        }
-        handleHashChange();
-      }
-    }
 
-    function updateDynamicLangTexts() {
-      // update all [data-i18n] after lang change
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (key && T[lang]?.[key]) el.textContent = T[lang][key];
-      });
-      document.getElementById('langToggle').textContent = lang === 'id' ? 'EN' : 'ID';
-    }
-
-    // ======================== DASHBOARD ========================
-    async function refreshDashboard() {
-      if (!currentUser) return;
-      try {
-        const { data: profile, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', currentUser.id)
-          .maybeSingle();
-        if (error) throw error;
-        if (!profile) return;
-        currentUserData = profile;
-
-        document.getElementById('dashCoinBalance').textContent = profile.coin_balance ?? 0;
-        document.getElementById('dashCoinPending').textContent = profile.coin_pending ?? 0;
-
-        const expiryEl = document.getElementById('dashExpiryDate');
-        const warningEl = document.getElementById('dashExpiryWarning');
-        if (profile.coin_expiry_at) {
-          expiryEl.textContent = formatDate(profile.coin_expiry_at);
-          const daysLeft = daysUntil(profile.coin_expiry_at);
-          if (daysLeft < 7) {
-            warningEl.classList.remove('hidden');
-          } else {
-            warningEl.classList.add('hidden');
-          }
-        } else {
-          expiryEl.textContent = '—';
-          warningEl.classList.add('hidden');
+        if (!userRow) {
+          // Fallback minimal user object
+          userRow = { id: session.user.id, email: session.user.email, role: 'user', status: 'active' };
         }
 
-        // quota hari ini
-        const today = getWIBDate();
-        const { count, error: countErr } = await supabase
-          .from('ad_clicks')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', currentUser.id)
-          .in('status', ['pending', 'verified'])
-          .gte('clicked_at', today + 'T00:00:00+07:00')
-          .lte('clicked_at', today + 'T23:59:59+07:00');
+        currentUser = userRow;
 
-        let dailyLimit = 100;
-        try {
-          const { data: settings } = await supabase
-            .from('settings')
-            .select('value')
-            .eq('key', 'daily_limit')
-            .maybeSingle();
-          if (settings?.value) dailyLimit = parseInt(settings.value) || 100;
-        } catch {}
-
-        const used = count ?? 0;
-        document.getElementById('quotaText').textContent = `${used}/${dailyLimit}`;
-        const pct = Math.min((used / dailyLimit) * 100, 100);
-        document.getElementById('quotaBar').style.width = pct + '%';
-      } catch (err) {
-        console.error('refreshDashboard:', err);
-      }
-    }
-
-    // ======================== CHECK-IN ========================
-    async function handleCheckin() {
-      if (!currentUser) return;
-      const btn = document.getElementById('checkinBtn');
-      setLoading(btn, true);
-      try {
-        const today = getWIBDate();
-        // cek sudah checkin
-        const { data: existing } = await supabase
-          .from('daily_checkins')
-          .select('*')
-          .eq('user_id', currentUser.id)
-          .eq('checkin_date', today)
-          .maybeSingle();
-
-        if (existing) {
-          showToast(t('alreadyCheckin'), 'error');
-          setLoading(btn, false);
+        if (userRow.role === 'admin') {
+          window.location.href = 'database.html';
           return;
         }
 
-        // ambil settings reward
-        let minReward = 5, maxReward = 20;
-        try {
-          const { data: settings } = await supabase
-            .from('settings')
-            .select('key, value')
-            .in('key', ['checkin_min', 'checkin_max']);
-          if (settings) {
-            settings.forEach(s => {
-              if (s.key === 'checkin_min') minReward = parseInt(s.value) || 5;
-              if (s.key === 'checkin_max') maxReward = parseInt(s.value) || 20;
-            });
-          }
-        } catch {}
-
-        const reward = Math.floor(Math.random() * (maxReward - minReward + 1)) + minReward;
-
-        // insert checkin
-        const { error: insertErr } = await supabase.from('daily_checkins').insert({
-          user_id: currentUser.id,
-          checkin_date: today,
-          reward_coins: reward,
-        });
-        if (insertErr) throw insertErr;
-
-        // update coin_pending
-        const { data: freshUser } = await supabase
-          .from('users')
-          .select('coin_pending')
-          .eq('id', currentUser.id)
-          .single();
-        const newPending = (freshUser?.coin_pending ?? 0) + reward;
-        await supabase.from('users').update({ coin_pending: newPending }).eq('id', currentUser.id);
-
-        // insert transaction
-        await supabase.from('coin_transactions').insert({
-          user_id: currentUser.id,
-          amount: reward,
-          type: 'checkin',
-          description: 'Check-in harian',
-        });
-
-        showToast(`${t('successCheckin')} +${reward} 🟡`, 'success');
-        await refreshDashboard();
-      } catch (err) {
-        showToast(err.message || t('errorGeneric'), 'error');
-      } finally {
-        setLoading(btn, false);
-      }
-    }
-
-    // ======================== WATCH AD ========================
-    async function getSettings(key, fallback) {
-      try {
-        const { data } = await supabase
-          .from('settings')
-          .select('value')
-          .eq('key', key)
-          .maybeSingle();
-        return data?.value ?? fallback;
-      } catch {
-        return fallback;
-      }
-    }
-
-    async function startWatchAd() {
-      if (!currentUser) return;
-      const btn = document.getElementById('watchNowBtn');
-      const statusEl = document.getElementById('watchStatus');
-      const timerEl = document.getElementById('watchTimer');
-      const adsterraBtn = document.getElementById('adsterraBtn');
-
-      watchFallbackActive = false;
-      setLoading(btn, true, t('waitingReturn'));
-      timerEl.classList.remove('hidden');
-      timerEl.textContent = '10';
-      adsterraBtn.classList.add('hidden');
-      statusEl.textContent = t('waitingReturn');
-
-      // ambil link monetag
-      let linksStr = await getSettings('monetag_links', '');
-      let links = linksStr ? linksStr.split(',').map(s => s.trim()).filter(Boolean) : [];
-      if (links.length === 0) {
-        links = [
-          'https://otieu.com/4/9237535',
-          'https://otieu.com/4/9237536',
-          'https://otieu.com/4/9237537',
-        ];
-      }
-      const randomLink = links[Math.floor(Math.random() * links.length)];
-
-      watchClickTime = Date.now();
-
-      // setup listener
-      setupWatchListeners();
-
-      // buka link
-      try {
-        window.open(randomLink, '_blank');
-      } catch (e) {
-        console.warn('popup blocked', e);
-      }
-
-      // countdown 10 detik
-      let secondsLeft = 10;
-      clearInterval(watchTimerInterval);
-      watchTimerInterval = setInterval(() => {
-        secondsLeft--;
-        timerEl.textContent = secondsLeft;
-        if (secondsLeft <= 0) {
-          clearInterval(watchTimerInterval);
-          if (!watchFallbackActive) {
-            watchFallbackActive = true;
-            adsterraBtn.classList.remove('hidden');
-            statusEl.textContent = t('adUnavailable');
-            resetWatchButton();
-          }
-        }
-      }, 1000);
-    }
-
-    function setupWatchListeners() {
-      if (watchListenersActive) return;
-      watchListenersActive = true;
-
-      const onVisibilityChange = () => {
-        if (document.visibilityState === 'visible') {
-          handleUserReturn();
-        }
-      };
-
-      const onFocus = () => {
-        handleUserReturn();
-      };
-
-      const onBlur = () => {
-        // user pergi, biarkan
-      };
-
-      document.addEventListener('visibilitychange', onVisibilityChange);
-      window.addEventListener('focus', onFocus);
-      window.addEventListener('blur', onBlur);
-
-      window._cleanupWatchListeners = () => {
-        document.removeEventListener('visibilitychange', onVisibilityChange);
-        window.removeEventListener('focus', onFocus);
-        window.removeEventListener('blur', onBlur);
-        watchListenersActive = false;
-      };
-    }
-
-    function cleanupWatchListeners() {
-      if (window._cleanupWatchListeners) window._cleanupWatchListeners();
-    }
-
-    async function handleUserReturn() {
-      if (!watchClickTime) return;
-      const elapsed = Date.now() - watchClickTime;
-      watchClickTime = 0;
-      cleanupWatchListeners();
-      clearInterval(watchTimerInterval);
-      document.getElementById('watchTimer').classList.add('hidden');
-      await processAdClaim(elapsed);
-    }
-
-    async function processAdClaim(elapsedMs) {
-      const statusEl = document.getElementById('watchStatus');
-      const btn = document.getElementById('watchNowBtn');
-      const adsterraBtn = document.getElementById('adsterraBtn');
-
-      if (elapsedMs < 5000) {
-        statusEl.textContent = t('adTooShort');
-        showToast(t('adTooShort'), 'error');
-        resetWatchButton();
-        return;
-      }
-
-      // klaim
-      try {
-        const result = await claimAdReward('monetag');
-        if (result.success) {
-          statusEl.textContent = t('adSuccess');
-          showToast(`${t('adSuccess')}`, 'success');
+        // If route is login or terms, go to dashboard
+        const route = getRoute();
+        if (route === 'login' || route === 'terms') {
+          showPage('dashboard');
         } else {
-          statusEl.textContent = result.message || t('adUnavailable');
-          showToast(result.message || t('adUnavailable'), 'error');
+          showPage(route);
         }
+        await loadDashboard();
+        if (route === 'history') await loadHistory();
+        if (route === 'profile') await loadProfile();
       } catch (err) {
-        statusEl.textContent = err.message || t('errorGeneric');
-        showToast(err.message || t('errorGeneric'), 'error');
+        console.error('checkAuth error:', err);
+        showLoginError(err.message || 'Terjadi kesalahan saat memeriksa sesi.');
+        showPage('login');
       }
-      resetWatchButton();
-      await refreshDashboard();
     }
 
-    async function claimAdReward(network) {
-      if (!currentUser) return { success: false, message: 'Not authenticated' };
+    // ============================================================
+    // DASHBOARD
+    // ============================================================
+    async function loadDashboard() {
+      if (!sb || !currentUser) return;
       try {
-        // ambil user data
-        const { data: user, error: userErr } = await supabase
+        const { data: user, error } = await sb
           .from('users')
           .select('*')
           .eq('id', currentUser.id)
-          .single();
-        if (userErr) throw userErr;
+          .maybeSingle();
+        if (error) throw error;
+        if (!user) return;
+        currentUser = user;
 
-        const reward = parseInt(await getSettings('reward_per_ad', '100')) || 100;
-        const dailyLimit = parseInt(await getSettings('daily_limit', '100')) || 100;
+        const balanceEl = document.getElementById('coin-balance');
+        const pendingEl = document.getElementById('coin-pending');
+        const expiryEl = document.getElementById('coin-expiry');
+        const warningEl = document.getElementById('expiry-warning');
+        const quotaEl = document.getElementById('quota-used');
+        const progressEl = document.getElementById('quota-progress');
 
-        const today = getWIBDate();
+        if (balanceEl) balanceEl.textContent = user.coin_balance ?? 0;
+        if (pendingEl) pendingEl.textContent = user.coin_pending ?? 0;
 
-        // cek kuota
-        const { count } = await supabase
+        // Expiry
+        if (expiryEl) {
+          if (user.coin_expiry_at) {
+            expiryEl.textContent = formatTanggal(user.coin_expiry_at);
+            const expiryDate = new Date(user.coin_expiry_at);
+            const now = new Date();
+            const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+            if (warningEl) {
+              if (daysLeft < 7 && daysLeft >= 0) {
+                warningEl.textContent = t('expiry_warning');
+                warningEl.classList.remove('hidden');
+              } else {
+                warningEl.classList.add('hidden');
+              }
+            }
+          } else {
+            expiryEl.textContent = '—';
+            if (warningEl) warningEl.classList.add('hidden');
+          }
+        }
+
+        // Quota: count ad_clicks today WIB with status pending/verified
+        const todayWIB = hariIniWIB();
+        const startOfDay = new Date(todayWIB + 'T00:00:00+07:00').toISOString();
+        const endOfDay = new Date(todayWIB + 'T23:59:59+07:00').toISOString();
+
+        const { count, error: countError } = await sb
+          .from('ad_clicks')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .in('status', ['pending', 'verified'])
+          .gte('clicked_at', startOfDay)
+          .lte('clicked_at', endOfDay);
+
+        if (countError) {
+          console.warn('Quota count error:', countError.message);
+        }
+
+        const used = count ?? 0;
+        if (quotaEl) quotaEl.textContent = used;
+        if (progressEl) progressEl.style.width = Math.min(100, (used / 100) * 100) + '%';
+
+      } catch (err) {
+        console.error('loadDashboard error:', err);
+        toast(t('toast_error_prefix') + (err.message || 'Gagal memuat dashboard'), 'error');
+      }
+    }
+
+    // ============================================================
+    // WATCH AD LOGIC
+    // ============================================================
+    function cleanupAdListeners() {
+      if (adReturnedHandler) {
+        document.removeEventListener('visibilitychange', adReturnedHandler);
+        window.removeEventListener('blur', adReturnedHandler);
+        window.removeEventListener('focus', adReturnedHandler);
+        adReturnedHandler = null;
+      }
+      if (adBlurHandler) {
+        window.removeEventListener('blur', adBlurHandler);
+        adBlurHandler = null;
+      }
+      if (adVisibilityHandler) {
+        document.removeEventListener('visibilitychange', adVisibilityHandler);
+        adVisibilityHandler = null;
+      }
+      if (adTimerInterval) {
+        clearInterval(adTimerInterval);
+        adTimerInterval = null;
+      }
+      const timerEl = document.getElementById('watch-timer');
+      if (timerEl) timerEl.classList.add('hidden');
+    }
+
+    async function startAdFlow(network) {
+      if (!sb || !currentUser) return;
+      if (isAdClaimInProgress) return;
+
+      // Get settings
+      let adsterraLink = 'https://www.effectiveratecpm.com/your-adsterra-link';
+      let monetagLinks = [
+        'https://example.com/ad1',
+        'https://example.com/ad2',
+        'https://example.com/ad3'
+      ];
+
+      try {
+        const { data: settingsRows } = await sb.from('settings').select('key, value');
+        if (settingsRows && settingsRows.length) {
+          const map = {};
+          settingsRows.forEach(r => { if (r.key) map[r.key] = r.value; });
+          if (map.adsterra_link) adsterraLink = map.adsterra_link;
+          if (map.monetag_links) {
+            const links = map.monetag_links.split(',').map(s => s.trim()).filter(Boolean);
+            if (links.length) monetagLinks = links;
+          }
+        }
+      } catch (e) { /* fallback */ }
+
+      const url = network === 'adsterra'
+        ? adsterraLink
+        : monetagLinks[Math.floor(Math.random() * monetagLinks.length)];
+
+      const clickedAt = Date.now();
+      isAdClaimInProgress = true;
+
+      const watchBtn = document.getElementById('btn-watch');
+      const adsterraBtn = document.getElementById('btn-adsterra');
+      const statusEl = document.getElementById('watch-status');
+      const timerEl = document.getElementById('watch-timer');
+
+      if (watchBtn) {
+        watchBtn.disabled = true;
+        watchBtn.textContent = t('ad_waiting');
+      }
+      if (adsterraBtn) {
+        adsterraBtn.disabled = true;
+        adsterraBtn.textContent = t('ad_waiting');
+      }
+      if (statusEl) statusEl.textContent = t('ad_waiting');
+
+      // Open ad
+      try {
+        window.open(url, '_blank');
+      } catch (e) {
+        console.warn('window.open blocked', e);
+      }
+
+      // Start 10s countdown
+      let secondsLeft = 10;
+      if (timerEl) {
+        timerEl.classList.remove('hidden');
+        timerEl.textContent = secondsLeft;
+      }
+      if (adTimerInterval) clearInterval(adTimerInterval);
+      adTimerInterval = setInterval(() => {
+        secondsLeft--;
+        if (timerEl) timerEl.textContent = secondsLeft > 0 ? secondsLeft : '0';
+        if (secondsLeft <= 0) {
+          clearInterval(adTimerInterval);
+          adTimerInterval = null;
+          if (timerEl) timerEl.classList.add('hidden');
+          // Show adsterra button if on watch page
+          if (getRoute() === 'watch' && adsterraBtn) {
+            adsterraBtn.classList.remove('hidden');
+          }
+          if (statusEl && getRoute() === 'watch') {
+            statusEl.textContent = t('watch_status');
+          }
+        }
+      }, 1000);
+
+      // Return detection
+      let hasReturned = false;
+      const handleReturn = async () => {
+        if (hasReturned || !isAdClaimInProgress) return;
+        hasReturned = true;
+        const returnedAt = Date.now();
+        const elapsed = returnedAt - clickedAt;
+
+        // Cleanup listeners
+        cleanupAdListeners();
+        isAdClaimInProgress = false;
+
+        if (elapsed >= 5000) {
+          await claimAd(network, clickedAt, returnedAt, Math.floor(elapsed / 1000));
+        } else {
+          toast(t('toast_too_short'), 'error');
+          resetWatchButtons();
+        }
+      };
+
+      const onVisibility = () => {
+        if (document.visibilityState === 'visible') {
+          handleReturn();
+        }
+      };
+      const onBlur = () => { /* ignore, wait for focus */ };
+      const onFocus = () => { handleReturn(); };
+
+      adVisibilityHandler = onVisibility;
+      adBlurHandler = onBlur;
+      adReturnedHandler = onFocus;
+
+      document.addEventListener('visibilitychange', onVisibility);
+      window.addEventListener('focus', onFocus);
+      // Also check on blur + timeout? handled by focus
+    }
+
+    function resetWatchButtons() {
+      isAdClaimInProgress = false;
+      const watchBtn = document.getElementById('btn-watch');
+      const adsterraBtn = document.getElementById('btn-adsterra');
+      if (watchBtn) {
+        watchBtn.disabled = false;
+        watchBtn.textContent = t('watch_now_btn');
+      }
+      if (adsterraBtn) {
+        adsterraBtn.disabled = false;
+        adsterraBtn.textContent = t('try_adsterra');
+        adsterraBtn.classList.add('hidden');
+      }
+      const statusEl = document.getElementById('watch-status');
+      if (statusEl) statusEl.textContent = t('watch_status');
+      cleanupAdListeners();
+    }
+
+    async function claimAd(network, clickedAt, returnedAt, durationSec) {
+      if (!sb || !currentUser) return;
+      try {
+        // Get settings
+        let reward = 100;
+        let dailyLimit = 100;
+        try {
+          const { data: settingsRows } = await sb.from('settings').select('key, value');
+          if (settingsRows) {
+            const map = {};
+            settingsRows.forEach(r => { if (r.key) map[r.key] = r.value; });
+            if (map.reward_per_ad) reward = parseInt(map.reward_per_ad, 10) || 100;
+            if (map.daily_limit) dailyLimit = parseInt(map.daily_limit, 10) || 100;
+          }
+        } catch (e) { /* defaults */ }
+
+        const todayWIB = hariIniWIB();
+        const startOfDay = new Date(todayWIB + 'T00:00:00+07:00').toISOString();
+        const endOfDay = new Date(todayWIB + 'T23:59:59+07:00').toISOString();
+
+        // Check daily quota
+        const { count, error: countError } = await sb
           .from('ad_clicks')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', currentUser.id)
           .in('status', ['pending', 'verified'])
-          .gte('clicked_at', today + 'T00:00:00+07:00')
-          .lte('clicked_at', today + 'T23:59:59+07:00');
+          .gte('clicked_at', startOfDay)
+          .lte('clicked_at', endOfDay);
 
+        if (countError) throw countError;
         if ((count ?? 0) >= dailyLimit) {
-          return { success: false, message: t('quotaExhausted') };
+          toast(t('toast_quota_habis'), 'error');
+          resetWatchButtons();
+          return;
         }
 
-        // cek 30 detik terakhir
+        // Check 30s cooldown
         const thirtySecAgo = new Date(Date.now() - 30000).toISOString();
-        const { data: recent } = await supabase
+        const { count: recentCount, error: recentError } = await sb
           .from('ad_clicks')
-          .select('id')
+          .select('*', { count: 'exact', head: true })
           .eq('user_id', currentUser.id)
-          .gte('clicked_at', thirtySecAgo)
-          .limit(1);
+          .gte('clicked_at', thirtySecAgo);
 
-        if (recent && recent.length > 0) {
-          return { success: false, message: t('wait30') };
+        if (recentError) throw recentError;
+        if ((recentCount ?? 0) > 0) {
+          toast(t('toast_wait_30'), 'error');
+          resetWatchButtons();
+          return;
         }
 
-        const now = new Date();
-        const clickedAt = new Date(now.getTime() - (parseInt(await getSettings('ad_min_seconds', '5')) || 5) * 1000).toISOString();
-
-        // insert ad_clicks
-        const { error: insertErr } = await supabase.from('ad_clicks').insert({
+        // Insert ad click
+        const { error: insertAdError } = await sb.from('ad_clicks').insert({
           user_id: currentUser.id,
           ad_network: network,
-          clicked_at: clickedAt,
-          returned_at: now.toISOString(),
-          duration_outside: 6,
+          clicked_at: new Date(clickedAt).toISOString(),
+          returned_at: new Date(returnedAt).toISOString(),
+          duration_outside: durationSec,
           status: 'pending',
-          ip_address: null,
           user_agent: navigator.userAgent,
         });
-        if (insertErr) throw insertErr;
+        if (insertAdError) throw insertAdError;
 
-        // update coin_pending
-        const newPending = (user.coin_pending ?? 0) + reward;
-        await supabase.from('users').update({ coin_pending: newPending }).eq('id', currentUser.id);
+        // Update pending
+        const newPending = (currentUser.coin_pending ?? 0) + reward;
+        const { error: updateError } = await sb
+          .from('users')
+          .update({ coin_pending: newPending })
+          .eq('id', currentUser.id);
+        if (updateError) throw updateError;
 
-        // insert transaction
-        await supabase.from('coin_transactions').insert({
+        // Insert transaction
+        const { error: txError } = await sb.from('coin_transactions').insert({
           user_id: currentUser.id,
           amount: reward,
           type: 'ad_reward',
           description: 'Reward iklan ' + network,
         });
+        if (txError) throw txError;
 
-        return { success: true, reward };
+        toast(`+${reward} 🟡${t('reward_pending_suffix')}`, 'success');
+        await loadDashboard();
       } catch (err) {
-        console.error('claimAdReward:', err);
-        return { success: false, message: err.message || t('errorGeneric') };
+        console.error('claimAd error:', err);
+        toast(t('toast_error_prefix') + (err.message || 'Gagal klaim iklan'), 'error');
+      } finally {
+        resetWatchButtons();
+        isAdClaimInProgress = false;
       }
     }
 
-    function resetWatchButton() {
-      const btn = document.getElementById('watchNowBtn');
-      setLoading(btn, false);
-      document.getElementById('watchTimer').classList.add('hidden');
-    }
-
-    async function startAdsterra() {
-      const adsterraLink = await getSettings('adsterra_link', 'https://www.effectiveratecpm.com/xxxxx');
-      watchFallbackActive = true;
-      const btn = document.getElementById('adsterraBtn');
-      setLoading(btn, true, t('adsterraWaiting'));
-      document.getElementById('watchTimer').classList.remove('hidden');
-      let secondsLeft = 10;
-      document.getElementById('watchTimer').textContent = secondsLeft;
-
-      watchClickTime = Date.now();
-      setupWatchListeners();
+    // ============================================================
+    // CHECK-IN
+    // ============================================================
+    async function handleCheckin() {
+      if (!sb || !currentUser) return;
       try {
-        window.open(adsterraLink, '_blank');
-      } catch {}
+        const todayWIB = hariIniWIB();
 
-      clearInterval(watchTimerInterval);
-      watchTimerInterval = setInterval(async () => {
-        secondsLeft--;
-        document.getElementById('watchTimer').textContent = secondsLeft;
-        if (secondsLeft <= 0) {
-          clearInterval(watchTimerInterval);
-          document.getElementById('watchTimer').classList.add('hidden');
-          cleanupWatchListeners();
-          watchClickTime = 0;
-          document.getElementById('watchStatus').textContent = t('adUnavailable');
-          showToast(t('adUnavailable'), 'error');
-          setLoading(btn, false);
-          document.getElementById('watchNowBtn').disabled = false;
+        // Check existing checkin
+        const { data: existing, error: checkError } = await sb
+          .from('daily_checkins')
+          .select('id')
+          .eq('user_id', currentUser.id)
+          .eq('checkin_date', todayWIB)
+          .maybeSingle();
+
+        if (checkError) throw checkError;
+        if (existing) {
+          toast(t('toast_checkin_done'), 'error');
+          return;
         }
-      }, 1000);
-    }
 
-    // ======================== CONVERT ========================
-    function updateConvertSummary() {
-      const amount = parseInt(document.getElementById('convertAmount').value) || 0;
-      const summaryDiv = document.getElementById('convertSummary');
-      if (amount > 0) {
-        summaryDiv.style.display = 'block';
-        const rupiah = Math.floor((amount / 10000) * 1000 * 0.95);
-        const fee = Math.floor((amount / 10000) * 1000 * 0.05);
-        document.getElementById('summaryCoins').textContent = amount.toLocaleString();
-        document.getElementById('summaryRupiah').textContent = 'Rp ' + rupiah.toLocaleString();
-        document.getElementById('summaryFee').textContent = 'Rp ' + fee.toLocaleString();
-      } else {
-        summaryDiv.style.display = 'none';
+        // Get reward range
+        let min = 5, max = 20;
+        try {
+          const { data: settingsRows } = await sb.from('settings').select('key, value');
+          if (settingsRows) {
+            const map = {};
+            settingsRows.forEach(r => { if (r.key) map[r.key] = r.value; });
+            if (map.checkin_min) min = parseInt(map.checkin_min, 10) || 5;
+            if (map.checkin_max) max = parseInt(map.checkin_max, 10) || 20;
+          }
+        } catch (e) { /* defaults */ }
+
+        const reward = Math.floor(Math.random() * (max - min + 1)) + min;
+
+        // Insert checkin
+        const { error: insertError } = await sb.from('daily_checkins').insert({
+          user_id: currentUser.id,
+          checkin_date: todayWIB,
+          reward_coins: reward,
+        });
+        if (insertError) throw insertError;
+
+        // Update pending
+        const newPending = (currentUser.coin_pending ?? 0) + reward;
+        const { error: updateError } = await sb
+          .from('users')
+          .update({ coin_pending: newPending })
+          .eq('id', currentUser.id);
+        if (updateError) throw updateError;
+
+        // Transaction
+        const { error: txError } = await sb.from('coin_transactions').insert({
+          user_id: currentUser.id,
+          amount: reward,
+          type: 'checkin',
+          description: 'Check-in harian',
+        });
+        if (txError) throw txError;
+
+        toast(`${t('toast_checkin_ok')} +${reward} 🟡`, 'success');
+        await loadDashboard();
+      } catch (err) {
+        console.error('checkin error:', err);
+        toast(t('toast_error_prefix') + (err.message || 'Check-in gagal'), 'error');
       }
     }
 
-    async function refreshConvertPage() {
-      if (!currentUserData) return;
-      document.getElementById('convertCoinBalance').textContent = currentUserData.coin_balance ?? 0;
-    }
-
+    // ============================================================
+    // CONVERT
+    // ============================================================
     async function handleConvert() {
-      if (!currentUser || !currentUserData) return;
-      const amount = parseInt(document.getElementById('convertAmount').value);
-      const method = document.getElementById('convertMethod').value;
-      const account = document.getElementById('convertAccount').value.trim();
-      const btn = document.getElementById('convertSubmitBtn');
+      if (!sb || !currentUser) return;
+      const inputCoins = document.getElementById('input-coins');
+      const selectMethod = document.getElementById('select-method');
+      const inputAccount = document.getElementById('input-account');
 
-      if (!amount || amount < 5000 || amount % 5000 !== 0) {
-        showToast(t('invalidAmount'), 'error');
+      const coins = parseInt(inputCoins?.value, 10);
+      const method = selectMethod?.value || 'DANA';
+      const account = inputAccount?.value?.trim() || '';
+
+      if (!coins || isNaN(coins) || coins < 5000 || coins % 5000 !== 0) {
+        toast(t('toast_convert_invalid'), 'error');
         return;
       }
-      if (amount > (currentUserData.coin_balance ?? 0)) {
-        showToast(t('insufficientBalance'), 'error');
+      if (coins > (currentUser.coin_balance ?? 0)) {
+        toast(t('toast_convert_balance'), 'error');
         return;
       }
       if (!account) {
-        showToast(t('invalidAccount'), 'error');
+        toast(t('toast_convert_account'), 'error');
         return;
       }
 
-      setLoading(btn, true);
       try {
-        const rupiah = Math.floor((amount / 10000) * 1000 * 0.95);
+        let coinRate = 10000;
+        let feePercent = 5;
+        try {
+          const { data: settingsRows } = await sb.from('settings').select('key, value');
+          if (settingsRows) {
+            const map = {};
+            settingsRows.forEach(r => { if (r.key) map[r.key] = r.value; });
+            if (map.coin_rate) coinRate = parseInt(map.coin_rate, 10) || 10000;
+            if (map.conversion_fee_percent) feePercent = parseFloat(map.conversion_fee_percent) || 5;
+          }
+        } catch (e) { /* defaults */ }
 
-        // insert payouts
-        const { error: payoutErr } = await supabase.from('payouts').insert({
+        const rupiah = Math.floor((coins / coinRate) * 1000 * (1 - feePercent / 100));
+
+        // Insert payout
+        const { error: payoutError } = await sb.from('payouts').insert({
           user_id: currentUser.id,
-          coins_used: amount,
+          coins_used: coins,
           rupiah_amount: rupiah,
-          method,
+          method: method,
           account_number: account,
           status: 'pending',
         });
-        if (payoutErr) throw payoutErr;
+        if (payoutError) throw payoutError;
 
-        // insert transaction
-        await supabase.from('coin_transactions').insert({
+        // Update balance
+        const newBalance = (currentUser.coin_balance ?? 0) - coins;
+        const { error: updateError } = await sb
+          .from('users')
+          .update({ coin_balance: newBalance })
+          .eq('id', currentUser.id);
+        if (updateError) throw updateError;
+
+        // Transaction
+        const { error: txError } = await sb.from('coin_transactions').insert({
           user_id: currentUser.id,
-          amount: -amount,
+          amount: -coins,
           type: 'convert',
           description: 'Konversi ke ' + method,
         });
+        if (txError) throw txError;
 
-        // update saldo
-        const newBalance = (currentUserData.coin_balance ?? 0) - amount;
-        await supabase.from('users').update({ coin_balance: newBalance }).eq('id', currentUser.id);
-
-        showToast(t('successConvert'), 'success');
-        document.getElementById('convertAmount').value = '';
-        document.getElementById('convertAccount').value = '';
-        document.getElementById('convertSummary').style.display = 'none';
-        await refreshDashboard();
-        await refreshConvertPage();
+        toast(t('toast_convert_ok'), 'success');
+        if (inputCoins) inputCoins.value = '';
+        if (inputAccount) inputAccount.value = '';
+        const summaryEl = document.getElementById('convert-summary');
+        if (summaryEl) summaryEl.textContent = t('convert_summary');
+        await loadDashboard();
       } catch (err) {
-        showToast(err.message || t('errorGeneric'), 'error');
-      } finally {
-        setLoading(btn, false);
+        console.error('convert error:', err);
+        toast(t('toast_error_prefix') + (err.message || 'Konversi gagal'), 'error');
       }
     }
 
-    // ======================== HISTORY ========================
-    async function refreshHistory() {
-      if (!currentUser) return;
+    // ============================================================
+    // HISTORY
+    // ============================================================
+    async function loadHistory() {
+      if (!sb || !currentUser) return;
+      const listEl = document.getElementById('history-list');
+      if (!listEl) return;
       try {
-        const { data, error } = await supabase
+        const { data, error } = await sb
           .from('coin_transactions')
           .select('*')
           .eq('user_id', currentUser.id)
           .order('created_at', { ascending: false })
           .limit(100);
+
         if (error) throw error;
 
-        const container = document.getElementById('historyListContainer');
         if (!data || data.length === 0) {
-          container.innerHTML = `<div class="empty-state">${t('noHistory')}</div>`;
+          listEl.innerHTML = `<p class="empty-state">${t('history_empty')}</p>`;
           return;
         }
 
-        const icons = {
+        const iconMap = {
           ad_reward: '🎬',
           checkin: '✅',
           convert: '💸',
@@ -1755,81 +1529,296 @@
           expired: '⏰',
         };
 
-        let html = '<ul class="history-list">';
-        data.forEach(tx => {
-          const icon = icons[tx.type] || '📄';
-          const isPositive = tx.amount > 0;
+        listEl.innerHTML = data.map(tx => {
+          const icon = iconMap[tx.type] || '📋';
+          const amount = tx.amount ?? 0;
+          const isPositive = amount >= 0;
+          const amountClass = isPositive ? 'amount-positive' : 'amount-negative';
           const sign = isPositive ? '+' : '';
-          const amtClass = isPositive ? 'positive' : 'negative';
-          html += `
-            <li class="history-item">
-              <div class="history-icon">${icon}</div>
+          return `
+            <div class="history-item">
+              <span class="history-icon">${icon}</span>
               <div class="history-info">
-                <div class="history-desc">${escapeHtml(tx.description || tx.type)}</div>
-                <div class="history-date">${formatDateTime(tx.created_at)}</div>
+                <div class="history-desc">${escapeHtml(tx.description || tx.type || '')}</div>
+                <div class="history-date">${formatTanggalWaktu(tx.created_at)}</div>
               </div>
-              <div class="history-amount ${amtClass}">${sign}${tx.amount} 🟡</div>
-            </li>`;
-        });
-        html += '</ul>';
-        container.innerHTML = html;
+              <span class="history-amount ${amountClass}">${sign}${amount} 🟡</span>
+            </div>
+          `;
+        }).join('');
       } catch (err) {
-        console.error('refreshHistory:', err);
-        showToast(err.message || t('errorGeneric'), 'error');
+        console.error('loadHistory error:', err);
+        listEl.innerHTML = `<p class="empty-state">Gagal memuat riwayat: ${escapeHtml(err.message || '')}</p>`;
       }
     }
 
-    // ======================== PROFILE ========================
-    async function refreshProfilePage() {
-      if (!currentUser) return;
+    // ============================================================
+    // PROFILE
+    // ============================================================
+    async function loadProfile() {
+      if (!sb || !currentUser) return;
       try {
-        const { data, error } = await supabase
+        const { data: user, error } = await sb
           .from('users')
           .select('*')
           .eq('id', currentUser.id)
           .maybeSingle();
         if (error) throw error;
-        if (!data) return;
-        currentUserData = data;
+        if (!user) return;
 
-        document.getElementById('profileEmail').textContent = currentUser.email || '—';
-        document.getElementById('profileRole').textContent = data.role || 'user';
-        document.getElementById('profileStatus').textContent = data.account_status || 'active';
-        document.getElementById('profileLastLogin').textContent = formatDateTime(data.last_login_at);
-        document.getElementById('profileExpiry').textContent = formatDate(data.coin_expiry_at);
+        document.getElementById('profile-email').textContent = user.email || '—';
+        document.getElementById('profile-role').textContent = user.role || 'user';
+        document.getElementById('profile-status').textContent = user.status || 'active';
+        document.getElementById('profile-last-login').textContent = formatTanggalWaktu(user.last_login_at);
+        document.getElementById('profile-expiry').textContent = formatTanggal(user.coin_expiry_at);
       } catch (err) {
-        console.error(err);
+        console.error('loadProfile error:', err);
+        document.getElementById('profile-email').textContent = 'Gagal memuat';
       }
     }
 
-    // ======================== INIT ========================
-    async function init() {
-      setLang(lang);
+    // ============================================================
+    // LANGUAGE
+    // ============================================================
+    function setLang(lang) {
+      currentLang = lang === 'en' ? 'en' : 'id';
+      localStorage.setItem('lang', currentLang);
+      applyLanguage();
+    }
 
-      const { data: { session } } = await supabase.auth.getSession();
-      await handleAuthState(session);
-
-      supabase.auth.onAuthStateChange(async (event, session) => {
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          await handleAuthState(session);
-        } else if (event === 'SIGNED_OUT') {
-          currentUser = null;
-          currentUserData = null;
-          location.hash = '#login';
-          handleHashChange();
+    function applyLanguage() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (key && T[currentLang] && T[currentLang][key]) {
+          el.textContent = T[currentLang][key];
         }
       });
-
-      window.addEventListener('hashchange', handleHashChange);
-
-      // default hash
-      if (!location.hash) {
-        if (currentUser) location.hash = '#dashboard';
-        else location.hash = '#login';
+      // Update all lang toggle buttons
+      document.querySelectorAll('.lang-toggle').forEach(btn => {
+        btn.textContent = currentLang === 'id' ? 'EN' : 'ID';
+      });
+      // Update login title/tagline (they have no data-i18n on purpose)
+      // Update convert summary if empty
+      const summaryEl = document.getElementById('convert-summary');
+      if (summaryEl && summaryEl.textContent === T.id.convert_summary || summaryEl?.textContent === T.en.convert_summary) {
+        summaryEl.textContent = t('convert_summary');
       }
     }
 
-    init();
+    function setupLangToggle(id) {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.addEventListener('click', () => {
+          setLang(currentLang === 'id' ? 'en' : 'id');
+        });
+      }
+    }
+
+    // ============================================================
+    // ESCAPE HTML
+    // ============================================================
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    // ============================================================
+    // EVENT BINDING
+    // ============================================================
+    function bindEvents() {
+      // Language toggles
+      ['lang-toggle-login', 'lang-toggle-dash', 'lang-toggle-watch', 'lang-toggle-convert', 'lang-toggle-history', 'lang-toggle-profile', 'lang-toggle-terms'].forEach(setupLangToggle);
+
+      // Google login
+      const googleBtn = document.getElementById('btn-google-login');
+      if (googleBtn) {
+        googleBtn.addEventListener('click', async () => {
+          hideLoginError();
+          if (!sb) {
+            showLoginError(t('toast_lib_fail'));
+            return;
+          }
+          googleBtn.disabled = true;
+          try {
+            const { error } = await sb.auth.signInWithOAuth({
+              provider: 'google',
+              options: { redirectTo: window.location.origin + window.location.pathname },
+            });
+            if (error) throw error;
+          } catch (err) {
+            showLoginError(err.message || 'Gagal masuk dengan Google.');
+            googleBtn.disabled = false;
+          }
+        });
+      }
+
+      // Dashboard nav
+      const watchNav = document.getElementById('btn-watch-nav');
+      if (watchNav) watchNav.addEventListener('click', () => showPage('watch'));
+
+      const convertNav = document.getElementById('btn-nav-convert');
+      if (convertNav) convertNav.addEventListener('click', () => { showPage('convert'); updateConvertBalance(); });
+
+      const historyNav = document.getElementById('btn-nav-history');
+      if (historyNav) historyNav.addEventListener('click', async () => { showPage('history'); await loadHistory(); });
+
+      const profileIcon = document.getElementById('btn-profile-icon');
+      if (profileIcon) profileIcon.addEventListener('click', async () => { showPage('profile'); await loadProfile(); });
+
+      const profileIconWatch = document.getElementById('btn-profile-icon-watch');
+      if (profileIconWatch) profileIconWatch.addEventListener('click', async () => { showPage('profile'); await loadProfile(); });
+
+      const profileIconConvert = document.getElementById('btn-profile-icon-convert');
+      if (profileIconConvert) profileIconConvert.addEventListener('click', async () => { showPage('profile'); await loadProfile(); });
+
+      const profileIconHistory = document.getElementById('btn-profile-icon-history');
+      if (profileIconHistory) profileIconHistory.addEventListener('click', async () => { showPage('profile'); await loadProfile(); });
+
+      // Check-in
+      const checkinBtn = document.getElementById('btn-checkin');
+      if (checkinBtn) checkinBtn.addEventListener('click', handleCheckin);
+
+      // Watch page
+      const watchBtn = document.getElementById('btn-watch');
+      if (watchBtn) watchBtn.addEventListener('click', () => startAdFlow('monetag'));
+
+      const adsterraBtn = document.getElementById('btn-adsterra');
+      if (adsterraBtn) adsterraBtn.addEventListener('click', () => startAdFlow('adsterra'));
+
+      const watchBack = document.getElementById('btn-watch-back');
+      if (watchBack) watchBack.addEventListener('click', () => { cleanupAdListeners(); showPage('dashboard'); });
+
+      // Convert
+      const convertBtn = document.getElementById('btn-convert');
+      if (convertBtn) convertBtn.addEventListener('click', handleConvert);
+
+      const convertBack = document.getElementById('btn-convert-back');
+      if (convertBack) convertBack.addEventListener('click', () => showPage('dashboard'));
+
+      const inputCoins = document.getElementById('input-coins');
+      if (inputCoins) inputCoins.addEventListener('input', updateConvertSummary);
+
+      const inputAccount = document.getElementById('input-account');
+      if (inputAccount) inputAccount.addEventListener('input', updateConvertSummary);
+
+      // History back
+      const historyBack = document.getElementById('btn-history-back');
+      if (historyBack) historyBack.addEventListener('click', () => showPage('dashboard'));
+
+      // Profile
+      const logoutBtn = document.getElementById('btn-logout');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+          if (!sb) return;
+          try {
+            await sb.auth.signOut();
+            currentUser = null;
+            showPage('login');
+          } catch (err) {
+            toast(t('toast_error_prefix') + (err.message || 'Logout gagal'), 'error');
+          }
+        });
+      }
+
+      const profileBack = document.getElementById('btn-profile-back');
+      if (profileBack) profileBack.addEventListener('click', () => showPage('dashboard'));
+
+      // Terms back
+      const termsBack = document.getElementById('btn-terms-back');
+      if (termsBack) termsBack.addEventListener('click', () => {
+        if (currentUser) showPage('dashboard');
+        else showPage('login');
+      });
+
+      // Terms links in login
+      document.querySelectorAll('a[href="#terms"]').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          showPage('terms');
+        });
+      });
+    }
+
+    function updateConvertBalance() {
+      const el = document.getElementById('convert-balance');
+      if (el && currentUser) el.textContent = currentUser.coin_balance ?? 0;
+    }
+
+    function updateConvertSummary() {
+      const inputCoins = document.getElementById('input-coins');
+      const summaryEl = document.getElementById('convert-summary');
+      if (!inputCoins || !summaryEl) return;
+      const coins = parseInt(inputCoins.value, 10);
+      if (!coins || isNaN(coins) || coins < 5000) {
+        summaryEl.textContent = t('convert_summary');
+        return;
+      }
+      const feePercent = 5;
+      const coinRate = 10000;
+      const rupiah = Math.floor((coins / coinRate) * 1000 * (1 - feePercent / 100));
+      summaryEl.innerHTML = `${coins} 🟡 → <strong>Rp ${rupiah.toLocaleString('id-ID')}</strong> (potongan ${feePercent}%)`;
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    function initApp() {
+      // Check Supabase library
+      if (typeof window.supabase === 'undefined') {
+        showLoginError(t('toast_lib_fail'));
+        // Still show login page
+        showPage('login');
+        return;
+      }
+
+      try {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      } catch (err) {
+        showLoginError('Gagal inisialisasi Supabase: ' + (err.message || ''));
+        showPage('login');
+        return;
+      }
+
+      // Apply language first
+      applyLanguage();
+      bindEvents();
+
+      // Auth state listener
+      try {
+        sb.auth.onAuthStateChange((event, session) => {
+          if (event === 'SIGNED_IN') {
+            checkAuth();
+          } else if (event === 'SIGNED_OUT') {
+            currentUser = null;
+            showPage('login');
+          }
+        });
+      } catch (e) {
+        console.warn('onAuthStateChange error:', e);
+      }
+
+      // Hash routing
+      window.addEventListener('hashchange', () => {
+        const route = getRoute();
+        showPage(route);
+        if (route === 'history') loadHistory();
+        if (route === 'profile') loadProfile();
+        if (route === 'convert') updateConvertBalance();
+        if (route === 'watch') resetWatchButtons();
+      });
+
+      // Initial route
+      const initialRoute = getRoute();
+      showPage(initialRoute);
+
+      // Check auth
+      checkAuth();
+    }
+
+    // Run after DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', initApp);
   </script>
 </body>
 </html>
