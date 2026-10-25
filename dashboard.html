@@ -5,1011 +5,1168 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Admin — Klik" Penghasil Saldo Dana</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🟡</text></svg>">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #0f172a;
-    color: #e2e8f0;
-    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0f172a;--card:#1e293b;--accent:#f59e0b;--text:#e2e8f0;
+    --success:#22c55e;--fail:#ef4444;--muted:#94a3b8;--border:#334155;
   }
-  #app { max-width: 480px; margin: 0 auto; padding: 12px; min-height: 100vh; }
+  html,body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  main#app{max-width:480px;margin:0 auto;padding:12px 12px 40px;min-height:100vh}
+  .hidden{display:none !important}
+  .page{animation:fadeIn .2s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
   /* Header */
-  .admin-header {
-    display: flex; flex-direction: column; gap: 8px;
-    padding: 12px 0; border-bottom: 1px solid #334155; margin-bottom: 12px;
-  }
-  .admin-header-top {
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .admin-header h1 { font-size: 16px; font-weight: 700; color: #f59e0b; }
-  .admin-header .subtitle { font-size: 11px; color: #94a3b8; }
-  .header-actions { display: flex; gap: 6px; align-items: center; }
-  .btn-sm {
-    background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
-    border-radius: 8px; padding: 5px 10px; font-size: 11px; cursor: pointer;
-    text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
-    transition: background 0.2s;
-  }
-  .btn-sm:hover { background: #334155; }
-  .btn-sm.danger { border-color: #ef4444; color: #ef4444; }
-  .btn-sm.danger:hover { background: #ef4444; color: #fff; }
-  .lang-toggle {
-    display: flex; background: #1e293b; border-radius: 8px; overflow: hidden;
-    border: 1px solid #334155;
-  }
-  .lang-toggle button {
-    background: transparent; color: #94a3b8; border: none; padding: 4px 8px;
-    font-size: 11px; cursor: pointer; font-weight: 600;
-  }
-  .lang-toggle button.active { background: #f59e0b; color: #0f172a; }
+  header#admin-header{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px}
+  .header-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+  .header-title{font-size:16px;font-weight:700;color:var(--accent);white-space:nowrap}
+  .header-title small{display:block;font-size:11px;font-weight:400;color:var(--muted)}
+  .header-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+  .btn-sm{font-size:11px;padding:6px 9px;border-radius:9px;border:1px solid var(--border);background:#0b1220;color:var(--text);cursor:pointer;text-decoration:none;white-space:nowrap;transition:.15s}
+  .btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+  .lang-toggle{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+  .lang-toggle button{font-size:11px;padding:6px 8px;border:none;background:#0b1220;color:var(--muted);cursor:pointer;transition:.15s}
+  .lang-toggle button.active{background:var(--accent);color:#0b1220;font-weight:700}
 
   /* Tabs */
-  .tabs {
-    display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px;
-    scrollbar-width: none;
-  }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tab-btn {
-    flex: 0 0 auto; background: #1e293b; color: #94a3b8; border: 1px solid #334155;
-    border-radius: 8px; padding: 7px 14px; font-size: 12px; cursor: pointer;
-    font-weight: 600; white-space: nowrap; transition: all 0.2s;
-  }
-  .tab-btn.active { background: #f59e0b; color: #0f172a; border-color: #f59e0b; }
-  .tab-btn:hover:not(.active) { background: #334155; }
-
-  /* Pages */
-  .page { animation: fadeIn 0.25s ease; }
-  .hidden { display: none !important; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-  #page-loading, #page-denied {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 60vh; text-align: center; gap: 12px; padding: 20px;
-  }
-  .spinner {
-    width: 32px; height: 32px; border: 3px solid #334155; border-top-color: #f59e0b;
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  #page-denied a { color: #f59e0b; }
+  nav#tabs{display:flex;gap:6px;flex-wrap:wrap}
+  nav#tabs button{flex:1 1 auto;font-size:12px;padding:9px 6px;border-radius:10px;border:1px solid var(--border);background:#0b1220;color:var(--muted);cursor:pointer;transition:.15s;white-space:nowrap}
+  nav#tabs button.active{background:linear-gradient(135deg,#f59e0b,#d97706);color:#0b1220;font-weight:700;border-color:transparent}
+  nav#tabs button:hover:not(.active){border-color:var(--accent);color:var(--accent)}
 
   /* Cards */
-  .card {
-    background: #1e293b; border-radius: 12px; padding: 14px;
-    border: 1px solid #334155; margin-bottom: 12px;
-  }
-  .card h2 { font-size: 14px; margin-bottom: 10px; color: #f59e0b; }
-  .stats-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-  }
-  .stat-card {
-    background: #1e293b; border-radius: 12px; padding: 14px;
-    border: 1px solid #334155; display: flex; flex-direction: column; gap: 4px;
-  }
-  .stat-label { font-size: 11px; color: #94a3b8; line-height: 1.3; }
-  .stat-value { font-size: 20px; font-weight: 700; color: #f59e0b; word-break: break-all; }
-  .stat-value.small { font-size: 16px; }
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px}
+  .card h2{font-size:14px;color:var(--accent);margin-bottom:12px;font-weight:700}
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat-box{background:#0b1220;border:1px solid var(--border);border-radius:12px;padding:12px}
+  .stat-box .stat-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+  .stat-box .stat-value{font-size:18px;font-weight:700;color:var(--accent);word-break:break-word}
+  .stat-box .stat-value.green{color:var(--success)}
+  .stat-box .stat-value.red{color:var(--fail)}
 
   /* Buttons */
-  .btn-primary {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: #0f172a; border: none; border-radius: 12px; padding: 12px 18px;
-    font-size: 14px; font-weight: 700; cursor: pointer; width: 100%;
-    transition: opacity 0.2s;
-  }
-  .btn-primary:hover { opacity: 0.9; }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-block { width: 100%; margin-top: 8px; }
-
-  /* Form */
-  .form-group { margin-bottom: 12px; }
-  .form-group label {
-    display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;
-  }
-  .form-group input, .form-group textarea, .form-group select {
-    width: 100%; background: #0f172a; color: #e2e8f0;
-    border: 1px solid #334155; border-radius: 8px; padding: 10px;
-    font-size: 13px; font-family: inherit; outline: none;
-  }
-  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-    border-color: #f59e0b;
-  }
-  .form-group textarea { resize: vertical; min-height: 70px; }
+  .btn-primary{display:inline-block;width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#0b1220;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;margin-top:10px}
+  .btn-primary:hover{filter:brightness(1.1)}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+  .btn-secondary{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#0b1220;color:var(--text);cursor:pointer;font-size:13px;transition:.15s}
+  .btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
 
   /* Table */
-  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 600px; }
-  th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #334155; }
-  th { color: #94a3b8; font-weight: 600; font-size: 11px; text-transform: uppercase; }
-  td { color: #e2e8f0; }
-  .badge {
-    display: inline-block; padding: 2px 8px; border-radius: 6px;
-    font-size: 10px; font-weight: 700; text-transform: uppercase;
-  }
-  .badge-pending { background: #f59e0b; color: #0f172a; }
-  .badge-approved { background: #22c55e; color: #fff; }
-  .badge-rejected { background: #ef4444; color: #fff; }
-  .badge-active { background: #22c55e; color: #fff; }
-  .badge-inactive { background: #ef4444; color: #fff; }
-  .badge-admin { background: #f59e0b; color: #0f172a; }
-  .badge-user { background: #334155; color: #e2e8f0; }
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;border:1px solid var(--border)}
+  table{width:100%;border-collapse:collapse;font-size:12px;min-width:560px}
+  thead{background:#0b1220}
+  th{padding:9px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:11px;white-space:nowrap;border-bottom:1px solid var(--border)}
+  td{padding:9px 8px;border-bottom:1px solid #253044;white-space:nowrap;vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#162033}
+  .empty{padding:24px 12px;text-align:center;color:var(--muted);font-size:13px}
 
-  .btn-approve, .btn-reject, .btn-view-user {
-    background: #22c55e; color: #fff; border: none; border-radius: 6px;
-    padding: 4px 8px; font-size: 11px; cursor: pointer; font-weight: 600;
-    margin: 1px 0; white-space: nowrap;
-  }
-  .btn-reject { background: #ef4444; }
-  .btn-view-user { background: #f59e0b; color: #0f172a; }
+  .badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700}
+  .badge.pending{background:rgba(245,158,11,.15);color:var(--accent)}
+  .badge.approved{background:rgba(34,197,94,.15);color:var(--success)}
+  .badge.rejected{background:rgba(239,68,68,.15);color:var(--fail)}
+  .badge.admin{background:rgba(245,158,11,.15);color:var(--accent)}
+  .badge.user{background:rgba(148,163,184,.15);color:var(--muted)}
+  .badge.active{background:rgba(34,197,94,.15);color:var(--success)}
+  .badge.inactive{background:rgba(239,68,68,.15);color:var(--fail)}
 
-  .empty-msg {
-    text-align: center; padding: 30px 10px; color: #94a3b8; font-size: 13px;
-  }
-  .error-msg { color: #ef4444; font-size: 12px; padding: 10px; }
+  .btn-approve,.btn-reject,.btn-view-user{padding:5px 9px;border-radius:8px;border:none;font-size:11px;font-weight:700;cursor:pointer;transition:.15s;margin:2px}
+  .btn-approve{background:rgba(34,197,94,.2);color:var(--success)}
+  .btn-approve:hover{background:var(--success);color:#0b1220}
+  .btn-reject{background:rgba(239,68,68,.2);color:var(--fail)}
+  .btn-reject:hover{background:var(--fail);color:#fff}
+  .btn-view-user{background:rgba(245,158,11,.2);color:var(--accent)}
+  .btn-view-user:hover{background:var(--accent);color:#0b1220}
 
-  /* Search */
-  .search-input {
-    width: 100%; background: #1e293b; color: #e2e8f0;
-    border: 1px solid #334155; border-radius: 8px; padding: 10px;
-    font-size: 13px; margin-bottom: 10px; outline: none;
-  }
-  .search-input:focus { border-color: #f59e0b; }
-
-  /* Filter */
-  .filter-select {
-    background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
-    border-radius: 8px; padding: 8px 10px; font-size: 13px; margin-bottom: 10px;
-    outline: none; width: 100%;
-  }
+  /* Forms */
+  .form-group{margin-bottom:12px}
+  .form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600}
+  .form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0b1220;color:var(--text);font-size:13px;font-family:inherit;transition:.15s}
+  .form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--accent)}
+  .form-group textarea{resize:vertical;min-height:70px}
+  .filter-row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+  .filter-row label{font-size:12px;color:var(--muted);white-space:nowrap}
+  .filter-row select{flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:#0b1220;color:var(--text);font-size:13px}
+  .search-row{margin-bottom:12px}
+  .search-row input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0b1220;color:var(--text);font-size:13px}
+  .search-row input:focus{outline:none;border-color:var(--accent)}
 
   /* Modal */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    display: flex; align-items: center; justify-content: center; z-index: 1000;
-    padding: 16px;
-  }
-  .modal-content {
-    background: #1e293b; border-radius: 16px; padding: 20px;
-    max-width: 440px; width: 100%; max-height: 85vh; overflow-y: auto;
-    border: 1px solid #334155;
-  }
-  .modal-content h3 { color: #f59e0b; margin-bottom: 12px; font-size: 16px; }
-  .modal-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #334155; font-size: 12px; gap: 10px; }
-  .modal-row .k { color: #94a3b8; flex-shrink: 0; }
-  .modal-row .v { color: #e2e8f0; text-align: right; word-break: break-all; }
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:16px;z-index:1000}
+  .modal-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;max-width:440px;width:100%;max-height:85vh;overflow-y:auto}
+  .modal-box h3{font-size:16px;color:var(--accent);margin-bottom:14px}
+  .modal-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #253044;font-size:13px}
+  .modal-row:last-of-type{border-bottom:none}
+  .modal-row .k{color:var(--muted);flex-shrink:0}
+  .modal-row .v{text-align:right;word-break:break-word}
 
   /* Toast */
-  #toast-container {
-    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
-    z-index: 2000; display: flex; flex-direction: column; gap: 8px;
-    width: calc(100% - 32px); max-width: 440px; pointer-events: none;
-  }
-  .toast {
-    padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
-    color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    animation: slideDown 0.3s ease; text-align: center;
-  }
-  .toast.sukses { background: #22c55e; }
-  .toast.gagal { background: #ef4444; }
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  #toast-container{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:2000;display:flex;flex-direction:column;gap:8px;width:calc(100% - 24px);max-width:440px;pointer-events:none}
+  .toast{padding:12px 16px;border-radius:12px;font-size:13px;font-weight:600;color:#0b1220;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:toastIn .25s ease;pointer-events:auto}
+  .toast.sukses{background:var(--success)}
+  .toast.gagal{background:var(--fail);color:#fff}
+  .toast.info{background:var(--accent)}
+  @keyframes toastIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
 
-  .noscript-msg {
-    background: #ef4444; color: #fff; padding: 16px; text-align: center;
-    font-size: 14px; font-weight: 600;
-  }
+  .loading-msg{text-align:center;padding:60px 20px;font-size:15px;color:var(--muted)}
+  .loading-msg .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 16px;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .error-msg{color:var(--fail);font-size:13px;padding:12px;text-align:center;border:1px solid rgba(239,68,68,.3);border-radius:10px;background:rgba(239,68,68,.05)}
+  .info-text{font-size:11px;color:var(--muted);margin-top:8px}
+  a{color:var(--accent)}
 
-  .section-title { font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 600; }
-  .updated-text { font-size: 11px; color: #64748b; margin-top: 8px; text-align: center; }
+  /* Settings form extra */
+  #settings-updated{margin-top:8px}
+
+  @media (max-width:360px){
+    .stats-grid{grid-template-columns:1fr}
+    .header-title{font-size:14px}
+  }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body>
-
 <noscript>
-  <div class="noscript-msg">JavaScript diperlukan untuk menjalankan panel admin. Aktifkan JavaScript di browser Anda.</div>
+  <div style="padding:40px 20px;text-align:center;color:#ef4444;font-size:14px;max-width:480px;margin:0 auto">
+    JavaScript diperlukan untuk menjalankan halaman admin ini. Aktifkan JavaScript di browser Anda.
+  </div>
 </noscript>
 
 <div id="toast-container"></div>
 
 <main id="app">
 
-  <!-- HEADER (statis, langsung terlihat) -->
-  <header class="admin-header">
-    <div class="admin-header-top">
-      <div>
-        <h1>⚙️ <span data-i18n="adminPanel">Admin Panel</span></h1>
-        <div class="subtitle">"Klik" Penghasil Saldo Dana</div>
-      </div>
-      <div class="header-actions">
-        <div class="lang-toggle">
-          <button id="lang-id" class="active">ID</button>
-          <button id="lang-en">EN</button>
+  <!-- ============ PAGE: LOADING ============ -->
+  <section id="page-loading" class="page">
+    <div class="loading-msg">
+      <div class="spinner"></div>
+      <div id="loading-text">Memeriksa akses admin...</div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE: DENIED ============ -->
+  <section id="page-denied" class="page hidden">
+    <div class="card" style="text-align:center;margin-top:40px">
+      <div style="font-size:40px;margin-bottom:12px">🚫</div>
+      <h2 style="color:var(--fail)">Akses Ditolak</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Anda bukan admin. Halaman ini hanya untuk administrator.</p>
+      <a href="index.html#dashboard" class="btn-primary" style="text-decoration:none;display:block;text-align:center">Kembali ke Dashboard</a>
+    </div>
+  </section>
+
+  <!-- ============ PAGE: STATS ============ -->
+  <section id="page-stats" class="page hidden">
+    <header id="admin-header">
+      <div class="header-top">
+        <div class="header-title">⚙️ Admin Panel<small>"Klik" Penghasil Saldo Dana</small></div>
+        <div class="header-actions">
+          <a href="index.html#dashboard" class="btn-sm" data-i18n="toDashboard">Dashboard</a>
+          <button id="btn-logout" class="btn-sm" data-i18n="logout">Logout</button>
+          <div class="lang-toggle">
+            <button data-lang="id" class="active">ID</button>
+            <button data-lang="en">EN</button>
+          </div>
         </div>
       </div>
-    </div>
-    <div style="display:flex; gap:6px;">
-      <a href="index.html#dashboard" class="btn-sm" data-i18n="toDashboard">📱 Dashboard User</a>
-      <button id="btn-logout" class="btn-sm danger" data-i18n="logout">Logout</button>
-    </div>
-    <nav class="tabs" id="tabs-nav">
-      <button class="tab-btn active" data-tab="stats" data-i18n="tabStats">Statistik</button>
-      <button class="tab-btn" data-tab="payouts" data-i18n="tabPayouts">Payouts</button>
-      <button class="tab-btn" data-tab="users" data-i18n="tabUsers">Users</button>
-      <button class="tab-btn" data-tab="settings" data-i18n="tabSettings">Settings</button>
-    </nav>
-  </header>
+      <nav id="tabs">
+        <button data-tab="stats" class="active" data-i18n="tabStats">Statistik</button>
+        <button data-tab="payouts" data-i18n="tabPayouts">Payouts</button>
+        <button data-tab="users" data-i18n="tabUsers">Users</button>
+        <button data-tab="settings" data-i18n="tabSettings">Settings</button>
+      </nav>
+    </header>
 
-  <!-- LOADING -->
-  <section id="page-loading" class="page">
-    <div class="spinner"></div>
-    <p data-i18n="checkingAccess">Memeriksa akses admin...</p>
+    <div class="card">
+      <h2 data-i18n="statsTitle">📊 Statistik</h2>
+      <div id="stats-grid" class="stats-grid">
+        <div class="stat-box"><div class="stat-label" data-i18n="totalUser">Total User</div><div class="stat-value" id="stat-total-user">—</div></div>
+        <div class="stat-box"><div class="stat-label" data-i18n="coinCirculating">Koin Beredar</div><div class="stat-value" id="stat-coin">—</div></div>
+        <div class="stat-box"><div class="stat-label" data-i18n="payoutPending">Payout Pending</div><div class="stat-value" id="stat-payout-pending">—</div></div>
+        <div class="stat-box"><div class="stat-label" data-i18n="payoutApproved">Payout Approved</div><div class="stat-value green" id="stat-payout-approved">—</div></div>
+        <div class="stat-box"><div class="stat-label" data-i18n="totalPaid">Total Dibayar</div><div class="stat-value green" id="stat-total-paid">—</div></div>
+        <div class="stat-box"><div class="stat-label" data-i18n="adsToday">Iklan Hari Ini</div><div class="stat-value" id="stat-ads-today">—</div></div>
+      </div>
+      <button id="btn-refresh-stats" class="btn-primary" data-i18n="refresh">🔄 Refresh</button>
+      <div id="stats-error" class="error-msg hidden" style="margin-top:10px"></div>
+    </div>
   </section>
 
-  <!-- DENIED -->
-  <section id="page-denied" class="page hidden">
-    <h2>🚫 <span data-i18n="accessDenied">Akses ditolak. Anda bukan admin.</span></h2>
-    <a href="index.html#dashboard" data-i18n="back">Kembali</a>
-  </section>
-
-  <!-- STATS -->
-  <section id="page-stats" class="page hidden">
-    <div class="stats-grid" id="stats-grid">
-      <div class="stat-card"><div class="stat-label">Memuat...</div></div>
-    </div>
-    <button class="btn-primary btn-block" id="btn-refresh-stats" data-i18n="refresh">🔄 Refresh</button>
-  </section>
-
-  <!-- PAYOUTS -->
+  <!-- ============ PAGE: PAYOUTS ============ -->
   <section id="page-payouts" class="page hidden">
-    <select class="filter-select" id="filter-payout">
-      <option value="all" data-i18n="filterAll">Semua</option>
-      <option value="pending" selected data-i18n="filterPending">Pending</option>
-      <option value="approved" data-i18n="filterApproved">Approved</option>
-      <option value="rejected" data-i18n="filterRejected">Rejected</option>
-    </select>
-    <div class="card">
-      <div class="table-wrap" id="payouts-table">
-        <div class="empty-msg">Memuat...</div>
+    <header id="admin-header-payouts">
+      <div class="header-top">
+        <div class="header-title">⚙️ Admin Panel<small>"Klik" Penghasil Saldo Dana</small></div>
+        <div class="header-actions">
+          <a href="index.html#dashboard" class="btn-sm" data-i18n="toDashboard">Dashboard</a>
+          <button class="btn-logout-shared btn-sm" data-i18n="logout">Logout</button>
+          <div class="lang-toggle">
+            <button data-lang="id" class="active">ID</button>
+            <button data-lang="en">EN</button>
+          </div>
+        </div>
       </div>
+      <nav class="tabs-shared">
+        <button data-tab="stats" data-i18n="tabStats">Statistik</button>
+        <button data-tab="payouts" class="active" data-i18n="tabPayouts">Payouts</button>
+        <button data-tab="users" data-i18n="tabUsers">Users</button>
+        <button data-tab="settings" data-i18n="tabSettings">Settings</button>
+      </nav>
+    </header>
+
+    <div class="card">
+      <h2 data-i18n="payoutsTitle">💸 Payouts</h2>
+      <div class="filter-row">
+        <label data-i18n="filter">Filter:</label>
+        <select id="filter-payout">
+          <option value="Semua" data-i18n="all">Semua</option>
+          <option value="pending" selected>Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div id="payouts-table-wrap" class="table-wrap">
+        <table id="payouts-table">
+          <thead>
+            <tr>
+              <th data-i18n="thDate">Tanggal</th>
+              <th data-i18n="thUser">User</th>
+              <th data-i18n="thCoin">Koin</th>
+              <th data-i18n="thRupiah">Rupiah</th>
+              <th data-i18n="thMethod">Metode</th>
+              <th data-i18n="thAccount">Nomor Akun</th>
+              <th data-i18n="thStatus">Status</th>
+              <th data-i18n="thAction">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="payouts-tbody"></tbody>
+        </table>
+      </div>
+      <div id="payouts-empty" class="empty hidden" data-i18n="noPayouts">Tidak ada payout</div>
+      <div id="payouts-error" class="error-msg hidden" style="margin-top:10px"></div>
     </div>
   </section>
 
-  <!-- USERS -->
+  <!-- ============ PAGE: USERS ============ -->
   <section id="page-users" class="page hidden">
-    <input type="text" class="search-input" id="search-users" placeholder="Cari email...">
-    <div class="card">
-      <div class="table-wrap" id="users-table">
-        <div class="empty-msg">Memuat...</div>
+    <header id="admin-header-users">
+      <div class="header-top">
+        <div class="header-title">⚙️ Admin Panel<small>"Klik" Penghasil Saldo Dana</small></div>
+        <div class="header-actions">
+          <a href="index.html#dashboard" class="btn-sm" data-i18n="toDashboard">Dashboard</a>
+          <button class="btn-logout-shared btn-sm" data-i18n="logout">Logout</button>
+          <div class="lang-toggle">
+            <button data-lang="id" class="active">ID</button>
+            <button data-lang="en">EN</button>
+          </div>
+        </div>
       </div>
+      <nav class="tabs-shared">
+        <button data-tab="stats" data-i18n="tabStats">Statistik</button>
+        <button data-tab="payouts" data-i18n="tabPayouts">Payouts</button>
+        <button data-tab="users" class="active" data-i18n="tabUsers">Users</button>
+        <button data-tab="settings" data-i18n="tabSettings">Settings</button>
+      </nav>
+    </header>
+
+    <div class="card">
+      <h2 data-i18n="usersTitle">👥 Users</h2>
+      <div class="search-row">
+        <input type="text" id="search-users" placeholder="Cari email..." data-i18n-placeholder="searchEmail">
+      </div>
+      <div class="table-wrap">
+        <table id="users-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Role</th>
+              <th data-i18n="thBalance">Saldo</th>
+              <th data-i18n="thPending">Pending</th>
+              <th data-i18n="thStatus">Status</th>
+              <th data-i18n="thLastLogin">Terakhir Login</th>
+              <th data-i18n="thAction">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+      <div id="users-empty" class="empty hidden" data-i18n="noUsers">Tidak ada user</div>
+      <div id="users-error" class="error-msg hidden" style="margin-top:10px"></div>
     </div>
   </section>
 
-  <!-- SETTINGS -->
+  <!-- ============ PAGE: SETTINGS ============ -->
   <section id="page-settings" class="page hidden">
-    <form id="form-settings" class="card">
-      <div class="form-group">
-        <label>monetag_links</label>
-        <textarea id="s-monetag_links" placeholder="Satu link per baris"></textarea>
+    <header id="admin-header-settings">
+      <div class="header-top">
+        <div class="header-title">⚙️ Admin Panel<small>"Klik" Penghasil Saldo Dana</small></div>
+        <div class="header-actions">
+          <a href="index.html#dashboard" class="btn-sm" data-i18n="toDashboard">Dashboard</a>
+          <button class="btn-logout-shared btn-sm" data-i18n="logout">Logout</button>
+          <div class="lang-toggle">
+            <button data-lang="id" class="active">ID</button>
+            <button data-lang="en">EN</button>
+          </div>
+        </div>
       </div>
-      <div class="form-group">
-        <label>adsterra_link</label>
-        <input type="text" id="s-adsterra_link">
-      </div>
-      <div class="form-group">
-        <label>reward_per_ad</label>
-        <input type="number" id="s-reward_per_ad">
-      </div>
-      <div class="form-group">
-        <label>daily_limit</label>
-        <input type="number" id="s-daily_limit">
-      </div>
-      <div class="form-group">
-        <label>conversion_fee_percent</label>
-        <input type="number" step="0.01" id="s-conversion_fee_percent">
-      </div>
-      <div class="form-group">
-        <label>checkin_min</label>
-        <input type="number" id="s-checkin_min">
-      </div>
-      <div class="form-group">
-        <label>checkin_max</label>
-        <input type="number" id="s-checkin_max">
-      </div>
-      <div class="form-group">
-        <label>coin_rate</label>
-        <input type="number" id="s-coin_rate">
-      </div>
-      <div class="form-group">
-        <label>coin_expiry_days</label>
-        <input type="number" id="s-coin_expiry_days">
-      </div>
-      <button type="submit" class="btn-primary" id="btn-save-settings" data-i18n="saveSettings">SIMPAN PENGATURAN</button>
-      <div class="updated-text" id="settings-updated"></div>
-    </form>
+      <nav class="tabs-shared">
+        <button data-tab="stats" data-i18n="tabStats">Statistik</button>
+        <button data-tab="payouts" data-i18n="tabPayouts">Payouts</button>
+        <button data-tab="users" data-i18n="tabUsers">Users</button>
+        <button data-tab="settings" class="active" data-i18n="tabSettings">Settings</button>
+      </nav>
+    </header>
+
+    <div class="card">
+      <h2 data-i18n="settingsTitle">⚙️ Pengaturan</h2>
+      <form id="form-settings" onsubmit="return false">
+        <div class="form-group">
+          <label>monetag_links (satu per baris)</label>
+          <textarea id="f-monetag_links" placeholder="https://..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>adsterra_link</label>
+          <input type="text" id="f-adsterra_link" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label>reward_per_ad</label>
+          <input type="number" id="f-reward_per_ad" step="1" min="0">
+        </div>
+        <div class="form-group">
+          <label>daily_limit</label>
+          <input type="number" id="f-daily_limit" step="1" min="0">
+        </div>
+        <div class="form-group">
+          <label>conversion_fee_percent</label>
+          <input type="number" id="f-conversion_fee_percent" step="0.1" min="0">
+        </div>
+        <div class="form-group">
+          <label>checkin_min</label>
+          <input type="number" id="f-checkin_min" step="1" min="0">
+        </div>
+        <div class="form-group">
+          <label>checkin_max</label>
+          <input type="number" id="f-checkin_max" step="1" min="0">
+        </div>
+        <div class="form-group">
+          <label>coin_rate</label>
+          <input type="number" id="f-coin_rate" step="1" min="1">
+        </div>
+        <div class="form-group">
+          <label>coin_expiry_days</label>
+          <input type="number" id="f-coin_expiry_days" step="1" min="1">
+        </div>
+        <button type="button" id="btn-save-settings" class="btn-primary" data-i18n="saveSettings">SIMPAN PENGATURAN</button>
+      </form>
+      <div class="info-text" id="settings-updated"></div>
+      <div id="settings-error" class="error-msg hidden" style="margin-top:10px"></div>
+    </div>
   </section>
+
+  <!-- ============ MODAL USER ============ -->
+  <div id="modal-user" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 data-i18n="userDetail">Detail User</h3>
+      <div id="modal-user-content"></div>
+      <button id="btn-close-modal" class="btn-primary" style="margin-top:16px" data-i18n="close">Tutup</button>
+    </div>
+  </div>
 
 </main>
 
-<!-- MODAL USER -->
-<div id="modal-user" class="modal-overlay hidden">
-  <div class="modal-content">
-    <h3 data-i18n="userDetail">Detail User</h3>
-    <div id="modal-user-body"></div>
-    <button class="btn-primary btn-block" id="btn-close-modal" style="margin-top:14px;" data-i18n="close">Tutup</button>
-  </div>
-</div>
-
-<script defer>
-(function () {
+<script>
+(function(){
   'use strict';
 
+  /* ==================== KONFIG ==================== */
   const SUPABASE_URL = "https://xyzbxersmhvexcycnrcu.supabase.co";
   const SUPABASE_KEY = "sb_publishable_lHQScOcYKDi4zuailh-mVQ_4Hf72L4w";
 
+  /* ==================== STATE ==================== */
   let sb = null;
   let currentUser = null;
-  let currentTab = 'stats';
   let currentPayoutFilter = 'pending';
-  let currentUserSearch = '';
-  let currentLang = localStorage.getItem('lang') || 'id';
+  let allUsersCache = [];
+  let lang = localStorage.getItem('lang') || 'id';
 
-  /* ============ KAMUS BILINGUAL ============ */
+  /* ==================== I18N ==================== */
   const T = {
     id: {
-      adminPanel: "Admin Panel",
-      toDashboard: "📱 Dashboard User",
+      toDashboard: "Dashboard",
       logout: "Logout",
       tabStats: "Statistik",
       tabPayouts: "Payouts",
       tabUsers: "Users",
       tabSettings: "Settings",
-      checkingAccess: "Memeriksa akses admin...",
-      accessDenied: "Akses ditolak. Anda bukan admin.",
-      back: "Kembali",
-      refresh: "🔄 Refresh",
-      filterAll: "Semua",
-      filterPending: "Pending",
-      filterApproved: "Approved",
-      filterRejected: "Rejected",
-      saveSettings: "SIMPAN PENGATURAN",
-      userDetail: "Detail User",
-      close: "Tutup",
+      statsTitle: "📊 Statistik",
       totalUser: "Total User",
-      coinsCirculating: "Koin Beredar",
+      coinCirculating: "Koin Beredar",
       payoutPending: "Payout Pending",
       payoutApproved: "Payout Approved",
       totalPaid: "Total Dibayar",
-      adsToday: "Total Iklan Hari Ini",
-      loading: "Memuat...",
-      noPayout: "Tidak ada payout",
-      noUser: "Tidak ada user",
+      adsToday: "Iklan Hari Ini",
+      refresh: "🔄 Refresh",
+      payoutsTitle: "💸 Payouts",
+      filter: "Filter:",
+      all: "Semua",
+      thDate: "Tanggal",
+      thUser: "User",
+      thCoin: "Koin",
+      thRupiah: "Rupiah",
+      thMethod: "Metode",
+      thAccount: "Nomor Akun",
+      thStatus: "Status",
+      thAction: "Aksi",
+      noPayouts: "Tidak ada payout",
+      usersTitle: "👥 Users",
+      searchEmail: "Cari email...",
+      thBalance: "Saldo",
+      thPending: "Pending",
+      thLastLogin: "Terakhir Login",
+      noUsers: "Tidak ada user",
+      settingsTitle: "⚙️ Pengaturan",
+      saveSettings: "SIMPAN PENGATURAN",
+      userDetail: "Detail User",
+      close: "Tutup",
       approve: "✅ Approve",
       reject: "❌ Reject",
       view: "Lihat",
       confirmApprove: "Approve payout ini?",
       rejectReason: "Alasan reject:",
-      approvedToast: "Payout disetujui",
-      rejectedToast: "Payout ditolak",
-      settingsSaved: "Pengaturan disimpan",
-      errorLoad: "Gagal memuat data",
-      lastUpdate: "Terakhir diupdate",
-      date: "Tanggal",
-      user: "User",
-      coins: "Koin",
-      rupiah: "Rupiah",
-      method: "Metode",
-      accountNo: "Nomor Akun",
-      status: "Status",
-      action: "Aksi",
-      email: "Email",
-      role: "Role",
-      balance: "Saldo",
-      pending: "Pending",
-      lastLogin: "Terakhir Login",
-      searchEmail: "Cari email..."
+      successApprove: "Payout berhasil di-approve",
+      successReject: "Payout ditolak & koin dikembalikan",
+      successSettings: "Pengaturan disimpan",
+      errorPrefix: "Error: ",
+      noSettings: "Belum ada pengaturan",
+      lastUpdated: "Terakhir diupdate: ",
+      checking: "Memeriksa akses admin...",
+      libFail: "Gagal memuat library. Periksa koneksi.",
+      initFail: "Gagal inisialisasi Supabase: "
     },
     en: {
-      adminPanel: "Admin Panel",
-      toDashboard: "📱 User Dashboard",
+      toDashboard: "Dashboard",
       logout: "Logout",
-      tabStats: "Statistics",
+      tabStats: "Stats",
       tabPayouts: "Payouts",
       tabUsers: "Users",
       tabSettings: "Settings",
-      checkingAccess: "Checking admin access...",
-      accessDenied: "Access denied. You are not an admin.",
-      back: "Back",
-      refresh: "🔄 Refresh",
-      filterAll: "All",
-      filterPending: "Pending",
-      filterApproved: "Approved",
-      filterRejected: "Rejected",
-      saveSettings: "SAVE SETTINGS",
-      userDetail: "User Detail",
-      close: "Close",
+      statsTitle: "📊 Statistics",
       totalUser: "Total Users",
-      coinsCirculating: "Coins Circulating",
+      coinCirculating: "Coins Circulating",
       payoutPending: "Pending Payouts",
       payoutApproved: "Approved Payouts",
       totalPaid: "Total Paid",
       adsToday: "Ads Today",
-      loading: "Loading...",
-      noPayout: "No payouts",
-      noUser: "No users",
+      refresh: "🔄 Refresh",
+      payoutsTitle: "💸 Payouts",
+      filter: "Filter:",
+      all: "All",
+      thDate: "Date",
+      thUser: "User",
+      thCoin: "Coins",
+      thRupiah: "Rupiah",
+      thMethod: "Method",
+      thAccount: "Account No.",
+      thStatus: "Status",
+      thAction: "Action",
+      noPayouts: "No payouts",
+      usersTitle: "👥 Users",
+      searchEmail: "Search email...",
+      thBalance: "Balance",
+      thPending: "Pending",
+      thLastLogin: "Last Login",
+      noUsers: "No users",
+      settingsTitle: "⚙️ Settings",
+      saveSettings: "SAVE SETTINGS",
+      userDetail: "User Detail",
+      close: "Close",
       approve: "✅ Approve",
       reject: "❌ Reject",
       view: "View",
       confirmApprove: "Approve this payout?",
       rejectReason: "Reject reason:",
-      approvedToast: "Payout approved",
-      rejectedToast: "Payout rejected",
-      settingsSaved: "Settings saved",
-      errorLoad: "Failed to load data",
-      lastUpdate: "Last updated",
-      date: "Date",
-      user: "User",
-      coins: "Coins",
-      rupiah: "Rupiah",
-      method: "Method",
-      accountNo: "Account No",
-      status: "Status",
-      action: "Action",
-      email: "Email",
-      role: "Role",
-      balance: "Balance",
-      pending: "Pending",
-      lastLogin: "Last Login",
-      searchEmail: "Search email..."
+      successApprove: "Payout approved successfully",
+      successReject: "Payout rejected & coins refunded",
+      successSettings: "Settings saved",
+      errorPrefix: "Error: ",
+      noSettings: "No settings yet",
+      lastUpdated: "Last updated: ",
+      checking: "Checking admin access...",
+      libFail: "Failed to load library. Check connection.",
+      initFail: "Failed to initialize Supabase: "
     }
   };
 
-  function t(key) { return (T[currentLang] && T[currentLang][key]) || key; }
+  function t(key){ return (T[lang] && T[lang][key]) || key; }
 
-  function setLang(lang) {
-    currentLang = lang;
-    localStorage.setItem('lang', lang);
-    document.documentElement.lang = lang;
+  function setLang(newLang){
+    lang = newLang;
+    localStorage.setItem('lang', newLang);
     document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      if (T[lang] && T[lang][key]) el.textContent = T[lang][key];
+      const k = el.getAttribute('data-i18n');
+      if (T[lang][k]) el.textContent = T[lang][k];
     });
-    document.getElementById('lang-id').classList.toggle('active', lang === 'id');
-    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-    // Update placeholder
-    const search = document.getElementById('search-users');
-    if (search) search.placeholder = t('searchEmail');
-    // Update filter options
-    document.querySelectorAll('#filter-payout option').forEach(opt => {
-      const k = opt.getAttribute('data-i18n');
-      if (k && T[lang][k]) opt.textContent = T[lang][k];
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const k = el.getAttribute('data-i18n-placeholder');
+      if (T[lang][k]) el.setAttribute('placeholder', T[lang][k]);
     });
+    document.querySelectorAll('.lang-toggle button').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+    // Re-render dynamic content if needed
+    if (document.getElementById('page-payouts').classList.contains('hidden') === false) {
+      loadPayouts(currentPayoutFilter);
+    }
+    if (document.getElementById('page-users').classList.contains('hidden') === false) {
+      renderUsersTable(allUsersCache);
+    }
   }
 
-  /* ============ HELPERS ============ */
-  function hariIniWIB() {
-    const now = new Date();
-    // WIB = UTC+7
-    const wib = new Date(now.getTime() + (7 * 60 * 60 * 1000));
-    return wib.toISOString().slice(0, 10);
+  /* ==================== HELPERS ==================== */
+  function toast(msg, type){
+    const c = document.getElementById('toast-container');
+    const d = document.createElement('div');
+    d.className = 'toast ' + (type || 'info');
+    d.textContent = msg;
+    c.appendChild(d);
+    setTimeout(() => { d.style.opacity = '0'; d.style.transition = 'opacity .3s'; setTimeout(() => d.remove(), 300); }, 3000);
   }
 
-  function formatTanggal(iso) {
-    if (!iso) return '-';
+  function formatTanggal(iso){
+    if (!iso) return '—';
     try {
       const d = new Date(iso);
-      return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-    } catch (e) { return '-'; }
+      if (isNaN(d.getTime())) return '—';
+      return d.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+    } catch(e){ return '—'; }
   }
 
-  function formatTanggalWaktu(iso) {
-    if (!iso) return '-';
+  function formatTanggalWaktu(iso){
+    if (!iso) return '—';
     try {
       const d = new Date(iso);
-      return d.toLocaleString('id-ID', {
-        day: '2-digit', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-      });
-    } catch (e) { return '-'; }
+      if (isNaN(d.getTime())) return '—';
+      return d.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    } catch(e){ return '—'; }
   }
 
-  function formatRupiah(num) {
+  function formatRupiah(num){
     const n = Number(num) || 0;
     return 'Rp ' + n.toLocaleString('id-ID');
   }
 
-  function escapeHtml(str) {
-    if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+  function hariIniWIB(){
+    // WIB = UTC+7
+    const now = new Date();
+    const wib = new Date(now.getTime() + (7 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+    const y = wib.getUTCFullYear();
+    const m = String(wib.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(wib.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 
-  function toast(msg, type) {
-    const container = document.getElementById('toast-container');
-    const div = document.createElement('div');
-    div.className = 'toast ' + (type === 'gagal' || type === 'error' ? 'gagal' : 'sukses');
-    div.textContent = msg;
-    container.appendChild(div);
-    setTimeout(() => {
-      div.style.transition = 'opacity 0.3s';
-      div.style.opacity = '0';
-      setTimeout(() => div.remove(), 300);
-    }, 3000);
+  function startOfDayWIBISO(){
+    const today = hariIniWIB(); // YYYY-MM-DD
+    // 00:00 WIB = 17:00 UTC hari sebelumnya
+    return today + 'T00:00:00+07:00';
   }
 
-  /* ============ ROUTING ============ */
-  function showPage(name) {
-    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  function escapeHTML(str){
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/[&<>"']/g, function(m){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
+    });
+  }
+
+  /* ==================== ROUTING ==================== */
+  const PAGES = ['loading','denied','stats','payouts','users','settings'];
+
+  function showPage(name){
+    PAGES.forEach(p => {
+      const el = document.getElementById('page-' + p);
+      if (el) el.classList.add('hidden');
+    });
     const target = document.getElementById('page-' + name);
     if (target) target.classList.remove('hidden');
     // Update tab active state
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-tab') === name);
+    document.querySelectorAll('nav#tabs button, nav.tabs-shared button').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-tab') === name);
     });
-    currentTab = name;
+    // Update hash tanpa scroll
+    if (name !== 'loading' && name !== 'denied') {
+      try { history.replaceState(null, '', '#' + name); } catch(e){}
+    }
+    window.scrollTo(0, 0);
   }
 
-  function switchTab(name) {
-    if (name === currentTab) return;
-    showPage(name);
-    if (name === 'stats') loadStats();
-    else if (name === 'payouts') loadPayouts(currentPayoutFilter);
-    else if (name === 'users') loadUsers(currentUserSearch);
-    else if (name === 'settings') loadSettings();
+  function getTabFromHash(){
+    const h = (location.hash || '').replace('#','');
+    if (['stats','payouts','users','settings'].includes(h)) return h;
+    return 'stats';
   }
 
-  /* ============ STATS ============ */
-  async function loadStats() {
-    const grid = document.getElementById('stats-grid');
-    grid.innerHTML = '<div class="stat-card"><div class="stat-label">' + t('loading') + '</div></div>';
+  /* ==================== LOADERS ==================== */
+  async function loadStats(){
+    const errEl = document.getElementById('stats-error');
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
     try {
-      // Total user active
+      // 1. Total user active
       const { count: totalUser, error: e1 } = await sb
-        .from('users').select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .from('users').select('*', { count: 'exact', head: true }).eq('status','active');
       if (e1) throw e1;
 
-      // Koin beredar: ambil semua coin_balance + coin_pending
-      const { data: usersData, error: e2 } = await sb
+      // 2. Koin beredar = sum coin_balance + coin_pending
+      let koinBeredar = 0;
+      const { data: usersCoin, error: e2 } = await sb
         .from('users').select('coin_balance, coin_pending');
       if (e2) throw e2;
-      let koinBeredar = 0;
-      (usersData || []).forEach(u => {
-        koinBeredar += Number(u.coin_balance || 0) + Number(u.coin_pending || 0);
-      });
+      if (usersCoin) {
+        usersCoin.forEach(u => {
+          koinBeredar += (Number(u.coin_balance) || 0) + (Number(u.coin_pending) || 0);
+        });
+      }
 
-      // Payout pending
+      // 3. Payout pending
       const { count: payoutPending, error: e3 } = await sb
-        .from('payouts').select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
+        .from('payouts').select('*', { count: 'exact', head: true }).eq('status','pending');
       if (e3) throw e3;
 
-      // Payout approved
+      // 4. Payout approved
       const { count: payoutApproved, error: e4 } = await sb
-        .from('payouts').select('*', { count: 'exact', head: true })
-        .eq('status', 'approved');
+        .from('payouts').select('*', { count: 'exact', head: true }).eq('status','approved');
       if (e4) throw e4;
 
-      // Total dibayar
-      const { data: approvedData, error: e5 } = await sb
-        .from('payouts').select('rupiah_amount').eq('status', 'approved');
-      if (e5) throw e5;
+      // 5. Total dibayar = sum rupiah_amount where approved
       let totalDibayar = 0;
-      (approvedData || []).forEach(p => { totalDibayar += Number(p.rupiah_amount || 0); });
+      const { data: approvedRows, error: e5 } = await sb
+        .from('payouts').select('rupiah_amount').eq('status','approved');
+      if (e5) throw e5;
+      if (approvedRows) {
+        approvedRows.forEach(r => { totalDibayar += Number(r.rupiah_amount) || 0; });
+      }
 
-      // Iklan hari ini WIB
-      const today = hariIniWIB();
-      const startUtc = new Date(today + 'T00:00:00+07:00').toISOString();
-      const endUtc = new Date(today + 'T23:59:59+07:00').toISOString();
-      const { count: iklanHariIni, error: e6 } = await sb
-        .from('ad_clicks').select('*', { count: 'exact', head: true })
-        .gte('created_at', startUtc).lte('created_at', endUtc);
-      if (e6) throw e6;
+      // 6. Iklan hari ini WIB
+      let iklanHariIni = 0;
+      try {
+        const startISO = startOfDayWIBISO();
+        const { count, error: e6 } = await sb
+          .from('ad_clicks').select('*', { count: 'exact', head: true })
+          .gte('created_at', startISO);
+        if (!e6 && count !== null) iklanHariIni = count;
+      } catch(e6) {
+        // Table ad_clicks mungkin tidak ada / RLS — jangan gagalkan semua
+        console.warn('ad_clicks query failed:', e6.message);
+      }
 
-      grid.innerHTML = `
-        <div class="stat-card"><div class="stat-label">${t('totalUser')}</div><div class="stat-value">${totalUser ?? 0}</div></div>
-        <div class="stat-card"><div class="stat-label">${t('coinsCirculating')}</div><div class="stat-value">${koinBeredar.toLocaleString('id-ID')}</div></div>
-        <div class="stat-card"><div class="stat-label">${t('payoutPending')}</div><div class="stat-value">${payoutPending ?? 0}</div></div>
-        <div class="stat-card"><div class="stat-label">${t('payoutApproved')}</div><div class="stat-value">${payoutApproved ?? 0}</div></div>
-        <div class="stat-card"><div class="stat-label">${t('totalPaid')}</div><div class="stat-value small">${formatRupiah(totalDibayar)}</div></div>
-        <div class="stat-card"><div class="stat-label">${t('adsToday')}</div><div class="stat-value">${iklanHariIni ?? 0}</div></div>
-      `;
-    } catch (err) {
+      // Render
+      document.getElementById('stat-total-user').textContent = totalUser ?? 0;
+      document.getElementById('stat-coin').textContent = koinBeredar.toLocaleString('id-ID');
+      document.getElementById('stat-payout-pending').textContent = payoutPending ?? 0;
+      document.getElementById('stat-payout-approved').textContent = payoutApproved ?? 0;
+      document.getElementById('stat-total-paid').textContent = formatRupiah(totalDibayar);
+      document.getElementById('stat-ads-today').textContent = iklanHariIni;
+
+    } catch(err){
       console.error('loadStats error:', err);
-      grid.innerHTML = '<div class="stat-card"><div class="error-msg">' + t('errorLoad') + ': ' + escapeHtml(err.message || err) + '</div></div>';
-      toast(t('errorLoad') + ': ' + (err.message || err), 'gagal');
+      errEl.textContent = t('errorPrefix') + (err.message || err);
+      errEl.classList.remove('hidden');
+      toast(t('errorPrefix') + (err.message || err), 'gagal');
     }
   }
 
-  /* ============ PAYOUTS ============ */
-  async function loadPayouts(filter) {
-    currentPayoutFilter = filter;
-    const wrap = document.getElementById('payouts-table');
-    wrap.innerHTML = '<div class="empty-msg">' + t('loading') + '</div>';
-    try {
-      let query = sb.from('payouts').select('*, users(email)').order('created_at', { ascending: false });
-      if (filter && filter !== 'all') query = query.eq('status', filter);
-      const { data, error } = await query;
-      if (error) throw error;
+  async function loadPayouts(filter){
+    currentPayoutFilter = filter || 'pending';
+    const tbody = document.getElementById('payouts-tbody');
+    const emptyEl = document.getElementById('payouts-empty');
+    const errEl = document.getElementById('payouts-error');
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
+    emptyEl.classList.add('hidden');
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:16px">Loading...</td></tr>';
 
-      if (!data || data.length === 0) {
-        wrap.innerHTML = '<div class="empty-msg">' + t('noPayout') + '</div>';
+    try {
+      let query = sb.from('payouts').select('*').order('created_at', { ascending: false });
+      if (filter && filter !== 'Semua' && filter !== 'All') {
+        query = query.eq('status', filter);
+      }
+      const { data: payouts, error: e1 } = await query;
+      if (e1) throw e1;
+
+      if (!payouts || payouts.length === 0) {
+        tbody.innerHTML = '';
+        emptyEl.classList.remove('hidden');
         return;
       }
 
-      let html = '<table><thead><tr>' +
-        '<th>' + t('date') + '</th>' +
-        '<th>' + t('user') + '</th>' +
-        '<th>' + t('coins') + '</th>' +
-        '<th>' + t('rupiah') + '</th>' +
-        '<th>' + t('method') + '</th>' +
-        '<th>' + t('accountNo') + '</th>' +
-        '<th>' + t('status') + '</th>' +
-        '<th>' + t('action') + '</th>' +
-        '</tr></thead><tbody>';
-
-      data.forEach(p => {
-        const email = (p.users && p.users.email) ? p.users.email : '-';
-        const badgeClass = 'badge-' + (p.status || 'pending');
-        let aksi = '-';
-        if (p.status === 'pending') {
-          aksi = `<button class="btn-approve" data-id="${escapeHtml(p.id)}">${t('approve')}</button>
-                  <button class="btn-reject" data-id="${escapeHtml(p.id)}">${t('reject')}</button>`;
+      // Ambil data user untuk email (join manual)
+      const userIds = [...new Set(payouts.map(p => p.user_id).filter(Boolean))];
+      let userMap = {};
+      if (userIds.length > 0) {
+        const { data: users, error: e2 } = await sb
+          .from('users').select('id, email').in('id', userIds);
+        if (!e2 && users) {
+          users.forEach(u => { userMap[u.id] = u; });
         }
-        html += '<tr>' +
-          '<td>' + formatTanggal(p.created_at) + '</td>' +
-          '<td>' + escapeHtml(email) + '</td>' +
-          '<td>' + (Number(p.coins_used) || 0).toLocaleString('id-ID') + '</td>' +
-          '<td>' + formatRupiah(p.rupiah_amount) + '</td>' +
-          '<td>' + escapeHtml(p.method || '-') + '</td>' +
-          '<td>' + escapeHtml(p.account_number || '-') + '</td>' +
-          '<td><span class="badge ' + badgeClass + '">' + escapeHtml(p.status || '-') + '</span></td>' +
-          '<td>' + aksi + '</td>' +
-          '</tr>';
-      });
-      html += '</tbody></table>';
-      wrap.innerHTML = html;
+      }
 
-      // Bind actions
-      wrap.querySelectorAll('.btn-approve').forEach(btn => {
-        btn.addEventListener('click', () => approvePayout(btn.getAttribute('data-id')));
+      tbody.innerHTML = '';
+      payouts.forEach(p => {
+        const email = (userMap[p.user_id] && userMap[p.user_id].email) || p.user_id || '—';
+        const statusClass = p.status || 'pending';
+        let actionHTML = '—';
+        if (p.status === 'pending') {
+          actionHTML = `<button class="btn-approve" data-id="${escapeHTML(p.id)}">${t('approve')}</button>
+                        <button class="btn-reject" data-id="${escapeHTML(p.id)}">${t('reject')}</button>`;
+        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatTanggal(p.created_at)}</td>
+          <td title="${escapeHTML(email)}">${escapeHTML(email.length > 22 ? email.slice(0,20)+'…' : email)}</td>
+          <td>${Number(p.coins_used) || 0}</td>
+          <td>${formatRupiah(p.rupiah_amount)}</td>
+          <td>${escapeHTML(p.method || '—')}</td>
+          <td>${escapeHTML(p.account_number || '—')}</td>
+          <td><span class="badge ${statusClass}">${statusClass}</span></td>
+          <td>${actionHTML}</td>
+        `;
+        tbody.appendChild(tr);
       });
-      wrap.querySelectorAll('.btn-reject').forEach(btn => {
-        btn.addEventListener('click', () => rejectPayout(btn.getAttribute('data-id')));
+
+      // Bind approve/reject
+      tbody.querySelectorAll('.btn-approve').forEach(b => {
+        b.addEventListener('click', () => approvePayout(b.getAttribute('data-id')));
       });
-    } catch (err) {
+      tbody.querySelectorAll('.btn-reject').forEach(b => {
+        b.addEventListener('click', () => rejectPayout(b.getAttribute('data-id')));
+      });
+
+    } catch(err){
       console.error('loadPayouts error:', err);
-      wrap.innerHTML = '<div class="error-msg">' + t('errorLoad') + ': ' + escapeHtml(err.message || err) + '</div>';
-      toast(t('errorLoad') + ': ' + (err.message || err), 'gagal');
+      tbody.innerHTML = '';
+      errEl.textContent = t('errorPrefix') + (err.message || err);
+      errEl.classList.remove('hidden');
+      toast(t('errorPrefix') + (err.message || err), 'gagal');
     }
   }
 
-  async function approvePayout(payoutId) {
-    if (!window.confirm(t('confirmApprove'))) return;
+  async function approvePayout(payoutId){
+    if (!confirm(t('confirmApprove'))) return;
     try {
+      const now = new Date().toISOString();
       const { error: e1 } = await sb.from('payouts')
-        .update({ status: 'approved', processed_at: new Date().toISOString() })
+        .update({ status: 'approved', processed_at: now })
         .eq('id', payoutId);
       if (e1) throw e1;
 
-      await sb.from('admin_logs').insert({
-        admin_id: currentUser.id,
-        action: 'approve_payout',
-        target_id: payoutId,
-        notes: 'Approved'
-      });
+      // Insert admin_logs (opsional — jangan gagalkan jika error)
+      try {
+        await sb.from('admin_logs').insert({
+          admin_id: currentUser.id,
+          action: 'approve_payout',
+          target_id: payoutId,
+          notes: 'Approved'
+        });
+      } catch(eLog) { console.warn('admin_logs insert failed:', eLog.message); }
 
-      toast(t('approvedToast'), 'sukses');
+      toast(t('successApprove'), 'sukses');
       loadPayouts(currentPayoutFilter);
-    } catch (err) {
+      loadStats();
+    } catch(err){
       console.error('approvePayout error:', err);
-      toast(err.message || 'Error', 'gagal');
+      toast(t('errorPrefix') + (err.message || err), 'gagal');
     }
   }
 
-  async function rejectPayout(payoutId) {
-    const alasan = window.prompt(t('rejectReason'));
-    if (alasan === null || alasan.trim() === '') return;
+  async function rejectPayout(payoutId){
+    const alasan = prompt(t('rejectReason'));
+    if (alasan === null) return; // user cancelled
+    if (!alasan.trim()) { toast('Alasan tidak boleh kosong', 'gagal'); return; }
 
     try {
-      const { data: payout, error: e0 } = await sb.from('payouts')
-        .select('*').eq('id', payoutId).single();
+      // Ambil payout dulu
+      const { data: payout, error: e0 } = await sb
+        .from('payouts').select('*').eq('id', payoutId).single();
       if (e0) throw e0;
+      if (!payout) throw new Error('Payout tidak ditemukan');
 
       const coinsUsed = Number(payout.coins_used) || 0;
       const userId = payout.user_id;
+      const now = new Date().toISOString();
 
+      // 1. Update payouts status = rejected
       const { error: e1 } = await sb.from('payouts')
-        .update({ status: 'rejected', processed_at: new Date().toISOString() })
+        .update({ status: 'rejected', processed_at: now, notes: alasan })
         .eq('id', payoutId);
       if (e1) throw e1;
 
-      // Refund coins
-      const { data: userData, error: e2 } = await sb.from('users')
-        .select('coin_balance').eq('id', userId).single();
-      if (e2) throw e2;
-      const newBalance = Number(userData.coin_balance || 0) + coinsUsed;
-      const { error: e3 } = await sb.from('users')
-        .update({ coin_balance: newBalance }).eq('id', userId);
-      if (e3) throw e3;
+      // 2. Refund koin ke user (baca dulu lalu update)
+      if (userId && coinsUsed > 0) {
+        const { data: usr, error: eU } = await sb
+          .from('users').select('coin_balance').eq('id', userId).single();
+        if (eU) throw eU;
+        const newBalance = (Number(usr.coin_balance) || 0) + coinsUsed;
+        const { error: e2 } = await sb.from('users')
+          .update({ coin_balance: newBalance }).eq('id', userId);
+        if (e2) throw e2;
 
-      await sb.from('coin_transactions').insert({
-        user_id: userId,
-        amount: coinsUsed,
-        type: 'payout',
-        description: 'Refund payout ditolak: ' + alasan
-      });
+        // 3. Insert coin_transactions
+        try {
+          await sb.from('coin_transactions').insert({
+            user_id: userId,
+            amount: coinsUsed,
+            type: 'payout',
+            description: 'Refund payout ditolak: ' + alasan
+          });
+        } catch(eTx) { console.warn('coin_transactions insert failed:', eTx.message); }
+      }
 
-      await sb.from('admin_logs').insert({
-        admin_id: currentUser.id,
-        action: 'reject_payout',
-        target_id: payoutId,
-        notes: alasan
-      });
+      // 4. Insert admin_logs
+      try {
+        await sb.from('admin_logs').insert({
+          admin_id: currentUser.id,
+          action: 'reject_payout',
+          target_id: payoutId,
+          notes: alasan
+        });
+      } catch(eLog) { console.warn('admin_logs insert failed:', eLog.message); }
 
-      toast(t('rejectedToast'), 'sukses');
+      toast(t('successReject'), 'sukses');
       loadPayouts(currentPayoutFilter);
-    } catch (err) {
+      loadStats();
+    } catch(err){
       console.error('rejectPayout error:', err);
-      toast(err.message || 'Error', 'gagal');
+      toast(t('errorPrefix') + (err.message || err), 'gagal');
     }
   }
 
-  /* ============ USERS ============ */
-  async function loadUsers(search) {
-    currentUserSearch = search || '';
-    const wrap = document.getElementById('users-table');
-    wrap.innerHTML = '<div class="empty-msg">' + t('loading') + '</div>';
+  async function loadUsers(search){
+    const tbody = document.getElementById('users-tbody');
+    const emptyEl = document.getElementById('users-empty');
+    const errEl = document.getElementById('users-error');
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
+    emptyEl.classList.add('hidden');
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px">Loading...</td></tr>';
+
     try {
       let query = sb.from('users').select('*').order('created_at', { ascending: false });
-      if (currentUserSearch.trim()) {
-        query = query.ilike('email', '%' + currentUserSearch.trim() + '%');
+      if (search && search.trim()) {
+        query = query.ilike('email', '%' + search.trim() + '%');
       }
-      const { data, error } = await query;
+      const { data: users, error } = await query;
       if (error) throw error;
 
-      if (!data || data.length === 0) {
-        wrap.innerHTML = '<div class="empty-msg">' + t('noUser') + '</div>';
+      allUsersCache = users || [];
+
+      if (!users || users.length === 0) {
+        tbody.innerHTML = '';
+        emptyEl.classList.remove('hidden');
         return;
       }
 
-      let html = '<table><thead><tr>' +
-        '<th>' + t('email') + '</th>' +
-        '<th>' + t('role') + '</th>' +
-        '<th>' + t('balance') + '</th>' +
-        '<th>' + t('pending') + '</th>' +
-        '<th>' + t('status') + '</th>' +
-        '<th>' + t('lastLogin') + '</th>' +
-        '<th>' + t('action') + '</th>' +
-        '</tr></thead><tbody>';
-
-      data.forEach(u => {
-        const roleClass = u.role === 'admin' ? 'badge-admin' : 'badge-user';
-        const statusClass = u.status === 'active' ? 'badge-active' : 'badge-inactive';
-        html += '<tr>' +
-          '<td>' + escapeHtml(u.email || '-') + '</td>' +
-          '<td><span class="badge ' + roleClass + '">' + escapeHtml(u.role || '-') + '</span></td>' +
-          '<td>' + (Number(u.coin_balance) || 0).toLocaleString('id-ID') + '</td>' +
-          '<td>' + (Number(u.coin_pending) || 0).toLocaleString('id-ID') + '</td>' +
-          '<td><span class="badge ' + statusClass + '">' + escapeHtml(u.status || '-') + '</span></td>' +
-          '<td>' + formatTanggalWaktu(u.last_login_at) + '</td>' +
-          '<td><button class="btn-view-user" data-id="' + escapeHtml(u.id) + '">' + t('view') + '</button></td>' +
-          '</tr>';
-      });
-      html += '</tbody></table>';
-      wrap.innerHTML = html;
-
-      wrap.querySelectorAll('.btn-view-user').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-id');
-          const user = data.find(x => String(x.id) === String(id));
-          if (user) openUserModal(user);
-        });
-      });
-    } catch (err) {
+      renderUsersTable(users);
+    } catch(err){
       console.error('loadUsers error:', err);
-      wrap.innerHTML = '<div class="error-msg">' + t('errorLoad') + ': ' + escapeHtml(err.message || err) + '</div>';
-      toast(t('errorLoad') + ': ' + (err.message || err), 'gagal');
+      tbody.innerHTML = '';
+      errEl.textContent = t('errorPrefix') + (err.message || err);
+      errEl.classList.remove('hidden');
+      toast(t('errorPrefix') + (err.message || err), 'gagal');
     }
   }
 
-  function openUserModal(user) {
-    const body = document.getElementById('modal-user-body');
-    const rows = [
-      ['Email', user.email],
-      ['Role', user.role],
-      ['Saldo', (Number(user.coin_balance) || 0).toLocaleString('id-ID')],
-      ['Pending', (Number(user.coin_pending) || 0).toLocaleString('id-ID')],
-      ['Status', user.status],
-      ['Device Fingerprint', user.device_fingerprint],
-      ['Phone', user.phone],
-      ['Last Login', formatTanggalWaktu(user.last_login_at)],
-      ['Coin Expiry', formatTanggalWaktu(user.coin_expiry_at)],
-      ['Created', formatTanggalWaktu(user.created_at)]
-    ];
-    body.innerHTML = rows.map(([k, v]) => {
-      return '<div class="modal-row"><span class="k">' + escapeHtml(k) + '</span><span class="v">' + escapeHtml(v || '-') + '</span></div>';
-    }).join('');
+  function renderUsersTable(users){
+    const tbody = document.getElementById('users-tbody');
+    const emptyEl = document.getElementById('users-empty');
+    if (!users || users.length === 0) {
+      tbody.innerHTML = '';
+      emptyEl.classList.remove('hidden');
+      return;
+    }
+    emptyEl.classList.add('hidden');
+    tbody.innerHTML = '';
+    users.forEach(u => {
+      const roleClass = u.role === 'admin' ? 'admin' : 'user';
+      const statusClass = u.status === 'active' ? 'active' : 'inactive';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td title="${escapeHTML(u.email || '')}">${escapeHTML((u.email || '—').length > 20 ? u.email.slice(0,18)+'…' : (u.email || '—'))}</td>
+        <td><span class="badge ${roleClass}">${escapeHTML(u.role || 'user')}</span></td>
+        <td>${Number(u.coin_balance) || 0}</td>
+        <td>${Number(u.coin_pending) || 0}</td>
+        <td><span class="badge ${statusClass}">${escapeHTML(u.status || '—')}</span></td>
+        <td>${formatTanggalWaktu(u.last_login_at)}</td>
+        <td><button class="btn-view-user" data-id="${escapeHTML(u.id)}">${t('view')}</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll('.btn-view-user').forEach(b => {
+      b.addEventListener('click', () => openUserModal(b.getAttribute('data-id')));
+    });
+  }
+
+  function openUserModal(userId){
+    const u = allUsersCache.find(x => x.id === userId);
+    if (!u) { toast('User tidak ditemukan', 'gagal'); return; }
+    const content = document.getElementById('modal-user-content');
+    content.innerHTML = `
+      <div class="modal-row"><span class="k">Email</span><span class="v">${escapeHTML(u.email || '—')}</span></div>
+      <div class="modal-row"><span class="k">Role</span><span class="v">${escapeHTML(u.role || '—')}</span></div>
+      <div class="modal-row"><span class="k">Saldo</span><span class="v">${Number(u.coin_balance) || 0} koin</span></div>
+      <div class="modal-row"><span class="k">Pending</span><span class="v">${Number(u.coin_pending) || 0} koin</span></div>
+      <div class="modal-row"><span class="k">Status</span><span class="v">${escapeHTML(u.status || '—')}</span></div>
+      <div class="modal-row"><span class="k">Device Fingerprint</span><span class="v" style="font-size:10px">${escapeHTML(u.device_fingerprint || '—')}</span></div>
+      <div class="modal-row"><span class="k">Phone</span><span class="v">${escapeHTML(u.phone || '—')}</span></div>
+      <div class="modal-row"><span class="k">Last Login</span><span class="v">${formatTanggalWaktu(u.last_login_at)}</span></div>
+      <div class="modal-row"><span class="k">Coin Expiry</span><span class="v">${formatTanggalWaktu(u.coin_expiry_at)}</span></div>
+      <div class="modal-row"><span class="k">Created At</span><span class="v">${formatTanggalWaktu(u.created_at)}</span></div>
+    `;
     document.getElementById('modal-user').classList.remove('hidden');
   }
 
-  function closeUserModal() {
-    document.getElementById('modal-user').classList.add('hidden');
-  }
-
-  /* ============ SETTINGS ============ */
-  const SETTING_KEYS = [
-    'monetag_links', 'adsterra_link', 'reward_per_ad', 'daily_limit',
-    'conversion_fee_percent', 'checkin_min', 'checkin_max', 'coin_rate', 'coin_expiry_days'
-  ];
-
-  async function loadSettings() {
+  async function loadSettings(){
+    const errEl = document.getElementById('settings-error');
+    const updEl = document.getElementById('settings-updated');
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
     try {
-      const { data, error } = await sb.from('settings').select('*');
+      const { data: settings, error } = await sb.from('settings').select('*');
       if (error) throw error;
+
       const map = {};
       let maxUpdated = null;
-      (data || []).forEach(row => {
-        map[row.key] = row.value;
-        if (row.updated_at) {
-          if (!maxUpdated || new Date(row.updated_at) > new Date(maxUpdated)) maxUpdated = row.updated_at;
-        }
+      (settings || []).forEach(s => {
+        map[s.key] = s.value;
+        if (s.updated_at && (!maxUpdated || s.updated_at > maxUpdated)) maxUpdated = s.updated_at;
       });
-      SETTING_KEYS.forEach(key => {
-        const el = document.getElementById('s-' + key);
-        if (el && map[key] !== undefined) el.value = map[key];
+
+      // Isi field
+      const fields = ['monetag_links','adsterra_link','reward_per_ad','daily_limit',
+        'conversion_fee_percent','checkin_min','checkin_max','coin_rate','coin_expiry_days'];
+      fields.forEach(k => {
+        const el = document.getElementById('f-' + k);
+        if (el) el.value = (map[k] !== undefined && map[k] !== null) ? map[k] : '';
       });
-      const updEl = document.getElementById('settings-updated');
-      updEl.textContent = maxUpdated ? (t('lastUpdate') + ': ' + formatTanggalWaktu(maxUpdated)) : '';
-    } catch (err) {
+
+      updEl.textContent = maxUpdated ? (t('lastUpdated') + formatTanggalWaktu(maxUpdated)) : t('noSettings');
+    } catch(err){
       console.error('loadSettings error:', err);
-      const updEl = document.getElementById('settings-updated');
-      updEl.textContent = t('errorLoad') + ': ' + (err.message || err);
-      toast(t('errorLoad') + ': ' + (err.message || err), 'gagal');
+      errEl.textContent = t('errorPrefix') + (err.message || err);
+      errEl.classList.remove('hidden');
+      toast(t('errorPrefix') + (err.message || err), 'gagal');
     }
   }
 
-  async function saveSettings(e) {
-    e.preventDefault();
+  async function saveSettings(){
     const btn = document.getElementById('btn-save-settings');
+    const errEl = document.getElementById('settings-error');
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
     btn.disabled = true;
+    btn.textContent = 'Menyimpan...';
+
     try {
-      for (const key of SETTING_KEYS) {
-        const el = document.getElementById('s-' + key);
+      const fields = ['monetag_links','adsterra_link','reward_per_ad','daily_limit',
+        'conversion_fee_percent','checkin_min','checkin_max','coin_rate','coin_expiry_days'];
+
+      for (const k of fields) {
+        const el = document.getElementById('f-' + k);
         if (!el) continue;
-        const value = el.value;
-        // Upsert: coba update dulu, kalau tidak ada baris, insert
-        const { data: existing, error: selErr } = await sb.from('settings')
-          .select('id').eq('key', key).maybeSingle();
-        if (selErr) throw selErr;
+        const val = el.value;
+        // Upsert: coba update dulu, kalau 0 row → insert
+        const { data: existing, error: eSel } = await sb
+          .from('settings').select('key').eq('key', k).maybeSingle();
+        if (eSel) throw eSel;
+
         if (existing) {
-          const { error: upErr } = await sb.from('settings')
-            .update({ value: value, updated_at: new Date().toISOString() }).eq('key', key);
-          if (upErr) throw upErr;
+          const { error: eUp } = await sb.from('settings')
+            .update({ value: val, updated_at: new Date().toISOString() }).eq('key', k);
+          if (eUp) throw eUp;
         } else {
-          const { error: insErr } = await sb.from('settings')
-            .insert({ key: key, value: value, updated_at: new Date().toISOString() });
-          if (insErr) throw insErr;
+          const { error: eIns } = await sb.from('settings')
+            .insert({ key: k, value: val, updated_at: new Date().toISOString() });
+          if (eIns) throw eIns;
         }
       }
-      toast(t('settingsSaved'), 'sukses');
-      loadSettings();
-    } catch (err) {
+
+      toast(t('successSettings'), 'sukses');
+      await loadSettings();
+    } catch(err){
       console.error('saveSettings error:', err);
-      toast(err.message || 'Error', 'gagal');
+      errEl.textContent = t('errorPrefix') + (err.message || err);
+      errEl.classList.remove('hidden');
+      toast(t('errorPrefix') + (err.message || err), 'gagal');
     } finally {
       btn.disabled = false;
+      btn.textContent = t('saveSettings');
     }
   }
 
-  /* ============ ADMIN CHECK ============ */
-  async function checkAdmin() {
-    if (typeof window.supabase === 'undefined') {
-      document.getElementById('page-loading').innerHTML =
-        '<div class="error-msg" style="font-size:14px;padding:20px;">Gagal memuat library. Periksa koneksi.</div>';
-      return;
-    }
-
-    try {
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    } catch (err) {
-      document.getElementById('page-loading').innerHTML =
-        '<div class="error-msg" style="font-size:14px;padding:20px;">Gagal inisialisasi Supabase: ' + escapeHtml(err.message || err) + '</div>';
-      return;
-    }
-
-    try {
-      const { data: { session }, error: sessionErr } = await sb.auth.getSession();
-      if (sessionErr) throw sessionErr;
-      if (!session) {
+  /* ==================== EVENT BINDINGS ==================== */
+  function bindEvents(){
+    // Logout (multiple headers)
+    document.querySelectorAll('#btn-logout, .btn-logout-shared').forEach(b => {
+      b.addEventListener('click', async () => {
+        try { await sb.auth.signOut(); } catch(e){ console.warn(e); }
         window.location.href = 'index.html#login';
-        return;
-      }
-
-      const { data: userData, error: userErr } = await sb
-        .from('users').select('*').eq('id', session.user.id).maybeSingle();
-      if (userErr) throw userErr;
-
-      if (!userData || userData.role !== 'admin') {
-        showPage('denied');
-        return;
-      }
-
-      currentUser = userData;
-      showPage('stats');
-      loadStats();
-    } catch (err) {
-      console.error('checkAdmin error:', err);
-      document.getElementById('page-loading').innerHTML =
-        '<div class="error-msg" style="font-size:14px;padding:20px;">Terjadi kesalahan: ' + escapeHtml(err.message || err) + '</div>';
-    }
-  }
-
-  /* ============ LOGOUT ============ */
-  async function logout() {
-    try {
-      if (sb) await sb.auth.signOut();
-    } catch (err) {
-      console.error('logout error:', err);
-    }
-    window.location.href = 'index.html#login';
-  }
-
-  /* ============ INIT ============ */
-  function init() {
-    // Bahasa
-    setLang(currentLang);
-
-    // Toggle bahasa
-    document.getElementById('lang-id').addEventListener('click', () => setLang('id'));
-    document.getElementById('lang-en').addEventListener('click', () => setLang('en'));
-
-    // Tab navigasi
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
+      });
     });
 
-    // Logout
-    document.getElementById('btn-logout').addEventListener('click', logout);
+    // Language toggle
+    document.querySelectorAll('.lang-toggle button').forEach(b => {
+      b.addEventListener('click', () => setLang(b.getAttribute('data-lang')));
+    });
+
+    // Tabs (all navs)
+    document.querySelectorAll('nav#tabs button, nav.tabs-shared button').forEach(b => {
+      b.addEventListener('click', () => {
+        const tab = b.getAttribute('data-tab');
+        showPage(tab);
+        if (tab === 'stats') loadStats();
+        else if (tab === 'payouts') loadPayouts(currentPayoutFilter);
+        else if (tab === 'users') loadUsers(document.getElementById('search-users').value);
+        else if (tab === 'settings') loadSettings();
+      });
+    });
 
     // Refresh stats
     document.getElementById('btn-refresh-stats').addEventListener('click', loadStats);
 
-    // Filter payouts
-    document.getElementById('filter-payout').addEventListener('change', function () {
+    // Payout filter
+    document.getElementById('filter-payout').addEventListener('change', function(){
       loadPayouts(this.value);
     });
 
-    // Search users (debounce)
+    // Users search (debounce)
     let searchTimer = null;
-    document.getElementById('search-users').addEventListener('input', function () {
-      const val = this.value;
+    document.getElementById('search-users').addEventListener('input', function(){
       clearTimeout(searchTimer);
+      const val = this.value;
       searchTimer = setTimeout(() => loadUsers(val), 400);
     });
 
-    // Form settings
-    document.getElementById('form-settings').addEventListener('submit', saveSettings);
+    // Save settings
+    document.getElementById('btn-save-settings').addEventListener('click', saveSettings);
 
     // Modal close
-    document.getElementById('btn-close-modal').addEventListener('click', closeUserModal);
-    document.getElementById('modal-user').addEventListener('click', function (e) {
-      if (e.target === this) closeUserModal();
+    document.getElementById('btn-close-modal').addEventListener('click', () => {
+      document.getElementById('modal-user').classList.add('hidden');
+    });
+    document.getElementById('modal-user').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('modal-user')) {
+        document.getElementById('modal-user').classList.add('hidden');
+      }
     });
 
-    // Mulai cek admin
-    checkAdmin();
+    // Hash change routing
+    window.addEventListener('hashchange', () => {
+      if (!currentUser) return;
+      const tab = getTabFromHash();
+      showPage(tab);
+      if (tab === 'stats') loadStats();
+      else if (tab === 'payouts') loadPayouts(currentPayoutFilter);
+      else if (tab === 'users') loadUsers(document.getElementById('search-users').value);
+      else if (tab === 'settings') loadSettings();
+    });
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  /* ==================== INIT ==================== */
+  async function init(){
+    // 1. Cek window.supabase
+    if (typeof window.supabase === 'undefined') {
+      document.getElementById('loading-text').innerHTML =
+        '<span style="color:#ef4444">' + t('libFail') + '</span>';
+      return;
+    }
+
+    // 2. Inisialisasi Supabase dalam try/catch
+    try {
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } catch(err){
+      console.error('init supabase error:', err);
+      document.getElementById('loading-text').innerHTML =
+        '<span style="color:#ef4444">' + t('initFail') + escapeHTML(err.message || err) + '</span>';
+      return;
+    }
+
+    // 3. Ambil session
+    let session = null;
+    try {
+      const { data, error } = await sb.auth.getSession();
+      if (error) {
+        console.error('getSession error:', error);
+        document.getElementById('loading-text').innerHTML =
+          '<span style="color:#ef4444">' + t('errorPrefix') + escapeHTML(error.message) + '</span>';
+        return;
+      }
+      session = data ? data.session : null;
+    } catch(err){
+      console.error('getSession catch:', err);
+      document.getElementById('loading-text').innerHTML =
+        '<span style="color:#ef4444">' + t('errorPrefix') + escapeHTML(err.message || err) + '</span>';
+      return;
+    }
+
+    // 4. Kalau tidak ada session → redirect login
+    if (!session || !session.user) {
+      window.location.href = 'index.html#login';
+      return;
+    }
+
+    // 5. Ambil user dari tabel users
+    let userRow = null;
+    try {
+      const { data, error } = await sb.from('users')
+        .select('*').eq('id', session.user.id).single();
+      if (error) {
+        console.error('users query error:', error);
+        // Bisa jadi RLS — tampilkan denied
+        showPage('denied');
+        return;
+      }
+      userRow = data;
+    } catch(err){
+      console.error('users query catch:', err);
+      showPage('denied');
+      return;
+    }
+
+    // 6. Cek role admin
+    if (!userRow || userRow.role !== 'admin') {
+      showPage('denied');
+      return;
+    }
+
+    currentUser = userRow;
+
+    // 7. Hapus query string sisa OAuth (?code=... atau #access_token=...)
+    try {
+      const url = window.location;
+      if (url.search || (url.hash && url.hash.includes('access_token'))) {
+        history.replaceState(null, '', url.pathname);
+      }
+    } catch(e){ /* ignore */ }
+
+    // 8. Bind events & tampilkan halaman
+    bindEvents();
+    setLang(lang); // apply i18n
+
+    const initialTab = getTabFromHash();
+    showPage(initialTab);
+    if (initialTab === 'stats') await loadStats();
+    else if (initialTab === 'payouts') await loadPayouts(currentPayoutFilter);
+    else if (initialTab === 'users') await loadUsers('');
+    else if (initialTab === 'settings') await loadSettings();
+  }
+
+  /* ==================== START ==================== */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
 })();
 </script>
-
 </body>
 </html>
