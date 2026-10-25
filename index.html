@@ -1,1824 +1,1583 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>"Klik" Penghasil Saldo Dana</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🟡</text></svg>" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>“Klik” Penghasil Saldo Dana</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🟡</text></svg>">
   <style>
+    /* ---------- RESET & GLOBAL ---------- */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    html, body {
-      height: 100%;
-      background: #0f172a;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      color: #e2e8f0;
-      -webkit-tap-highlight-color: transparent;
-    }
     body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background-color: #0f172a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
       min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 12px;
     }
     #app {
       width: 100%;
       max-width: 420px;
-      padding: 16px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+      margin: 0 auto;
+      position: relative;
     }
     .page {
+      background: transparent;
       width: 100%;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      animation: fadeIn 0.2s ease;
+      animation: fade 0.15s ease;
     }
-    .page.hidden {
+    .hidden {
       display: none !important;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fade {
+      from { opacity: 0.6; }
+      to { opacity: 1; }
     }
+
+    /* ---------- TYPOGRAPHY & UTILS ---------- */
+    h1, h2, h3 {
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: -0.01em;
+    }
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.3rem; margin-bottom: 12px; }
+    h3 { font-size: 1.1rem; }
+    a {
+      color: #f59e0b;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    a:hover { text-decoration: underline; }
+    .text-gold { color: #f59e0b; }
+    .text-green { color: #22c55e; }
+    .text-red { color: #ef4444; }
+    .text-muted { color: #94a3b8; font-size: 0.85rem; }
+    .text-center { text-align: center; }
+    .text-small { font-size: 0.85rem; }
+    .fw-bold { font-weight: 700; }
+    .mt-1 { margin-top: 4px; }
+    .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 16px; }
+    .mt-4 { margin-top: 24px; }
+    .mb-1 { margin-bottom: 4px; }
+    .mb-2 { margin-bottom: 8px; }
+    .mb-3 { margin-bottom: 16px; }
+    .flex { display: flex; align-items: center; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .gap-1 { gap: 6px; }
+    .gap-2 { gap: 12px; }
+    .gap-3 { gap: 20px; }
+    .w-full { width: 100%; }
+
+    /* ---------- CARD ---------- */
     .card {
       background: #1e293b;
       border-radius: 16px;
       padding: 24px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      border: 1px solid #2d3a4f;
+      margin-bottom: 16px;
     }
+    .card:last-child { margin-bottom: 0; }
+
+    /* ---------- HEADER ---------- */
     .header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      padding: 10px 0 16px 0;
       gap: 8px;
-      margin-bottom: 4px;
+      flex-wrap: wrap;
     }
-    .header-left {
+    .logo-area {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       font-weight: 700;
-      font-size: 15px;
-      line-height: 1.2;
+      font-size: 1.1rem;
+      white-space: nowrap;
     }
-    .header-left .logo {
-      font-size: 22px;
-    }
-    .header-right {
+    .logo-area span { color: #f59e0b; font-size: 1.5rem; }
+    .header-actions {
       display: flex;
       align-items: center;
       gap: 8px;
+      margin-left: auto;
     }
-    .lang-toggle, .icon-btn {
+    .btn-icon {
       background: #334155;
       border: none;
+      border-radius: 10px;
+      padding: 6px 12px;
       color: #e2e8f0;
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 12px;
-      font-weight: 700;
+      font-weight: 600;
+      font-size: 0.9rem;
       cursor: pointer;
       transition: background 0.15s;
-      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid #475569;
     }
-    .lang-toggle:hover, .icon-btn:hover {
-      background: #475569;
-    }
+    .btn-icon:hover { background: #475569; }
+
+    /* ---------- BUTTONS ---------- */
     .btn-primary {
       background: linear-gradient(135deg, #f59e0b, #d97706);
       color: #0f172a;
+      font-weight: 700;
       border: none;
       border-radius: 12px;
-      padding: 14px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
+      padding: 14px 20px;
+      font-size: 1rem;
       width: 100%;
-      font-family: inherit;
-      transition: opacity 0.15s, transform 0.1s;
+      cursor: pointer;
+      transition: transform 0.1s, filter 0.2s;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .btn-primary:active {
-      transform: scale(0.98);
-    }
+    .btn-primary:active { transform: scale(0.97); }
     .btn-primary:disabled {
-      opacity: 0.55;
+      opacity: 0.5;
+      filter: grayscale(0.5);
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
     .btn-secondary {
       background: #334155;
       color: #e2e8f0;
-      border: none;
-      border-radius: 12px;
-      padding: 12px;
       font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
+      border: 1px solid #475569;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 0.95rem;
       width: 100%;
-      font-family: inherit;
+      cursor: pointer;
       transition: background 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .btn-secondary:hover {
-      background: #475569;
-    }
+    .btn-secondary:hover { background: #3e4e63; }
     .btn-danger {
       background: #ef4444;
-      color: #fff;
+      color: white;
+      font-weight: 700;
       border: none;
       border-radius: 12px;
-      padding: 12px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
+      padding: 14px 20px;
+      font-size: 1rem;
       width: 100%;
-      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s;
     }
-    .btn-danger:active {
-      opacity: 0.85;
-    }
-    .btn-google {
+    .btn-danger:hover { background: #dc2626; }
+    .btn-white {
       background: #ffffff;
       color: #1e293b;
-      border: none;
-      border-radius: 12px;
-      padding: 14px;
       font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 1rem;
       width: 100%;
-      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      transition: background 0.15s;
     }
-    .btn-google:hover {
-      background: #f1f5f9;
-    }
-    .btn-google:active {
-      transform: scale(0.98);
-    }
-    .btn-google:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .login-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 24px;
-      padding-top: 24px;
-    }
-    .login-logo {
-      font-size: 64px;
-      text-align: center;
-      line-height: 1;
-    }
-    .login-title {
-      text-align: center;
-      font-size: 22px;
-      font-weight: 800;
-      color: #f8fafc;
-      line-height: 1.25;
-    }
-    .login-tagline {
-      text-align: center;
-      font-size: 15px;
-      color: #94a3b8;
-      margin-top: -8px;
-    }
-    .login-terms {
-      text-align: center;
-      font-size: 12px;
-      color: #94a3b8;
-      line-height: 1.5;
-      padding: 0 8px;
-    }
-    .login-terms a {
-      color: #f59e0b;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-    .error-box {
-      color: #ef4444;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 13px;
-      text-align: center;
-      line-height: 1.4;
-      word-break: break-word;
-    }
-    .error-box.hidden {
-      display: none;
-    }
-    .balance-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 8px;
-    }
-    .balance-label {
-      font-size: 13px;
-      color: #94a3b8;
-      font-weight: 500;
-    }
-    .balance-value {
-      font-size: 24px;
-      font-weight: 800;
-      color: #f59e0b;
-    }
-    .balance-sub {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      color: #94a3b8;
-      margin-top: 2px;
-    }
-    .balance-pending {
-      color: #fbbf24;
-      font-weight: 600;
-    }
-    .expiry-warning {
-      color: #ef4444;
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 10px;
-    }
-    .quota-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      margin-bottom: 8px;
-      color: #cbd5e1;
-    }
-    .progress-track {
-      background: #334155;
-      border-radius: 999px;
-      height: 10px;
-      overflow: hidden;
+    .btn-white:hover { background: #f1f5f9; }
+    .btn-google-svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .btn-sm { padding: 8px 14px; font-size: 0.85rem; width: auto; }
+
+    /* ---------- FORM ---------- */
+    input, select {
       width: 100%;
-    }
-    .progress-fill {
-      background: linear-gradient(90deg, #f59e0b, #d97706);
-      height: 100%;
-      border-radius: 999px;
-      width: 0%;
-      transition: width 0.35s ease;
-    }
-    .spacer-8 { height: 8px; }
-    .spacer-12 { height: 12px; }
-    .section-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: #f8fafc;
-      margin-bottom: 12px;
-    }
-    .input-field, .select-field {
-      width: 100%;
+      padding: 12px 14px;
       background: #0f172a;
       border: 1px solid #334155;
       border-radius: 10px;
-      padding: 12px 14px;
       color: #e2e8f0;
-      font-size: 15px;
+      font-size: 1rem;
       font-family: inherit;
+      margin-bottom: 12px;
       outline: none;
-      transition: border-color 0.15s;
-      margin-bottom: 12px;
+      transition: border 0.15s;
     }
-    .input-field:focus, .select-field:focus {
-      border-color: #f59e0b;
-    }
-    .input-field::placeholder {
-      color: #64748b;
-    }
-    .select-field {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 40px;
-      cursor: pointer;
-    }
-    .convert-summary {
-      background: #0f172a;
-      border-radius: 10px;
-      padding: 12px 14px;
-      font-size: 13px;
-      color: #94a3b8;
-      line-height: 1.6;
-      margin-bottom: 12px;
-      min-height: 48px;
-    }
-    .convert-summary strong {
-      color: #f59e0b;
-    }
-    .history-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 58vh;
-      overflow-y: auto;
-    }
-    .history-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: #0f172a;
-      border-radius: 10px;
-      padding: 12px;
-    }
-    .history-icon {
-      font-size: 22px;
-      flex-shrink: 0;
-      width: 32px;
-      text-align: center;
-    }
-    .history-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .history-desc {
-      font-size: 13px;
-      color: #e2e8f0;
+    input:focus, select:focus { border-color: #f59e0b; }
+    input::placeholder { color: #64748b; }
+    label {
+      display: block;
+      font-size: 0.85rem;
       font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .history-date {
-      font-size: 11px;
-      color: #64748b;
-      margin-top: 2px;
-    }
-    .history-amount {
-      font-weight: 800;
-      font-size: 14px;
-      flex-shrink: 0;
-    }
-    .amount-positive { color: #22c55e; }
-    .amount-negative { color: #ef4444; }
-    .empty-state {
-      text-align: center;
-      color: #64748b;
-      font-size: 14px;
-      padding: 32px 0;
-    }
-    .profile-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid #334155;
-      font-size: 14px;
-    }
-    .profile-row:last-child {
-      border-bottom: none;
-    }
-    .profile-key {
-      color: #94a3b8;
-      flex-shrink: 0;
-    }
-    .profile-val {
-      color: #e2e8f0;
-      font-weight: 600;
-      text-align: right;
-      word-break: break-word;
-    }
-    .terms-content {
-      font-size: 13px;
-      line-height: 1.7;
       color: #cbd5e1;
+      margin-bottom: 4px;
     }
-    .terms-content ol {
-      padding-left: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+
+    /* ---------- PROGRESS BAR ---------- */
+    .progress-bg {
+      background: #0f172a;
+      height: 12px;
+      border-radius: 99px;
+      overflow: hidden;
+      border: 1px solid #334155;
     }
-    .terms-content a {
-      color: #f59e0b;
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+      width: 0%;
+      transition: width 0.4s ease;
+      border-radius: 99px;
     }
-    .watch-status {
-      font-size: 13px;
-      color: #94a3b8;
-      text-align: center;
-      margin: 8px 0 4px;
-    }
-    .watch-timer {
-      font-size: 34px;
-      font-weight: 800;
-      color: #f59e0b;
-      text-align: center;
-      margin: 12px 0;
-      letter-spacing: 2px;
-    }
-    .watch-timer.hidden {
-      display: none;
-    }
+
+    /* ---------- TOAST ---------- */
     #toast-container {
       position: fixed;
-      top: 16px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 9999;
       display: flex;
       flex-direction: column;
+      align-items: center;
       gap: 8px;
-      width: calc(100% - 32px);
-      max-width: 380px;
+      width: 100%;
+      max-width: 400px;
       pointer-events: none;
+      padding: 0 12px;
     }
     .toast {
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 14px;
+      padding: 12px 20px;
+      border-radius: 12px;
       font-weight: 600;
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-      animation: toastIn 0.25s ease;
+      font-size: 0.9rem;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+      animation: slideDown 0.25s ease;
       pointer-events: auto;
-      word-break: break-word;
       text-align: center;
+      width: auto;
+      max-width: 100%;
+      color: #fff;
+      word-break: break-word;
     }
-    .toast.success { background: #22c55e; }
-    .toast.error { background: #ef4444; }
-    @keyframes toastIn {
+    .toast.success { background: #22c55e; color: #0f172a; }
+    .toast.error { background: #ef4444; color: #fff; }
+    @keyframes slideDown {
       from { opacity: 0; transform: translateY(-12px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .btn-wa {
-      display: block;
-      text-align: center;
-      background: #25d366;
-      color: #0f172a;
-      border-radius: 12px;
-      padding: 12px;
-      font-weight: 700;
-      font-size: 14px;
-      text-decoration: none;
-      transition: opacity 0.15s;
+
+    /* ---------- SPECIFIC PAGE STYLES ---------- */
+    /* Login */
+    #page-login .login-logo {
+      font-size: 4.5rem;
+      line-height: 1;
+      margin-bottom: 8px;
     }
-    .btn-wa:active { opacity: 0.85; }
-    .nav-row {
-      display: flex;
-      gap: 10px;
-    }
-    .nav-row > * { flex: 1; }
-    .mt-4 { margin-top: 4px; }
-    .mt-8 { margin-top: 8px; }
-    .mt-12 { margin-top: 12px; }
-    .text-center { text-align: center; }
-    .text-muted { color: #94a3b8; font-size: 13px; }
-    .noscript-msg {
-      background: #ef4444;
-      color: #fff;
-      padding: 16px;
-      text-align: center;
-      font-weight: 700;
-      font-size: 14px;
-      border-radius: 12px;
-      margin: 16px;
-      max-width: 420px;
-    }
-    .loading-text {
+    #page-login .tagline {
       color: #94a3b8;
-      font-size: 13px;
+      font-size: 1rem;
+      margin-top: 4px;
+    }
+    #login-error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      margin-top: 12px;
+      color: #ef4444;
+    }
+
+    /* Dashboard balance */
+    .balance-big {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #f59e0b;
+      line-height: 1.2;
+    }
+    .coin-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+    }
+
+    /* Watch */
+    #watch-timer {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #f59e0b;
       text-align: center;
+      margin: 12px 0;
+    }
+
+    /* History list */
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 12px 0;
+      border-bottom: 1px solid #334155;
+      gap: 12px;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-icon { font-size: 1.4rem; width: 32px; text-align: center; flex-shrink: 0; }
+    .history-desc { flex: 1; min-width: 0; }
+    .history-desc .desc-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-desc .desc-date {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .history-amount {
+      font-weight: 700;
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      body { padding: 8px; }
+      .card { padding: 18px; }
+      .balance-big { font-size: 1.8rem; }
+      .header { padding: 6px 0 12px 0; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body>
   <noscript>
-    <div class="noscript-msg">Aktifkan JavaScript untuk menggunakan aplikasi ini.</div>
+    <div style="background:#1e293b;color:#e2e8f0;padding:24px;border-radius:16px;text-align:center;margin:20px auto;max-width:420px;">
+      <h2 style="color:#f59e0b;">⚠️ JavaScript Diperlukan</h2>
+      <p>Aktifkan JavaScript untuk menggunakan aplikasi ini.</p>
+    </div>
   </noscript>
 
   <div id="toast-container"></div>
 
   <main id="app">
-    <!-- ============ LOGIN PAGE (visible by default, NO hidden class) ============ -->
+    <!-- ========== LOGIN (LANGSUNG TAMPIL) ========== -->
     <section id="page-login" class="page">
-      <div class="header">
-        <span></span>
-        <button class="lang-toggle" id="lang-toggle-login" type="button">EN</button>
-      </div>
-      <div class="login-container">
+      <div class="card text-center" style="margin-top: 40px;">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+          <button class="btn-icon" id="lang-toggle-login" type="button" data-i18n="lang_toggle">EN</button>
+        </div>
         <div class="login-logo">🟡</div>
-        <h1 class="login-title">"Klik" Penghasil Saldo Dana</h1>
-        <p class="login-tagline">Klik Doang, Dapet Duit!</p>
-        <div id="login-error" class="error-box hidden"></div>
-        <button id="btn-google-login" class="btn-google" type="button">
-          <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
-            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-          </svg>
-          Masuk dengan Google
-        </button>
-        <p class="login-terms">
-          Dengan masuk, Anda setuju dengan <a href="#terms">Syarat &amp; Ketentuan</a>
+        <h1 style="font-size: 1.6rem; line-height: 1.3;">“Klik” Penghasil Saldo Dana</h1>
+        <p class="tagline" data-i18n="tagline">Klik Doang, Dapet Duit!</p>
+        <div style="margin-top: 28px;">
+          <button class="btn-white" id="btn-google-login" type="button">
+            <svg class="btn-google-svg" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            <span data-i18n="login_google">Masuk dengan Google</span>
+          </button>
+        </div>
+        <p class="text-small text-muted mt-3" data-i18n="terms_agree">
+          Dengan masuk, Anda setuju dengan <a href="#terms" data-i18n="terms_link">Syarat &amp; Ketentuan</a>
         </p>
+        <div id="login-error" class="hidden" style="color:#ef4444"></div>
       </div>
     </section>
 
-    <!-- ============ DASHBOARD ============ -->
+    <!-- ========== DASHBOARD ========== -->
     <section id="page-dashboard" class="page hidden">
       <div class="header">
-        <div class="header-left">
-          <span class="logo">🟡</span>
-          <span>"Klik" Penghasil Saldo Dana</span>
+        <div class="logo-area"><span>🟡</span> <span data-i18n="app_short">Klik</span></div>
+        <div class="header-actions">
+          <button class="btn-icon" id="lang-toggle-dash" type="button">EN</button>
+          <button class="btn-icon" onclick="window.location.hash='#profile'" aria-label="Profil">👤</button>
         </div>
-        <div class="header-right">
-          <button class="lang-toggle" id="lang-toggle-dash" type="button">EN</button>
-          <button class="icon-btn" id="btn-profile-icon" type="button" aria-label="Profil">👤</button>
+      </div>
+      <div class="card">
+        <p class="text-muted text-small" data-i18n="balance_available">Saldo Tersedia</p>
+        <div class="balance-big"><span id="dash-balance">0</span> 🟡</div>
+        <div class="coin-row">
+          <span class="text-muted" data-i18n="balance_pending">Pending</span>
+          <span><span id="dash-pending">0</span> 🟡</span>
         </div>
+        <div class="coin-row">
+          <span class="text-muted" data-i18n="expiry_label">Berlaku hingga</span>
+          <span id="dash-expiry">—</span>
+        </div>
+        <p id="dash-expiry-warning" class="text-red text-small hidden" data-i18n="expiry_warning">Segera login untuk memperpanjang</p>
       </div>
 
       <div class="card">
-        <div class="balance-row">
-          <span class="balance-label" data-i18n="balance_label">Saldo Tersedia</span>
-          <span class="balance-value"><span id="coin-balance">0</span> 🟡</span>
+        <div class="flex-between mb-2">
+          <span class="text-muted" data-i18n="daily_quota">Kuota hari ini</span>
+          <span><span id="dash-quota">0</span>/100</span>
         </div>
-        <div class="balance-sub">
-          <span data-i18n="pending_label">Pending</span>
-          <span class="balance-pending"><span id="coin-pending">0</span> 🟡</span>
-        </div>
-        <div class="balance-sub">
-          <span data-i18n="expiry_label">Berlaku hingga</span>
-          <span id="coin-expiry">—</span>
-        </div>
-        <div id="expiry-warning" class="expiry-warning hidden"></div>
-      </div>
-
-      <div class="card">
-        <div class="quota-label">
-          <span data-i18n="quota_label">Kuota hari ini</span>
-          <span><span id="quota-used">0</span>/100</span>
-        </div>
-        <div class="progress-track">
-          <div id="quota-progress" class="progress-fill"></div>
+        <div class="progress-bg">
+          <div class="progress-fill" id="dash-progress" style="width:0%"></div>
         </div>
       </div>
 
-      <button class="btn-primary" id="btn-watch-nav" type="button" data-i18n="watch_ads_btn">🎬 TONTON IKLAN</button>
-      <button class="btn-secondary" id="btn-checkin" type="button" data-i18n="checkin_btn">✅ CHECK-IN HARIAN</button>
-
-      <div class="nav-row">
-        <button class="btn-secondary" id="btn-nav-convert" type="button" data-i18n="convert_nav">Konversi</button>
-        <button class="btn-secondary" id="btn-nav-history" type="button" data-i18n="history_nav">Riwayat</button>
+      <div class="card" style="padding: 20px;">
+        <button class="btn-primary" id="btn-watch-nav" onclick="window.location.hash='#watch'" type="button">
+          🎬 <span data-i18n="watch_ads_btn">TONTON IKLAN</span>
+        </button>
+        <button class="btn-secondary mt-2" id="btn-checkin" type="button">
+          ✅ <span data-i18n="checkin_btn">CHECK-IN HARIAN</span>
+        </button>
+        <div class="flex gap-2 mt-3">
+          <button class="btn-secondary" onclick="window.location.hash='#convert'" type="button">
+            💸 <span data-i18n="nav_convert">Konversi</span>
+          </button>
+          <button class="btn-secondary" onclick="window.location.hash='#history'" type="button">
+            📋 <span data-i18n="nav_history">Riwayat</span>
+          </button>
+        </div>
+        <div class="text-center mt-3">
+          <a href="https://wa.me/6281525742110?text=Halo%20saya%20butuh%20bantuan" target="_blank" rel="noopener" class="text-small" data-i18n="wa_help">💬 Butuh bantuan? Hubungi WA</a>
+        </div>
       </div>
-
-      <a class="btn-wa" href="https://wa.me/6281525742110?text=Halo%20saya%20butuh%20bantuan" target="_blank" rel="noopener" data-i18n="wa_help">💬 Butuh bantuan? Chat WhatsApp</a>
     </section>
 
-    <!-- ============ WATCH ============ -->
+    <!-- ========== WATCH ========== -->
     <section id="page-watch" class="page hidden">
       <div class="header">
-        <div class="header-left">
-          <span class="logo">🟡</span>
-          <span>"Klik" Penghasil Saldo Dana</span>
-        </div>
-        <div class="header-right">
-          <button class="lang-toggle" id="lang-toggle-watch" type="button">EN</button>
-          <button class="icon-btn" id="btn-profile-icon-watch" type="button" aria-label="Profil">👤</button>
+        <div class="logo-area"><span>🟡</span> <span data-i18n="app_short">Klik</span></div>
+        <div class="header-actions">
+          <button class="btn-icon" onclick="window.location.hash='#dashboard'" aria-label="Dashboard">🏠</button>
         </div>
       </div>
-
-      <div class="card text-center">
-        <h2 class="section-title" data-i18n="watch_title">Tonton Iklan, Dapat 100 🟡</h2>
-        <p class="watch-status" id="watch-status" data-i18n="watch_status">Tekan tombol di bawah untuk menonton iklan.</p>
-        <div id="watch-timer" class="watch-timer hidden">10</div>
+      <div class="card">
+        <h2 data-i18n="watch_title">Tonton Iklan, Dapat 100 🟡</h2>
+        <p id="watch-status" class="text-muted text-small mb-2" data-i18n="watch_status_ready">Siap menonton iklan</p>
         <button class="btn-primary" id="btn-watch" type="button" data-i18n="watch_now_btn">TONTON IKLAN SEKARANG</button>
-        <div class="spacer-12"></div>
-        <button class="btn-secondary hidden" id="btn-adsterra" type="button" data-i18n="try_adsterra">Coba Adsterra</button>
+        <div id="watch-timer" class="hidden">10</div>
+        <button class="btn-secondary mt-2 hidden" id="btn-adsterra" type="button" data-i18n="try_adsterra">Coba Adsterra</button>
+        <button class="btn-secondary mt-3" onclick="window.location.hash='#dashboard'" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
       </div>
-
-      <button class="btn-secondary" id="btn-watch-back" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
     </section>
 
-    <!-- ============ CONVERT ============ -->
+    <!-- ========== CONVERT ========== -->
     <section id="page-convert" class="page hidden">
       <div class="header">
-        <div class="header-left">
-          <span class="logo">🟡</span>
-          <span>"Klik" Penghasil Saldo Dana</span>
-        </div>
-        <div class="header-right">
-          <button class="lang-toggle" id="lang-toggle-convert" type="button">EN</button>
-          <button class="icon-btn" id="btn-profile-icon-convert" type="button" aria-label="Profil">👤</button>
+        <div class="logo-area"><span>🟡</span> <span data-i18n="app_short">Klik</span></div>
+        <div class="header-actions">
+          <button class="btn-icon" onclick="window.location.hash='#dashboard'" aria-label="Dashboard">🏠</button>
         </div>
       </div>
-
       <div class="card">
-        <div class="balance-row">
-          <span class="balance-label" data-i18n="balance_label">Saldo</span>
-          <span class="balance-value"><span id="convert-balance">0</span> 🟡</span>
-        </div>
-        <div class="spacer-12"></div>
-        <input class="input-field" id="input-coins" type="number" placeholder="5000" step="5000" min="5000" />
-        <select class="select-field" id="select-method">
+        <h2 data-i18n="convert_title">Konversi Koin</h2>
+        <p class="mb-3"><span data-i18n="balance_label">Saldo</span>: <strong><span id="convert-balance">0</span> 🟡</strong></p>
+
+        <label for="input-coins" data-i18n="coins_label">Jumlah koin (kelipatan 5000)</label>
+        <input type="number" id="input-coins" placeholder="5000" step="5000" min="5000" value="5000">
+
+        <label for="select-method" data-i18n="method_label">Metode</label>
+        <select id="select-method">
           <option value="DANA">DANA</option>
           <option value="OVO">OVO</option>
           <option value="GoPay">GoPay</option>
           <option value="ShopeePay">ShopeePay</option>
           <option value="Pulsa">Pulsa</option>
         </select>
-        <input class="input-field" id="input-account" type="text" placeholder="Nomor akun / HP" />
-        <div class="convert-summary" id="convert-summary" data-i18n="convert_summary">Masukkan jumlah koin untuk melihat estimasi.</div>
-        <button class="btn-primary" id="btn-convert" type="button" data-i18n="convert_submit">AJUKAN PENARIKAN</button>
-      </div>
 
-      <button class="btn-secondary" id="btn-convert-back" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
+        <label for="input-account" data-i18n="account_label">Nomor akun / HP</label>
+        <input type="text" id="input-account" placeholder="0812xxxxxxx">
+
+        <div id="convert-summary" class="text-small text-muted mb-2"></div>
+
+        <button class="btn-primary" id="btn-convert" type="button" data-i18n="convert_btn">AJUKAN PENARIKAN</button>
+        <button class="btn-secondary mt-3" onclick="window.location.hash='#dashboard'" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
+      </div>
     </section>
 
-    <!-- ============ HISTORY ============ -->
+    <!-- ========== HISTORY ========== -->
     <section id="page-history" class="page hidden">
       <div class="header">
-        <div class="header-left">
-          <span class="logo">🟡</span>
-          <span>"Klik" Penghasil Saldo Dana</span>
-        </div>
-        <div class="header-right">
-          <button class="lang-toggle" id="lang-toggle-history" type="button">EN</button>
-          <button class="icon-btn" id="btn-profile-icon-history" type="button" aria-label="Profil">👤</button>
+        <div class="logo-area"><span>🟡</span> <span data-i18n="app_short">Klik</span></div>
+        <div class="header-actions">
+          <button class="btn-icon" onclick="window.location.hash='#dashboard'" aria-label="Dashboard">🏠</button>
         </div>
       </div>
-
       <div class="card">
-        <h2 class="section-title" data-i18n="history_title">Riwayat Transaksi</h2>
-        <div class="history-list" id="history-list">
-          <p class="empty-state" data-i18n="history_empty">Belum ada riwayat</p>
+        <h2 data-i18n="history_title">Riwayat Transaksi</h2>
+        <div id="history-list">
+          <p class="text-muted text-small" data-i18n="history_loading">Memuat...</p>
         </div>
+        <button class="btn-secondary mt-3" onclick="window.location.hash='#dashboard'" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
       </div>
-
-      <button class="btn-secondary" id="btn-history-back" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
     </section>
 
-    <!-- ============ PROFILE ============ -->
+    <!-- ========== PROFILE ========== -->
     <section id="page-profile" class="page hidden">
       <div class="header">
-        <div class="header-left">
-          <span class="logo">🟡</span>
-          <span>"Klik" Penghasil Saldo Dana</span>
-        </div>
-        <div class="header-right">
-          <button class="lang-toggle" id="lang-toggle-profile" type="button">EN</button>
+        <div class="logo-area"><span>🟡</span> <span data-i18n="app_short">Klik</span></div>
+        <div class="header-actions">
+          <button class="btn-icon" onclick="window.location.hash='#dashboard'" aria-label="Dashboard">🏠</button>
         </div>
       </div>
-
       <div class="card">
-        <h2 class="section-title" data-i18n="profile_title">Profil Saya</h2>
-        <div class="profile-row">
-          <span class="profile-key" data-i18n="profile_email">Email</span>
-          <span class="profile-val" id="profile-email">—</span>
-        </div>
-        <div class="profile-row">
-          <span class="profile-key" data-i18n="profile_role">Role</span>
-          <span class="profile-val" id="profile-role">—</span>
-        </div>
-        <div class="profile-row">
-          <span class="profile-key" data-i18n="profile_status">Status</span>
-          <span class="profile-val" id="profile-status">—</span>
-        </div>
-        <div class="profile-row">
-          <span class="profile-key" data-i18n="profile_last_login">Login terakhir</span>
-          <span class="profile-val" id="profile-last-login">—</span>
-        </div>
-        <div class="profile-row">
-          <span class="profile-key" data-i18n="profile_expiry">Koin berlaku hingga</span>
-          <span class="profile-val" id="profile-expiry">—</span>
-        </div>
-        <div class="spacer-12"></div>
-        <button class="btn-danger" id="btn-logout" type="button" data-i18n="logout">Logout</button>
+        <h2 data-i18n="profile_title">Profil</h2>
+        <div class="mb-2"><span class="text-muted" data-i18n="profile_email">Email</span>: <span id="profile-email">—</span></div>
+        <div class="mb-2"><span class="text-muted" data-i18n="profile_role">Role</span>: <span id="profile-role">—</span></div>
+        <div class="mb-2"><span class="text-muted" data-i18n="profile_status">Status</span>: <span id="profile-status">—</span></div>
+        <div class="mb-2"><span class="text-muted" data-i18n="profile_last_login">Login terakhir</span>: <span id="profile-last-login">—</span></div>
+        <div class="mb-3"><span class="text-muted" data-i18n="profile_expiry">Kadaluarsa koin</span>: <span id="profile-expiry">—</span></div>
+        <button class="btn-danger" id="btn-logout" type="button" data-i18n="logout_btn">Logout</button>
+        <button class="btn-secondary mt-3" onclick="window.location.hash='#dashboard'" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
       </div>
-
-      <button class="btn-secondary" id="btn-profile-back" type="button" data-i18n="back_dashboard">Kembali ke Dashboard</button>
     </section>
 
-    <!-- ============ TERMS ============ -->
+    <!-- ========== TERMS ========== -->
     <section id="page-terms" class="page hidden">
       <div class="header">
-        <div class="header-left">
-          <span class="logo">🟡</span>
-          <span>"Klik" Penghasil Saldo Dana</span>
-        </div>
-        <div class="header-right">
-          <button class="lang-toggle" id="lang-toggle-terms" type="button">EN</button>
+        <div class="logo-area"><span>🟡</span> <span data-i18n="app_short">Klik</span></div>
+        <div class="header-actions">
+          <button class="btn-icon" onclick="window.location.hash='#dashboard'" aria-label="Dashboard">🏠</button>
         </div>
       </div>
-
       <div class="card">
-        <h2 class="section-title" data-i18n="terms_title">Syarat &amp; Ketentuan</h2>
-        <div class="terms-content" id="terms-content">
-          <ol>
-            <li>Satu akun per orang. Dilarang menggunakan akun ganda.</li>
-            <li>Dilarang menggunakan bot, VPN, atau alat otomatis lainnya.</li>
-            <li>Koin pending akan diverifikasi dalam 24 jam.</li>
-            <li>Koin kadaluarsa dalam 30 hari jika tidak ada aktivitas.</li>
-            <li>Konversi minimal 5000 koin dengan potongan 5%.</li>
-            <li>Payout diproses manual oleh admin.</li>
-            <li>Admin berhak mengubah aturan tanpa pemberitahuan.</li>
-            <li>Hubungi kami via <a href="https://wa.me/6281525742110?text=Halo%20saya%20butuh%20bantuan" target="_blank" rel="noopener">WhatsApp</a>.</li>
-          </ol>
+        <h2 data-i18n="terms_title">Syarat &amp; Ketentuan</h2>
+        <div class="text-small" style="line-height: 1.7;">
+          <p class="mb-2" data-i18n="terms_1">1. Satu akun per orang.</p>
+          <p class="mb-2" data-i18n="terms_2">2. Dilarang menggunakan bot, VPN, atau akun ganda.</p>
+          <p class="mb-2" data-i18n="terms_3">3. Koin pending diproses dalam 24 jam.</p>
+          <p class="mb-2" data-i18n="terms_4">4. Koin kadaluarsa setelah 30 hari.</p>
+          <p class="mb-2" data-i18n="terms_5">5. Konversi minimal 5000 koin, potongan 5%.</p>
+          <p class="mb-2" data-i18n="terms_6">6. Payout dilakukan manual oleh admin.</p>
+          <p class="mb-2" data-i18n="terms_7">7. Admin berhak mengubah aturan sewaktu-waktu.</p>
+          <p class="mb-2" data-i18n="terms_8">8. Kontak: WA 081525742110.</p>
         </div>
+        <button class="btn-secondary mt-3" onclick="window.location.hash='#login'" type="button" data-i18n="back_login">Kembali</button>
       </div>
-
-      <button class="btn-secondary" id="btn-terms-back" type="button" data-i18n="back">Kembali</button>
     </section>
   </main>
 
   <script defer>
     // ============================================================
-    // SUPABASE CREDENTIALS
+    // KONFIGURASI SUPABASE
     // ============================================================
     const SUPABASE_URL = "https://xyzbxersmhvexcycnrcu.supabase.co";
     const SUPABASE_KEY = "sb_publishable_lHQScOcYKDi4zuailh-mVQ_4Hf72L4w";
+    const REDIRECT_URL = "https://armadaplayindonesia.github.io/DatabaseAPIGames/index.html";
 
-    // ============================================================
-    // GLOBAL STATE
-    // ============================================================
     let sb = null;
-    let currentUser = null;
-    let currentLang = localStorage.getItem('lang') || 'id';
-    let adReturnedHandler = null;
-    let adTimerInterval = null;
-    let adBlurHandler = null;
-    let adVisibilityHandler = null;
-    let isAdClaimInProgress = false;
 
     // ============================================================
-    // BILINGUAL DICTIONARY
+    // KAMUS BAHASA
     // ============================================================
     const T = {
       id: {
-        balance_label: "Saldo Tersedia",
-        pending_label: "Pending",
+        lang_toggle: "EN",
+        tagline: "Klik Doang, Dapet Duit!",
+        login_google: "Masuk dengan Google",
+        terms_agree: "Dengan masuk, Anda setuju dengan",
+        terms_link: "Syarat & Ketentuan",
+        app_short: "Klik",
+        balance_available: "Saldo Tersedia",
+        balance_pending: "Pending",
         expiry_label: "Berlaku hingga",
-        quota_label: "Kuota hari ini",
-        watch_ads_btn: "🎬 TONTON IKLAN",
-        checkin_btn: "✅ CHECK-IN HARIAN",
-        convert_nav: "Konversi",
-        history_nav: "Riwayat",
-        wa_help: "💬 Butuh bantuan? Chat WhatsApp",
+        expiry_warning: "Segera login untuk memperpanjang",
+        daily_quota: "Kuota hari ini",
+        watch_ads_btn: "TONTON IKLAN",
+        checkin_btn: "CHECK-IN HARIAN",
+        nav_convert: "Konversi",
+        nav_history: "Riwayat",
+        wa_help: "💬 Butuh bantuan? Hubungi WA",
         watch_title: "Tonton Iklan, Dapat 100 🟡",
-        watch_status: "Tekan tombol di bawah untuk menonton iklan.",
+        watch_status_ready: "Siap menonton iklan",
         watch_now_btn: "TONTON IKLAN SEKARANG",
         try_adsterra: "Coba Adsterra",
         back_dashboard: "Kembali ke Dashboard",
-        back: "Kembali",
-        convert_summary: "Masukkan jumlah koin untuk melihat estimasi.",
-        convert_submit: "AJUKAN PENARIKAN",
+        convert_title: "Konversi Koin",
+        balance_label: "Saldo",
+        coins_label: "Jumlah koin (kelipatan 5000)",
+        method_label: "Metode",
+        account_label: "Nomor akun / HP",
+        convert_btn: "AJUKAN PENARIKAN",
         history_title: "Riwayat Transaksi",
+        history_loading: "Memuat...",
         history_empty: "Belum ada riwayat",
-        profile_title: "Profil Saya",
+        profile_title: "Profil",
         profile_email: "Email",
         profile_role: "Role",
         profile_status: "Status",
         profile_last_login: "Login terakhir",
-        profile_expiry: "Koin berlaku hingga",
-        logout: "Logout",
+        profile_expiry: "Kadaluarsa koin",
+        logout_btn: "Logout",
         terms_title: "Syarat & Ketentuan",
-        expiry_warning: "Segera login untuk memperpanjang",
-        login_btn: "Masuk dengan Google",
-        login_terms: "Dengan masuk, Anda setuju dengan Syarat & Ketentuan",
-        toast_quota_habis: "Kuota harian habis",
-        toast_wait_30: "Tunggu 30 detik sebelum menonton lagi",
-        toast_too_short: "Iklan terlalu singkat, coba lagi",
-        toast_checkin_done: "Sudah check-in hari ini",
-        toast_checkin_ok: "Check-in berhasil!",
-        toast_convert_ok: "Pengajuan penarikan berhasil!",
-        toast_convert_invalid: "Jumlah koin tidak valid",
-        toast_convert_balance: "Saldo tidak cukup",
-        toast_convert_account: "Nomor akun wajib diisi",
-        toast_error_prefix: "Gagal: ",
-        toast_lib_fail: "Gagal memuat library Supabase. Periksa koneksi.",
-        reward_pending_suffix: " (pending)",
-        loading: "Memuat...",
-        ad_waiting: "Menunggu kamu kembali...",
-        ad_returned_too_short: "Iklan terlalu singkat, coba lagi",
-        ad_timer_label: "Kembali dalam",
+        terms_1: "1. Satu akun per orang.",
+        terms_2: "2. Dilarang menggunakan bot, VPN, atau akun ganda.",
+        terms_3: "3. Koin pending diproses dalam 24 jam.",
+        terms_4: "4. Koin kadaluarsa setelah 30 hari.",
+        terms_5: "5. Konversi minimal 5000 koin, potongan 5%.",
+        terms_6: "6. Payout dilakukan manual oleh admin.",
+        terms_7: "7. Admin berhak mengubah aturan sewaktu-waktu.",
+        terms_8: "8. Kontak: WA 081525742110.",
+        back_login: "Kembali",
+        toast_success: "Berhasil",
+        toast_error: "Gagal",
+        err_lib: "Gagal memuat library Supabase. Periksa koneksi internet.",
+        err_generic: "Terjadi kesalahan.",
+        err_login: "Gagal login. Coba lagi.",
+        err_quota: "Kuota harian habis.",
+        err_too_fast: "Iklan terlalu singkat, coba lagi.",
+        err_wait30: "Tunggu 30 detik sebelum menonton lagi.",
+        err_checkin_done: "Sudah check-in hari ini.",
+        err_convert_amount: "Jumlah koin harus kelipatan 5000 dan minimal 5000.",
+        err_convert_balance: "Saldo tidak mencukupi.",
+        err_convert_account: "Nomor akun harus diisi.",
+        msg_ad_reward: "Reward iklan",
+        msg_checkin: "Check-in harian",
+        msg_convert: "Konversi ke",
+        msg_pending: "pending",
+        msg_checkin_success: "Check-in berhasil!",
+        msg_convert_success: "Penarikan diajukan!",
+        watch_waiting: "Menunggu kamu kembali...",
+        watch_countdown: "Harap tunggu",
+        watch_done: "Selesai!",
+        watch_claim: "Klaim reward...",
+        profile_na: "—",
       },
       en: {
-        balance_label: "Available Balance",
-        pending_label: "Pending",
+        lang_toggle: "ID",
+        tagline: "Just Click, Get Money!",
+        login_google: "Sign in with Google",
+        terms_agree: "By signing in, you agree to the",
+        terms_link: "Terms & Conditions",
+        app_short: "Klik",
+        balance_available: "Available Balance",
+        balance_pending: "Pending",
         expiry_label: "Valid until",
-        quota_label: "Today's quota",
-        watch_ads_btn: "🎬 WATCH ADS",
-        checkin_btn: "✅ DAILY CHECK-IN",
-        convert_nav: "Convert",
-        history_nav: "History",
-        wa_help: "💬 Need help? Chat WhatsApp",
+        expiry_warning: "Login soon to extend",
+        daily_quota: "Today's quota",
+        watch_ads_btn: "WATCH ADS",
+        checkin_btn: "DAILY CHECK-IN",
+        nav_convert: "Convert",
+        nav_history: "History",
+        wa_help: "💬 Need help? Contact WA",
         watch_title: "Watch Ads, Earn 100 🟡",
-        watch_status: "Press the button below to watch an ad.",
+        watch_status_ready: "Ready to watch ads",
         watch_now_btn: "WATCH AD NOW",
         try_adsterra: "Try Adsterra",
         back_dashboard: "Back to Dashboard",
-        back: "Back",
-        convert_summary: "Enter coin amount to see estimate.",
-        convert_submit: "SUBMIT WITHDRAWAL",
+        convert_title: "Convert Coins",
+        balance_label: "Balance",
+        coins_label: "Coin amount (multiple of 5000)",
+        method_label: "Method",
+        account_label: "Account / phone number",
+        convert_btn: "SUBMIT WITHDRAWAL",
         history_title: "Transaction History",
+        history_loading: "Loading...",
         history_empty: "No history yet",
-        profile_title: "My Profile",
+        profile_title: "Profile",
         profile_email: "Email",
         profile_role: "Role",
         profile_status: "Status",
         profile_last_login: "Last login",
-        profile_expiry: "Coins valid until",
-        logout: "Logout",
+        profile_expiry: "Coin expiry",
+        logout_btn: "Logout",
         terms_title: "Terms & Conditions",
-        expiry_warning: "Login soon to extend",
-        login_btn: "Sign in with Google",
-        login_terms: "By signing in, you agree to the Terms & Conditions",
-        toast_quota_habis: "Daily quota exceeded",
-        toast_wait_30: "Wait 30 seconds before watching again",
-        toast_too_short: "Ad too short, please try again",
-        toast_checkin_done: "Already checked in today",
-        toast_checkin_ok: "Check-in successful!",
-        toast_convert_ok: "Withdrawal request submitted!",
-        toast_convert_invalid: "Invalid coin amount",
-        toast_convert_balance: "Insufficient balance",
-        toast_convert_account: "Account number is required",
-        toast_error_prefix: "Error: ",
-        toast_lib_fail: "Failed to load Supabase library. Check your connection.",
-        reward_pending_suffix: " (pending)",
-        loading: "Loading...",
-        ad_waiting: "Waiting for you to return...",
-        ad_returned_too_short: "Ad too short, please try again",
-        ad_timer_label: "Return in",
+        terms_1: "1. One account per person.",
+        terms_2: "2. Bots, VPN, and duplicate accounts are prohibited.",
+        terms_3: "3. Pending coins are processed within 24 hours.",
+        terms_4: "4. Coins expire after 30 days.",
+        terms_5: "5. Minimum conversion 5000 coins, 5% fee.",
+        terms_6: "6. Payouts are processed manually by admin.",
+        terms_7: "7. Admin reserves the right to change rules.",
+        terms_8: "8. Contact: WA 081525742110.",
+        back_login: "Back",
+        toast_success: "Success",
+        toast_error: "Failed",
+        err_lib: "Failed to load Supabase library. Check your internet connection.",
+        err_generic: "An error occurred.",
+        err_login: "Login failed. Please try again.",
+        err_quota: "Daily quota reached.",
+        err_too_fast: "Ad too short, try again.",
+        err_wait30: "Wait 30 seconds before watching again.",
+        err_checkin_done: "Already checked in today.",
+        err_convert_amount: "Coin amount must be a multiple of 5000 and at least 5000.",
+        err_convert_balance: "Insufficient balance.",
+        err_convert_account: "Account number is required.",
+        msg_ad_reward: "Ad reward",
+        msg_checkin: "Daily check-in",
+        msg_convert: "Convert to",
+        msg_pending: "pending",
+        msg_checkin_success: "Check-in successful!",
+        msg_convert_success: "Withdrawal submitted!",
+        watch_waiting: "Waiting for you to return...",
+        watch_countdown: "Please wait",
+        watch_done: "Done!",
+        watch_claim: "Claiming reward...",
+        profile_na: "—",
       }
     };
 
+    let currentLang = localStorage.getItem('lang') || 'id';
+
     // ============================================================
-    // HELPERS
+    // TOAST
     // ============================================================
-    function t(key) {
-      return (T[currentLang] && T[currentLang][key]) || T.id[key] || key;
-    }
-
-    function hariIniWIB() {
-      const now = new Date();
-      const wib = new Date(now.getTime() + (7 * 60 + now.getTimezoneOffset()) * 60000);
-      const y = wib.getFullYear();
-      const m = String(wib.getMonth() + 1).padStart(2, '0');
-      const d = String(wib.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
-    }
-
-    function formatTanggal(iso) {
-      if (!iso) return '—';
-      try {
-        const d = new Date(iso);
-        if (isNaN(d.getTime())) return '—';
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        return `${String(d.getDate()).padStart(2,'0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
-      } catch { return '—'; }
-    }
-
-    function formatTanggalWaktu(iso) {
-      if (!iso) return '—';
-      try {
-        const d = new Date(iso);
-        if (isNaN(d.getTime())) return '—';
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        const datePart = `${String(d.getDate()).padStart(2,'0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
-        const timePart = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-        return `${datePart} ${timePart}`;
-      } catch { return '—'; }
-    }
-
     function toast(msg, type = 'success') {
       const container = document.getElementById('toast-container');
       if (!container) return;
       const el = document.createElement('div');
-      el.className = 'toast ' + (type === 'error' ? 'error' : 'success');
+      el.className = `toast ${type}`;
       el.textContent = msg;
       container.appendChild(el);
       setTimeout(() => {
-        if (el.parentNode) el.parentNode.removeChild(el);
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.3s';
+        setTimeout(() => el.remove(), 300);
       }, 3000);
     }
 
-    function showLoginError(msg) {
-      const el = document.getElementById('login-error');
-      if (el) {
-        el.textContent = msg;
-        el.classList.remove('hidden');
-      }
+    // ============================================================
+    // HELPER
+    // ============================================================
+    function hariIniWIB() {
+      const d = new Date();
+      // WIB = UTC+7
+      const wib = new Date(d.getTime() + (7 * 60 * 60 * 1000));
+      return wib.toISOString().slice(0, 10);
     }
 
-    function hideLoginError() {
-      const el = document.getElementById('login-error');
-      if (el) {
-        el.textContent = '';
-        el.classList.add('hidden');
-      }
+    function formatTanggal(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      const bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      return `${d.getDate().toString().padStart(2, '0')} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function formatTanggalWaktu(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      const bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      const tgl = `${d.getDate().toString().padStart(2, '0')} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+      const jam = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+      return `${tgl} ${jam}`;
+    }
+
+    function getLangText(key) {
+      return T[currentLang][key] || T['id'][key] || key;
     }
 
     // ============================================================
     // ROUTING
     // ============================================================
     function showPage(name) {
-      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-      const target = document.getElementById('page-' + name);
-      if (target) {
-        target.classList.remove('hidden');
-      } else {
-        const loginPage = document.getElementById('page-login');
-        if (loginPage) loginPage.classList.remove('hidden');
-      }
-      // Update hash without triggering hashchange loop
-      if (window.location.hash !== '#' + name) {
-        history.replaceState(null, '', '#' + name);
-      }
-      // Close any open ad listeners
-      cleanupAdListeners();
+      document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
+      const page = document.getElementById('page-' + name);
+      if (page) page.classList.remove('hidden');
     }
 
     function getRoute() {
       const hash = window.location.hash.replace('#', '').trim();
-      const valid = ['login', 'dashboard', 'watch', 'convert', 'history', 'profile', 'terms'];
-      return valid.includes(hash) ? hash : 'login';
+      return hash || 'login';
     }
 
     // ============================================================
-    // AUTH
+    // BAHASA
     // ============================================================
-    async function checkAuth() {
-      if (!sb) {
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      // Update semua elemen data-i18n
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (T[lang] && T[lang][key] !== undefined) {
+          // Jangan timpa innerHTML jika mengandung tag <a>
+          if (el.tagName === 'A' && key === 'terms_link') {
+            el.textContent = T[lang][key];
+          } else if (key === 'terms_agree') {
+            // Biarkan HTML asli, hanya update teks
+            // Kita tangani secara khusus di bawah
+          } else {
+            el.textContent = T[lang][key];
+          }
+        }
+      });
+      // Khusus terms_agree (mengandung <a>)
+      document.querySelectorAll('[data-i18n="terms_agree"]').forEach(el => {
+        const link = el.querySelector('a');
+        if (link) {
+          el.childNodes[0].textContent = T[lang].terms_agree + ' ';
+        }
+      });
+      // Update tombol toggle bahasa
+      document.querySelectorAll('.btn-icon[id^="lang-toggle"]').forEach(btn => {
+        btn.textContent = T[lang].lang_toggle;
+      });
+    }
+
+    // ============================================================
+    // INIT UTAMA
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Set bahasa default
+      setLang(currentLang);
+
+      // ---- 1. Cek library Supabase ----
+      if (typeof window.supabase === 'undefined') {
+        const errEl = document.getElementById('login-error');
+        if (errEl) {
+          errEl.textContent = getLangText('err_lib');
+          errEl.classList.remove('hidden');
+        }
+        return;
+      }
+
+      // ---- 2. Inisialisasi Supabase ----
+      try {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      } catch (e) {
+        const errEl = document.getElementById('login-error');
+        if (errEl) {
+          errEl.textContent = getLangText('err_lib');
+          errEl.classList.remove('hidden');
+        }
+        return;
+      }
+
+      // ---- 3. Tangani error OAuth di URL ----
+      const urlParams = new URLSearchParams(window.location.search);
+      const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
+      const errorMsg = urlParams.get('error_description') || urlParams.get('error') ||
+                       hashParams.get('error_description') || hashParams.get('error');
+      if (errorMsg) {
+        const errEl = document.getElementById('login-error');
+        if (errEl) {
+          errEl.textContent = decodeURIComponent(errorMsg).replace(/\+/g, ' ');
+          errEl.classList.remove('hidden');
+        }
+        history.replaceState(null, '', window.location.pathname + '#login');
         showPage('login');
         return;
       }
-      try {
-        const { data: { session }, error: sessionError } = await sb.auth.getSession();
-        if (sessionError) throw sessionError;
-        if (!session) {
-          currentUser = null;
-          showPage('login');
-          return;
-        }
-        // Fetch user row
-        let { data: userRow, error: userError } = await sb
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .maybeSingle();
 
-        if (userError) {
-          console.warn('Fetch user error:', userError.message);
-          // Try insert if row missing
-          if (userError.code === 'PGRST116' || !userRow) {
-            const { error: insertError } = await sb.from('users').insert({
-              id: session.user.id,
-              email: session.user.email,
+      // ---- 4. Routing listener ----
+      window.addEventListener('hashchange', () => showPage(getRoute()));
+      showPage(getRoute());
+
+      // ---- 5. Tombol Google Login ----
+      const btnGoogle = document.getElementById('btn-google-login');
+      if (btnGoogle) {
+        btnGoogle.addEventListener('click', async function() {
+          try {
+            const { error } = await sb.auth.signInWithOAuth({
+              provider: 'google',
+              options: { redirectTo: REDIRECT_URL }
             });
-            if (insertError) {
-              console.warn('Insert user error:', insertError.message);
-              // Still try to fetch again
+            if (error) {
+              const errEl = document.getElementById('login-error');
+              if (errEl) {
+                errEl.textContent = error.message;
+                errEl.classList.remove('hidden');
+              }
             }
-            const { data: retryRow, error: retryError } = await sb
-              .from('users')
-              .select('*')
-              .eq('id', session.user.id)
-              .maybeSingle();
-            if (!retryError && retryRow) userRow = retryRow;
+          } catch (e) {
+            const errEl = document.getElementById('login-error');
+            if (errEl) {
+              errEl.textContent = getLangText('err_login');
+              errEl.classList.remove('hidden');
+            }
           }
-        }
-
-        if (!userRow) {
-          // Fallback minimal user object
-          userRow = { id: session.user.id, email: session.user.email, role: 'user', status: 'active' };
-        }
-
-        currentUser = userRow;
-
-        if (userRow.role === 'admin') {
-          window.location.href = 'database.html';
-          return;
-        }
-
-        // If route is login or terms, go to dashboard
-        const route = getRoute();
-        if (route === 'login' || route === 'terms') {
-          showPage('dashboard');
-        } else {
-          showPage(route);
-        }
-        await loadDashboard();
-        if (route === 'history') await loadHistory();
-        if (route === 'profile') await loadProfile();
-      } catch (err) {
-        console.error('checkAuth error:', err);
-        showLoginError(err.message || 'Terjadi kesalahan saat memeriksa sesi.');
-        showPage('login');
+        });
       }
-    }
 
-    // ============================================================
-    // DASHBOARD
-    // ============================================================
-    async function loadDashboard() {
-      if (!sb || !currentUser) return;
-      try {
-        const { data: user, error } = await sb
-          .from('users')
-          .select('*')
-          .eq('id', currentUser.id)
-          .maybeSingle();
-        if (error) throw error;
-        if (!user) return;
-        currentUser = user;
+      // ---- 6. Toggle bahasa (semua halaman) ----
+      document.querySelectorAll('.btn-icon[id^="lang-toggle"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setLang(currentLang === 'id' ? 'en' : 'id');
+        });
+      });
 
-        const balanceEl = document.getElementById('coin-balance');
-        const pendingEl = document.getElementById('coin-pending');
-        const expiryEl = document.getElementById('coin-expiry');
-        const warningEl = document.getElementById('expiry-warning');
-        const quotaEl = document.getElementById('quota-used');
-        const progressEl = document.getElementById('quota-progress');
+      // ---- 7. Auth flow ----
+      async function checkAuth() {
+        try {
+          const { data: { session }, error } = await sb.auth.getSession();
+          if (error) {
+            const errEl = document.getElementById('login-error');
+            if (errEl) {
+              errEl.textContent = error.message;
+              errEl.classList.remove('hidden');
+            }
+            showPage('login');
+            return;
+          }
+          if (!session) {
+            showPage('login');
+            return;
+          }
 
-        if (balanceEl) balanceEl.textContent = user.coin_balance ?? 0;
-        if (pendingEl) pendingEl.textContent = user.coin_pending ?? 0;
+          const user = session.user;
+          // Ambil user dari tabel users
+          let { data: userData, error: userErr } = await sb
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          if (userErr && userErr.code !== 'PGRST116') {
+            // PGRST116 = no rows found
+            const errEl = document.getElementById('login-error');
+            if (errEl) {
+              errEl.textContent = userErr.message;
+              errEl.classList.remove('hidden');
+            }
+            showPage('login');
+            return;
+          }
+
+          if (!userData) {
+            // Insert user baru
+            const { error: insertErr } = await sb.from('users').insert({
+              id: user.id,
+              email: user.email
+            });
+            if (insertErr) {
+              // Coba ambil ulang
+              const { data: retry } = await sb.from('users').select('*').eq('id', user.id).maybeSingle();
+              userData = retry;
+            } else {
+              const { data: retry } = await sb.from('users').select('*').eq('id', user.id).maybeSingle();
+              userData = retry;
+            }
+          }
+
+          if (!userData) {
+            showPage('login');
+            return;
+          }
+
+          // Cek role admin
+          if (userData.role === 'admin') {
+            window.location.href = 'database.html';
+            return;
+          }
+
+          // Hapus query string ?code=... dari URL
+          if (window.location.search.includes('code=')) {
+            history.replaceState(null, '', window.location.pathname + '#dashboard');
+          }
+
+          showPage('dashboard');
+          await loadDashboard(userData);
+          showPage(getRoute() === 'login' ? 'dashboard' : getRoute());
+
+          // Setelah login, arahkan ke dashboard jika masih di login
+          if (getRoute() === 'login') {
+            window.location.hash = '#dashboard';
+          }
+
+        } catch (e) {
+          const errEl = document.getElementById('login-error');
+          if (errEl) {
+            errEl.textContent = getLangText('err_generic');
+            errEl.classList.remove('hidden');
+          }
+          showPage('login');
+        }
+      }
+
+      // Auth state listener
+      sb.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN') {
+          checkAuth();
+        } else if (event === 'SIGNED_OUT') {
+          showPage('login');
+        }
+      });
+
+      // Panggil checkAuth saat init
+      checkAuth();
+
+      // ============================================================
+      // LOAD DASHBOARD
+      // ============================================================
+      async function loadDashboard(userData) {
+        if (!userData) {
+          try {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) return;
+            const { data } = await sb.from('users').select('*').eq('id', session.user.id).maybeSingle();
+            userData = data;
+          } catch (e) { return; }
+        }
+        if (!userData) return;
+
+        // Update saldo
+        const saldoEl = document.getElementById('dash-balance');
+        const pendingEl = document.getElementById('dash-pending');
+        const expiryEl = document.getElementById('dash-expiry');
+        const expiryWarn = document.getElementById('dash-expiry-warning');
+        const quotaEl = document.getElementById('dash-quota');
+        const progressEl = document.getElementById('dash-progress');
+        const convertBalance = document.getElementById('convert-balance');
+
+        if (saldoEl) saldoEl.textContent = userData.coin_balance ?? 0;
+        if (pendingEl) pendingEl.textContent = userData.coin_pending ?? 0;
+        if (convertBalance) convertBalance.textContent = userData.coin_balance ?? 0;
 
         // Expiry
         if (expiryEl) {
-          if (user.coin_expiry_at) {
-            expiryEl.textContent = formatTanggal(user.coin_expiry_at);
-            const expiryDate = new Date(user.coin_expiry_at);
+          if (userData.coin_expiry_at) {
+            expiryEl.textContent = formatTanggal(userData.coin_expiry_at);
+            const expiryDate = new Date(userData.coin_expiry_at);
             const now = new Date();
-            const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-            if (warningEl) {
-              if (daysLeft < 7 && daysLeft >= 0) {
-                warningEl.textContent = t('expiry_warning');
-                warningEl.classList.remove('hidden');
-              } else {
-                warningEl.classList.add('hidden');
-              }
+            const diffDays = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+            if (diffDays < 7 && diffDays >= 0) {
+              expiryWarn?.classList.remove('hidden');
+            } else {
+              expiryWarn?.classList.add('hidden');
             }
           } else {
             expiryEl.textContent = '—';
-            if (warningEl) warningEl.classList.add('hidden');
+            expiryWarn?.classList.add('hidden');
           }
         }
 
-        // Quota: count ad_clicks today WIB with status pending/verified
-        const todayWIB = hariIniWIB();
-        const startOfDay = new Date(todayWIB + 'T00:00:00+07:00').toISOString();
-        const endOfDay = new Date(todayWIB + 'T23:59:59+07:00').toISOString();
-
-        const { count, error: countError } = await sb
-          .from('ad_clicks')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .in('status', ['pending', 'verified'])
-          .gte('clicked_at', startOfDay)
-          .lte('clicked_at', endOfDay);
-
-        if (countError) {
-          console.warn('Quota count error:', countError.message);
+        // Kuota hari ini (ad_clicks hari ini WIB, status pending/verified)
+        try {
+          const today = hariIniWIB();
+          const { data: clicks } = await sb
+            .from('ad_clicks')
+            .select('id')
+            .eq('user_id', userData.id)
+            .eq('status', 'verified')
+            .gte('clicked_at', today + 'T00:00:00+07:00')
+            .lte('clicked_at', today + 'T23:59:59+07:00');
+          // fallback: hitung semua pending juga? Gunakan total untuk quota
+          const count = clicks?.length || 0;
+          if (quotaEl) quotaEl.textContent = Math.min(count, 100);
+          if (progressEl) progressEl.style.width = Math.min((count / 100) * 100, 100) + '%';
+        } catch (e) {
+          if (quotaEl) quotaEl.textContent = '0';
+          if (progressEl) progressEl.style.width = '0%';
         }
-
-        const used = count ?? 0;
-        if (quotaEl) quotaEl.textContent = used;
-        if (progressEl) progressEl.style.width = Math.min(100, (used / 100) * 100) + '%';
-
-      } catch (err) {
-        console.error('loadDashboard error:', err);
-        toast(t('toast_error_prefix') + (err.message || 'Gagal memuat dashboard'), 'error');
       }
-    }
 
-    // ============================================================
-    // WATCH AD LOGIC
-    // ============================================================
-    function cleanupAdListeners() {
-      if (adReturnedHandler) {
-        document.removeEventListener('visibilitychange', adReturnedHandler);
-        window.removeEventListener('blur', adReturnedHandler);
-        window.removeEventListener('focus', adReturnedHandler);
-        adReturnedHandler = null;
-      }
-      if (adBlurHandler) {
-        window.removeEventListener('blur', adBlurHandler);
-        adBlurHandler = null;
-      }
-      if (adVisibilityHandler) {
-        document.removeEventListener('visibilitychange', adVisibilityHandler);
-        adVisibilityHandler = null;
-      }
-      if (adTimerInterval) {
-        clearInterval(adTimerInterval);
-        adTimerInterval = null;
-      }
-      const timerEl = document.getElementById('watch-timer');
-      if (timerEl) timerEl.classList.add('hidden');
-    }
+      // ============================================================
+      // TOMBOL WATCH IKLAN
+      // ============================================================
+      const btnWatch = document.getElementById('btn-watch');
+      const btnAdsterra = document.getElementById('btn-adsterra');
+      const watchTimer = document.getElementById('watch-timer');
+      const watchStatus = document.getElementById('watch-status');
 
-    async function startAdFlow(network) {
-      if (!sb || !currentUser) return;
-      if (isAdClaimInProgress) return;
+      let clickedAt = 0;
+      let watchInterval = null;
+      let isWatching = false;
 
-      // Get settings
-      let adsterraLink = 'https://www.effectiveratecpm.com/your-adsterra-link';
-      let monetagLinks = [
+      const monetagLinks = [
         'https://example.com/ad1',
         'https://example.com/ad2',
         'https://example.com/ad3'
       ];
 
-      try {
-        const { data: settingsRows } = await sb.from('settings').select('key, value');
-        if (settingsRows && settingsRows.length) {
-          const map = {};
-          settingsRows.forEach(r => { if (r.key) map[r.key] = r.value; });
-          if (map.adsterra_link) adsterraLink = map.adsterra_link;
-          if (map.monetag_links) {
-            const links = map.monetag_links.split(',').map(s => s.trim()).filter(Boolean);
-            if (links.length) monetagLinks = links;
-          }
-        }
-      } catch (e) { /* fallback */ }
-
-      const url = network === 'adsterra'
-        ? adsterraLink
-        : monetagLinks[Math.floor(Math.random() * monetagLinks.length)];
-
-      const clickedAt = Date.now();
-      isAdClaimInProgress = true;
-
-      const watchBtn = document.getElementById('btn-watch');
-      const adsterraBtn = document.getElementById('btn-adsterra');
-      const statusEl = document.getElementById('watch-status');
-      const timerEl = document.getElementById('watch-timer');
-
-      if (watchBtn) {
-        watchBtn.disabled = true;
-        watchBtn.textContent = t('ad_waiting');
-      }
-      if (adsterraBtn) {
-        adsterraBtn.disabled = true;
-        adsterraBtn.textContent = t('ad_waiting');
-      }
-      if (statusEl) statusEl.textContent = t('ad_waiting');
-
-      // Open ad
-      try {
-        window.open(url, '_blank');
-      } catch (e) {
-        console.warn('window.open blocked', e);
-      }
-
-      // Start 10s countdown
-      let secondsLeft = 10;
-      if (timerEl) {
-        timerEl.classList.remove('hidden');
-        timerEl.textContent = secondsLeft;
-      }
-      if (adTimerInterval) clearInterval(adTimerInterval);
-      adTimerInterval = setInterval(() => {
-        secondsLeft--;
-        if (timerEl) timerEl.textContent = secondsLeft > 0 ? secondsLeft : '0';
-        if (secondsLeft <= 0) {
-          clearInterval(adTimerInterval);
-          adTimerInterval = null;
-          if (timerEl) timerEl.classList.add('hidden');
-          // Show adsterra button if on watch page
-          if (getRoute() === 'watch' && adsterraBtn) {
-            adsterraBtn.classList.remove('hidden');
-          }
-          if (statusEl && getRoute() === 'watch') {
-            statusEl.textContent = t('watch_status');
-          }
-        }
-      }, 1000);
-
-      // Return detection
-      let hasReturned = false;
-      const handleReturn = async () => {
-        if (hasReturned || !isAdClaimInProgress) return;
-        hasReturned = true;
-        const returnedAt = Date.now();
-        const elapsed = returnedAt - clickedAt;
-
-        // Cleanup listeners
-        cleanupAdListeners();
-        isAdClaimInProgress = false;
-
-        if (elapsed >= 5000) {
-          await claimAd(network, clickedAt, returnedAt, Math.floor(elapsed / 1000));
-        } else {
-          toast(t('toast_too_short'), 'error');
-          resetWatchButtons();
-        }
-      };
-
-      const onVisibility = () => {
-        if (document.visibilityState === 'visible') {
-          handleReturn();
-        }
-      };
-      const onBlur = () => { /* ignore, wait for focus */ };
-      const onFocus = () => { handleReturn(); };
-
-      adVisibilityHandler = onVisibility;
-      adBlurHandler = onBlur;
-      adReturnedHandler = onFocus;
-
-      document.addEventListener('visibilitychange', onVisibility);
-      window.addEventListener('focus', onFocus);
-      // Also check on blur + timeout? handled by focus
-    }
-
-    function resetWatchButtons() {
-      isAdClaimInProgress = false;
-      const watchBtn = document.getElementById('btn-watch');
-      const adsterraBtn = document.getElementById('btn-adsterra');
-      if (watchBtn) {
-        watchBtn.disabled = false;
-        watchBtn.textContent = t('watch_now_btn');
-      }
-      if (adsterraBtn) {
-        adsterraBtn.disabled = false;
-        adsterraBtn.textContent = t('try_adsterra');
-        adsterraBtn.classList.add('hidden');
-      }
-      const statusEl = document.getElementById('watch-status');
-      if (statusEl) statusEl.textContent = t('watch_status');
-      cleanupAdListeners();
-    }
-
-    async function claimAd(network, clickedAt, returnedAt, durationSec) {
-      if (!sb || !currentUser) return;
-      try {
-        // Get settings
-        let reward = 100;
-        let dailyLimit = 100;
+      async function getSettings() {
         try {
-          const { data: settingsRows } = await sb.from('settings').select('key, value');
-          if (settingsRows) {
-            const map = {};
-            settingsRows.forEach(r => { if (r.key) map[r.key] = r.value; });
-            if (map.reward_per_ad) reward = parseInt(map.reward_per_ad, 10) || 100;
-            if (map.daily_limit) dailyLimit = parseInt(map.daily_limit, 10) || 100;
-          }
-        } catch (e) { /* defaults */ }
-
-        const todayWIB = hariIniWIB();
-        const startOfDay = new Date(todayWIB + 'T00:00:00+07:00').toISOString();
-        const endOfDay = new Date(todayWIB + 'T23:59:59+07:00').toISOString();
-
-        // Check daily quota
-        const { count, error: countError } = await sb
-          .from('ad_clicks')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', currentUser.id)
-          .in('status', ['pending', 'verified'])
-          .gte('clicked_at', startOfDay)
-          .lte('clicked_at', endOfDay);
-
-        if (countError) throw countError;
-        if ((count ?? 0) >= dailyLimit) {
-          toast(t('toast_quota_habis'), 'error');
-          resetWatchButtons();
-          return;
-        }
-
-        // Check 30s cooldown
-        const thirtySecAgo = new Date(Date.now() - 30000).toISOString();
-        const { count: recentCount, error: recentError } = await sb
-          .from('ad_clicks')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', currentUser.id)
-          .gte('clicked_at', thirtySecAgo);
-
-        if (recentError) throw recentError;
-        if ((recentCount ?? 0) > 0) {
-          toast(t('toast_wait_30'), 'error');
-          resetWatchButtons();
-          return;
-        }
-
-        // Insert ad click
-        const { error: insertAdError } = await sb.from('ad_clicks').insert({
-          user_id: currentUser.id,
-          ad_network: network,
-          clicked_at: new Date(clickedAt).toISOString(),
-          returned_at: new Date(returnedAt).toISOString(),
-          duration_outside: durationSec,
-          status: 'pending',
-          user_agent: navigator.userAgent,
-        });
-        if (insertAdError) throw insertAdError;
-
-        // Update pending
-        const newPending = (currentUser.coin_pending ?? 0) + reward;
-        const { error: updateError } = await sb
-          .from('users')
-          .update({ coin_pending: newPending })
-          .eq('id', currentUser.id);
-        if (updateError) throw updateError;
-
-        // Insert transaction
-        const { error: txError } = await sb.from('coin_transactions').insert({
-          user_id: currentUser.id,
-          amount: reward,
-          type: 'ad_reward',
-          description: 'Reward iklan ' + network,
-        });
-        if (txError) throw txError;
-
-        toast(`+${reward} 🟡${t('reward_pending_suffix')}`, 'success');
-        await loadDashboard();
-      } catch (err) {
-        console.error('claimAd error:', err);
-        toast(t('toast_error_prefix') + (err.message || 'Gagal klaim iklan'), 'error');
-      } finally {
-        resetWatchButtons();
-        isAdClaimInProgress = false;
+          const { data } = await sb.from('settings').select('*').maybeSingle();
+          return data || {};
+        } catch (e) { return {}; }
       }
-    }
 
-    // ============================================================
-    // CHECK-IN
-    // ============================================================
-    async function handleCheckin() {
-      if (!sb || !currentUser) return;
-      try {
-        const todayWIB = hariIniWIB();
-
-        // Check existing checkin
-        const { data: existing, error: checkError } = await sb
-          .from('daily_checkins')
-          .select('id')
-          .eq('user_id', currentUser.id)
-          .eq('checkin_date', todayWIB)
-          .maybeSingle();
-
-        if (checkError) throw checkError;
-        if (existing) {
-          toast(t('toast_checkin_done'), 'error');
-          return;
+      function startWatchTimer(seconds, onDone) {
+        let remaining = seconds;
+        if (watchTimer) {
+          watchTimer.classList.remove('hidden');
+          watchTimer.textContent = remaining;
         }
+        if (watchInterval) clearInterval(watchInterval);
+        watchInterval = setInterval(() => {
+          remaining--;
+          if (watchTimer) watchTimer.textContent = remaining;
+          if (remaining <= 0) {
+            clearInterval(watchInterval);
+            watchInterval = null;
+            if (watchTimer) watchTimer.classList.add('hidden');
+            if (onDone) onDone();
+          }
+        }, 1000);
+      }
 
-        // Get reward range
-        let min = 5, max = 20;
+      function resetWatchButton() {
+        if (btnWatch) {
+          btnWatch.disabled = false;
+          btnWatch.textContent = getLangText('watch_now_btn');
+        }
+        if (watchTimer) watchTimer.classList.add('hidden');
+        if (watchInterval) {
+          clearInterval(watchInterval);
+          watchInterval = null;
+        }
+        isWatching = false;
+        if (watchStatus) watchStatus.textContent = getLangText('watch_status_ready');
+      }
+
+      async function claimAd(network, clickedAtMs, returnedAtMs, durationSec) {
         try {
-          const { data: settingsRows } = await sb.from('settings').select('key, value');
-          if (settingsRows) {
-            const map = {};
-            settingsRows.forEach(r => { if (r.key) map[r.key] = r.value; });
-            if (map.checkin_min) min = parseInt(map.checkin_min, 10) || 5;
-            if (map.checkin_max) max = parseInt(map.checkin_max, 10) || 20;
+          const { data: { session } } = await sb.auth.getSession();
+          if (!session) { toast(getLangText('err_generic'), 'error'); return; }
+
+          const userId = session.user.id;
+          const settings = await getSettings();
+          const reward = settings.reward_per_ad ?? 100;
+          const dailyLimit = settings.daily_limit ?? 100;
+
+          // Cek kuota hari ini
+          const today = hariIniWIB();
+          const { data: todayClicks } = await sb
+            .from('ad_clicks')
+            .select('id')
+            .eq('user_id', userId)
+            .in('status', ['pending', 'verified'])
+            .gte('clicked_at', today + 'T00:00:00+07:00')
+            .lte('clicked_at', today + 'T23:59:59+07:00');
+
+          if ((todayClicks?.length || 0) >= dailyLimit) {
+            toast(getLangText('err_quota'), 'error');
+            resetWatchButton();
+            return;
           }
-        } catch (e) { /* defaults */ }
 
-        const reward = Math.floor(Math.random() * (max - min + 1)) + min;
+          // Cek 30 detik terakhir
+          const thirtySecAgo = new Date(Date.now() - 30000).toISOString();
+          const { data: recentClicks } = await sb
+            .from('ad_clicks')
+            .select('id')
+            .eq('user_id', userId)
+            .gte('clicked_at', thirtySecAgo);
 
-        // Insert checkin
-        const { error: insertError } = await sb.from('daily_checkins').insert({
-          user_id: currentUser.id,
-          checkin_date: todayWIB,
-          reward_coins: reward,
-        });
-        if (insertError) throw insertError;
+          if ((recentClicks?.length || 0) > 0) {
+            toast(getLangText('err_wait30'), 'error');
+            resetWatchButton();
+            return;
+          }
 
-        // Update pending
-        const newPending = (currentUser.coin_pending ?? 0) + reward;
-        const { error: updateError } = await sb
-          .from('users')
-          .update({ coin_pending: newPending })
-          .eq('id', currentUser.id);
-        if (updateError) throw updateError;
+          // Insert ad_clicks
+          const { error: insertErr } = await sb.from('ad_clicks').insert({
+            user_id: userId,
+            ad_network: network,
+            clicked_at: new Date(clickedAtMs).toISOString(),
+            returned_at: new Date(returnedAtMs).toISOString(),
+            duration_outside: durationSec,
+            status: 'pending',
+            user_agent: navigator.userAgent
+          });
+          if (insertErr) { toast(insertErr.message, 'error'); resetWatchButton(); return; }
 
-        // Transaction
-        const { error: txError } = await sb.from('coin_transactions').insert({
-          user_id: currentUser.id,
-          amount: reward,
-          type: 'checkin',
-          description: 'Check-in harian',
-        });
-        if (txError) throw txError;
+          // Update users coin_pending
+          const { data: userRow } = await sb.from('users').select('coin_pending').eq('id', userId).maybeSingle();
+          const newPending = (userRow?.coin_pending ?? 0) + reward;
+          await sb.from('users').update({ coin_pending: newPending }).eq('id', userId);
 
-        toast(`${t('toast_checkin_ok')} +${reward} 🟡`, 'success');
-        await loadDashboard();
-      } catch (err) {
-        console.error('checkin error:', err);
-        toast(t('toast_error_prefix') + (err.message || 'Check-in gagal'), 'error');
+          // Insert coin_transactions
+          await sb.from('coin_transactions').insert({
+            user_id: userId,
+            amount: reward,
+            type: 'ad_reward',
+            description: getLangText('msg_ad_reward') + ' ' + network
+          });
+
+          toast(`+${reward} 🟡 (${getLangText('msg_pending')})`, 'success');
+          resetWatchButton();
+          await loadDashboard();
+
+        } catch (e) {
+          toast(e.message || getLangText('err_generic'), 'error');
+          resetWatchButton();
+        }
       }
-    }
 
-    // ============================================================
-    // CONVERT
-    // ============================================================
-    async function handleConvert() {
-      if (!sb || !currentUser) return;
+      // Tombol watch utama
+      if (btnWatch) {
+        btnWatch.addEventListener('click', async function() {
+          if (isWatching) return;
+          try {
+            const settings = await getSettings();
+            const linksRaw = settings.monetag_links || '';
+            let links = linksRaw.split(',').map(s => s.trim()).filter(Boolean);
+            if (links.length === 0) links = monetagLinks;
+            const url = links[Math.floor(Math.random() * links.length)];
+
+            window.open(url, '_blank');
+            clickedAt = Date.now();
+            isWatching = true;
+            btnWatch.disabled = true;
+            btnWatch.textContent = getLangText('watch_waiting');
+            if (watchStatus) watchStatus.textContent = getLangText('watch_waiting');
+
+            // Timer countdown
+            startWatchTimer(10, () => {
+              // Setelah timer habis, tampilkan tombol adsterra jika tidak ada event return
+              if (isWatching) {
+                btnAdsterra?.classList.remove('hidden');
+              }
+            });
+
+            // Listener untuk mendeteksi user kembali
+            const handleReturn = () => {
+              if (!isWatching) return;
+              const now = Date.now();
+              const diff = now - clickedAt;
+              if (diff >= 5000) {
+                claimAd('monetag', clickedAt, now, Math.floor(diff / 1000));
+              } else {
+                toast(getLangText('err_too_fast'), 'error');
+                resetWatchButton();
+              }
+              document.removeEventListener('visibilitychange', visibilityHandler);
+              window.removeEventListener('focus', handleReturn);
+            };
+
+            const visibilityHandler = () => {
+              if (document.visibilityState === 'visible') {
+                handleReturn();
+              }
+            };
+
+            document.addEventListener('visibilitychange', visibilityHandler);
+            window.addEventListener('focus', handleReturn);
+
+          } catch (e) {
+            toast(e.message || getLangText('err_generic'), 'error');
+            resetWatchButton();
+          }
+        });
+      }
+
+      // Tombol adsterra
+      if (btnAdsterra) {
+        btnAdsterra.addEventListener('click', async function() {
+          try {
+            const settings = await getSettings();
+            const url = settings.adsterra_link || 'https://example.com/adsterra';
+            window.open(url, '_blank');
+            clickedAt = Date.now();
+            isWatching = true;
+            btnAdsterra.disabled = true;
+
+            const handleReturn = () => {
+              if (!isWatching) return;
+              const now = Date.now();
+              const diff = now - clickedAt;
+              if (diff >= 5000) {
+                claimAd('adsterra', clickedAt, now, Math.floor(diff / 1000));
+              } else {
+                toast(getLangText('err_too_fast'), 'error');
+                resetWatchButton();
+              }
+              btnAdsterra.disabled = false;
+              btnAdsterra.classList.add('hidden');
+              document.removeEventListener('visibilitychange', visibilityHandler);
+              window.removeEventListener('focus', handleReturn);
+            };
+
+            const visibilityHandler = () => {
+              if (document.visibilityState === 'visible') handleReturn();
+            };
+
+            document.addEventListener('visibilitychange', visibilityHandler);
+            window.addEventListener('focus', handleReturn);
+
+          } catch (e) {
+            toast(e.message || getLangText('err_generic'), 'error');
+            resetWatchButton();
+          }
+        });
+      }
+
+      // ============================================================
+      // CHECK-IN HARIAN
+      // ============================================================
+      const btnCheckin = document.getElementById('btn-checkin');
+      if (btnCheckin) {
+        btnCheckin.addEventListener('click', async function() {
+          try {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) { toast(getLangText('err_login'), 'error'); return; }
+            const userId = session.user.id;
+
+            const today = hariIniWIB();
+            const { data: existing } = await sb
+              .from('daily_checkins')
+              .select('id')
+              .eq('user_id', userId)
+              .eq('checkin_date', today)
+              .maybeSingle();
+
+            if (existing) {
+              toast(getLangText('err_checkin_done'), 'error');
+              return;
+            }
+
+            const settings = await getSettings();
+            const min = settings.checkin_min ?? 5;
+            const max = settings.checkin_max ?? 20;
+            const reward = Math.floor(Math.random() * (max - min + 1)) + min;
+
+            // Insert daily_checkins
+            const { error: insertErr } = await sb.from('daily_checkins').insert({
+              user_id: userId,
+              checkin_date: today,
+              reward_coins: reward
+            });
+            if (insertErr) { toast(insertErr.message, 'error'); return; }
+
+            // Update users
+            const { data: userRow } = await sb.from('users').select('coin_pending').eq('id', userId).maybeSingle();
+            const newPending = (userRow?.coin_pending ?? 0) + reward;
+            await sb.from('users').update({ coin_pending: newPending }).eq('id', userId);
+
+            // Insert coin_transactions
+            await sb.from('coin_transactions').insert({
+              user_id: userId,
+              amount: reward,
+              type: 'checkin',
+              description: getLangText('msg_checkin')
+            });
+
+            toast(`${getLangText('msg_checkin_success')} +${reward} 🟡`, 'success');
+            await loadDashboard();
+
+          } catch (e) {
+            toast(e.message || getLangText('err_generic'), 'error');
+          }
+        });
+      }
+
+      // ============================================================
+      // CONVERT
+      // ============================================================
+      const btnConvert = document.getElementById('btn-convert');
+      const convertSummary = document.getElementById('convert-summary');
       const inputCoins = document.getElementById('input-coins');
       const selectMethod = document.getElementById('select-method');
       const inputAccount = document.getElementById('input-account');
 
-      const coins = parseInt(inputCoins?.value, 10);
-      const method = selectMethod?.value || 'DANA';
-      const account = inputAccount?.value?.trim() || '';
-
-      if (!coins || isNaN(coins) || coins < 5000 || coins % 5000 !== 0) {
-        toast(t('toast_convert_invalid'), 'error');
-        return;
+      function updateConvertSummary() {
+        if (!convertSummary || !inputCoins) return;
+        const coins = parseInt(inputCoins.value) || 0;
+        const rate = 10000;
+        const fee = 5;
+        const rupiah = Math.floor((coins / rate) * 1000 * (1 - fee / 100));
+        convertSummary.textContent = coins > 0 ? `≈ Rp ${rupiah.toLocaleString('id-ID')} (fee 5%)` : '';
       }
-      if (coins > (currentUser.coin_balance ?? 0)) {
-        toast(t('toast_convert_balance'), 'error');
-        return;
-      }
-      if (!account) {
-        toast(t('toast_convert_account'), 'error');
-        return;
-      }
-
-      try {
-        let coinRate = 10000;
-        let feePercent = 5;
-        try {
-          const { data: settingsRows } = await sb.from('settings').select('key, value');
-          if (settingsRows) {
-            const map = {};
-            settingsRows.forEach(r => { if (r.key) map[r.key] = r.value; });
-            if (map.coin_rate) coinRate = parseInt(map.coin_rate, 10) || 10000;
-            if (map.conversion_fee_percent) feePercent = parseFloat(map.conversion_fee_percent) || 5;
-          }
-        } catch (e) { /* defaults */ }
-
-        const rupiah = Math.floor((coins / coinRate) * 1000 * (1 - feePercent / 100));
-
-        // Insert payout
-        const { error: payoutError } = await sb.from('payouts').insert({
-          user_id: currentUser.id,
-          coins_used: coins,
-          rupiah_amount: rupiah,
-          method: method,
-          account_number: account,
-          status: 'pending',
-        });
-        if (payoutError) throw payoutError;
-
-        // Update balance
-        const newBalance = (currentUser.coin_balance ?? 0) - coins;
-        const { error: updateError } = await sb
-          .from('users')
-          .update({ coin_balance: newBalance })
-          .eq('id', currentUser.id);
-        if (updateError) throw updateError;
-
-        // Transaction
-        const { error: txError } = await sb.from('coin_transactions').insert({
-          user_id: currentUser.id,
-          amount: -coins,
-          type: 'convert',
-          description: 'Konversi ke ' + method,
-        });
-        if (txError) throw txError;
-
-        toast(t('toast_convert_ok'), 'success');
-        if (inputCoins) inputCoins.value = '';
-        if (inputAccount) inputAccount.value = '';
-        const summaryEl = document.getElementById('convert-summary');
-        if (summaryEl) summaryEl.textContent = t('convert_summary');
-        await loadDashboard();
-      } catch (err) {
-        console.error('convert error:', err);
-        toast(t('toast_error_prefix') + (err.message || 'Konversi gagal'), 'error');
-      }
-    }
-
-    // ============================================================
-    // HISTORY
-    // ============================================================
-    async function loadHistory() {
-      if (!sb || !currentUser) return;
-      const listEl = document.getElementById('history-list');
-      if (!listEl) return;
-      try {
-        const { data, error } = await sb
-          .from('coin_transactions')
-          .select('*')
-          .eq('user_id', currentUser.id)
-          .order('created_at', { ascending: false })
-          .limit(100);
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-          listEl.innerHTML = `<p class="empty-state">${t('history_empty')}</p>`;
-          return;
-        }
-
-        const iconMap = {
-          ad_reward: '🎬',
-          checkin: '✅',
-          convert: '💸',
-          payout: '💰',
-          expired: '⏰',
-        };
-
-        listEl.innerHTML = data.map(tx => {
-          const icon = iconMap[tx.type] || '📋';
-          const amount = tx.amount ?? 0;
-          const isPositive = amount >= 0;
-          const amountClass = isPositive ? 'amount-positive' : 'amount-negative';
-          const sign = isPositive ? '+' : '';
-          return `
-            <div class="history-item">
-              <span class="history-icon">${icon}</span>
-              <div class="history-info">
-                <div class="history-desc">${escapeHtml(tx.description || tx.type || '')}</div>
-                <div class="history-date">${formatTanggalWaktu(tx.created_at)}</div>
-              </div>
-              <span class="history-amount ${amountClass}">${sign}${amount} 🟡</span>
-            </div>
-          `;
-        }).join('');
-      } catch (err) {
-        console.error('loadHistory error:', err);
-        listEl.innerHTML = `<p class="empty-state">Gagal memuat riwayat: ${escapeHtml(err.message || '')}</p>`;
-      }
-    }
-
-    // ============================================================
-    // PROFILE
-    // ============================================================
-    async function loadProfile() {
-      if (!sb || !currentUser) return;
-      try {
-        const { data: user, error } = await sb
-          .from('users')
-          .select('*')
-          .eq('id', currentUser.id)
-          .maybeSingle();
-        if (error) throw error;
-        if (!user) return;
-
-        document.getElementById('profile-email').textContent = user.email || '—';
-        document.getElementById('profile-role').textContent = user.role || 'user';
-        document.getElementById('profile-status').textContent = user.status || 'active';
-        document.getElementById('profile-last-login').textContent = formatTanggalWaktu(user.last_login_at);
-        document.getElementById('profile-expiry').textContent = formatTanggal(user.coin_expiry_at);
-      } catch (err) {
-        console.error('loadProfile error:', err);
-        document.getElementById('profile-email').textContent = 'Gagal memuat';
-      }
-    }
-
-    // ============================================================
-    // LANGUAGE
-    // ============================================================
-    function setLang(lang) {
-      currentLang = lang === 'en' ? 'en' : 'id';
-      localStorage.setItem('lang', currentLang);
-      applyLanguage();
-    }
-
-    function applyLanguage() {
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (key && T[currentLang] && T[currentLang][key]) {
-          el.textContent = T[currentLang][key];
-        }
-      });
-      // Update all lang toggle buttons
-      document.querySelectorAll('.lang-toggle').forEach(btn => {
-        btn.textContent = currentLang === 'id' ? 'EN' : 'ID';
-      });
-      // Update login title/tagline (they have no data-i18n on purpose)
-      // Update convert summary if empty
-      const summaryEl = document.getElementById('convert-summary');
-      if (summaryEl && summaryEl.textContent === T.id.convert_summary || summaryEl?.textContent === T.en.convert_summary) {
-        summaryEl.textContent = t('convert_summary');
-      }
-    }
-
-    function setupLangToggle(id) {
-      const btn = document.getElementById(id);
-      if (btn) {
-        btn.addEventListener('click', () => {
-          setLang(currentLang === 'id' ? 'en' : 'id');
-        });
-      }
-    }
-
-    // ============================================================
-    // ESCAPE HTML
-    // ============================================================
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/[&<>"']/g, m => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[m]));
-    }
-
-    // ============================================================
-    // EVENT BINDING
-    // ============================================================
-    function bindEvents() {
-      // Language toggles
-      ['lang-toggle-login', 'lang-toggle-dash', 'lang-toggle-watch', 'lang-toggle-convert', 'lang-toggle-history', 'lang-toggle-profile', 'lang-toggle-terms'].forEach(setupLangToggle);
-
-      // Google login
-      const googleBtn = document.getElementById('btn-google-login');
-      if (googleBtn) {
-        googleBtn.addEventListener('click', async () => {
-          hideLoginError();
-          if (!sb) {
-            showLoginError(t('toast_lib_fail'));
-            return;
-          }
-          googleBtn.disabled = true;
-          try {
-            const { error } = await sb.auth.signInWithOAuth({
-              provider: 'google',
-              options: { redirectTo: window.location.origin + window.location.pathname },
-            });
-            if (error) throw error;
-          } catch (err) {
-            showLoginError(err.message || 'Gagal masuk dengan Google.');
-            googleBtn.disabled = false;
-          }
-        });
-      }
-
-      // Dashboard nav
-      const watchNav = document.getElementById('btn-watch-nav');
-      if (watchNav) watchNav.addEventListener('click', () => showPage('watch'));
-
-      const convertNav = document.getElementById('btn-nav-convert');
-      if (convertNav) convertNav.addEventListener('click', () => { showPage('convert'); updateConvertBalance(); });
-
-      const historyNav = document.getElementById('btn-nav-history');
-      if (historyNav) historyNav.addEventListener('click', async () => { showPage('history'); await loadHistory(); });
-
-      const profileIcon = document.getElementById('btn-profile-icon');
-      if (profileIcon) profileIcon.addEventListener('click', async () => { showPage('profile'); await loadProfile(); });
-
-      const profileIconWatch = document.getElementById('btn-profile-icon-watch');
-      if (profileIconWatch) profileIconWatch.addEventListener('click', async () => { showPage('profile'); await loadProfile(); });
-
-      const profileIconConvert = document.getElementById('btn-profile-icon-convert');
-      if (profileIconConvert) profileIconConvert.addEventListener('click', async () => { showPage('profile'); await loadProfile(); });
-
-      const profileIconHistory = document.getElementById('btn-profile-icon-history');
-      if (profileIconHistory) profileIconHistory.addEventListener('click', async () => { showPage('profile'); await loadProfile(); });
-
-      // Check-in
-      const checkinBtn = document.getElementById('btn-checkin');
-      if (checkinBtn) checkinBtn.addEventListener('click', handleCheckin);
-
-      // Watch page
-      const watchBtn = document.getElementById('btn-watch');
-      if (watchBtn) watchBtn.addEventListener('click', () => startAdFlow('monetag'));
-
-      const adsterraBtn = document.getElementById('btn-adsterra');
-      if (adsterraBtn) adsterraBtn.addEventListener('click', () => startAdFlow('adsterra'));
-
-      const watchBack = document.getElementById('btn-watch-back');
-      if (watchBack) watchBack.addEventListener('click', () => { cleanupAdListeners(); showPage('dashboard'); });
-
-      // Convert
-      const convertBtn = document.getElementById('btn-convert');
-      if (convertBtn) convertBtn.addEventListener('click', handleConvert);
-
-      const convertBack = document.getElementById('btn-convert-back');
-      if (convertBack) convertBack.addEventListener('click', () => showPage('dashboard'));
-
-      const inputCoins = document.getElementById('input-coins');
       if (inputCoins) inputCoins.addEventListener('input', updateConvertSummary);
 
-      const inputAccount = document.getElementById('input-account');
-      if (inputAccount) inputAccount.addEventListener('input', updateConvertSummary);
+      if (btnConvert) {
+        btnConvert.addEventListener('click', async function() {
+          try {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) { toast(getLangText('err_login'), 'error'); return; }
+            const userId = session.user.id;
 
-      // History back
-      const historyBack = document.getElementById('btn-history-back');
-      if (historyBack) historyBack.addEventListener('click', () => showPage('dashboard'));
+            const coins = parseInt(inputCoins?.value);
+            const method = selectMethod?.value;
+            const account = inputAccount?.value?.trim();
 
-      // Profile
-      const logoutBtn = document.getElementById('btn-logout');
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-          if (!sb) return;
+            if (!coins || coins < 5000 || coins % 5000 !== 0) {
+              toast(getLangText('err_convert_amount'), 'error');
+              return;
+            }
+            if (!account) {
+              toast(getLangText('err_convert_account'), 'error');
+              return;
+            }
+
+            const { data: userRow } = await sb.from('users').select('coin_balance').eq('id', userId).maybeSingle();
+            const balance = userRow?.coin_balance ?? 0;
+            if (coins > balance) {
+              toast(getLangText('err_convert_balance'), 'error');
+              return;
+            }
+
+            const settings = await getSettings();
+            const rate = settings.coin_rate ?? 10000;
+            const feePercent = settings.conversion_fee_percent ?? 5;
+            const rupiah = Math.floor((coins / rate) * 1000 * (1 - feePercent / 100));
+
+            // Insert payouts
+            const { error: payoutErr } = await sb.from('payouts').insert({
+              user_id: userId,
+              coins_used: coins,
+              rupiah_amount: rupiah,
+              method,
+              account_number: account,
+              status: 'pending'
+            });
+            if (payoutErr) { toast(payoutErr.message, 'error'); return; }
+
+            // Update users
+            await sb.from('users').update({ coin_balance: balance - coins }).eq('id', userId);
+
+            // Insert coin_transactions
+            await sb.from('coin_transactions').insert({
+              user_id: userId,
+              amount: -coins,
+              type: 'convert',
+              description: getLangText('msg_convert') + ' ' + method
+            });
+
+            toast(getLangText('msg_convert_success') + ` (${rupiah.toLocaleString('id-ID')})`, 'success');
+            if (inputCoins) inputCoins.value = 5000;
+            if (inputAccount) inputAccount.value = '';
+            updateConvertSummary();
+            await loadDashboard();
+
+          } catch (e) {
+            toast(e.message || getLangText('err_generic'), 'error');
+          }
+        });
+      }
+
+      // ============================================================
+      // HISTORY
+      // ============================================================
+      async function loadHistory() {
+        const listEl = document.getElementById('history-list');
+        if (!listEl) return;
+        try {
+          const { data: { session } } = await sb.auth.getSession();
+          if (!session) {
+            listEl.innerHTML = `<p class="text-muted text-small">${getLangText('err_login')}</p>`;
+            return;
+          }
+          const { data: transactions, error } = await sb
+            .from('coin_transactions')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .order('created_at', { ascending: false })
+            .limit(100);
+
+          if (error) {
+            listEl.innerHTML = `<p class="text-muted text-small">${error.message}</p>`;
+            return;
+          }
+          if (!transactions || transactions.length === 0) {
+            listEl.innerHTML = `<p class="text-muted text-small">${getLangText('history_empty')}</p>`;
+            return;
+          }
+
+          const icons = {
+            ad_reward: '🎬',
+            checkin: '✅',
+            convert: '💸',
+            payout: '💰',
+            expired: '⏰'
+          };
+
+          listEl.innerHTML = transactions.map(tx => {
+            const icon = icons[tx.type] || '📌';
+            const amountClass = tx.amount >= 0 ? 'text-green' : 'text-red';
+            const sign = tx.amount >= 0 ? '+' : '';
+            return `
+              <div class="history-item">
+                <div class="history-icon">${icon}</div>
+                <div class="history-desc">
+                  <div class="desc-title">${tx.description || tx.type}</div>
+                  <div class="desc-date">${formatTanggalWaktu(tx.created_at)}</div>
+                </div>
+                <div class="history-amount ${amountClass}">${sign}${tx.amount} 🟡</div>
+              </div>
+            `;
+          }).join('');
+
+        } catch (e) {
+          listEl.innerHTML = `<p class="text-muted text-small">${getLangText('err_generic')}</p>`;
+        }
+      }
+
+      // Load history saat hash berubah ke #history
+      window.addEventListener('hashchange', () => {
+        if (getRoute() === 'history') loadHistory();
+        if (getRoute() === 'profile') loadProfile();
+        if (getRoute() === 'dashboard') loadDashboard();
+        if (getRoute() === 'convert') updateConvertSummary();
+      });
+
+      // ============================================================
+      // PROFILE
+      // ============================================================
+      async function loadProfile() {
+        try {
+          const { data: { session } } = await sb.auth.getSession();
+          if (!session) return;
+          const { data: userData, error } = await sb
+            .from('users')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+          if (error || !userData) {
+            document.getElementById('profile-email').textContent = session.user.email || '—';
+            document.getElementById('profile-role').textContent = '—';
+            document.getElementById('profile-status').textContent = '—';
+            document.getElementById('profile-last-login').textContent = '—';
+            document.getElementById('profile-expiry').textContent = '—';
+            return;
+          }
+
+          document.getElementById('profile-email').textContent = userData.email || session.user.email || '—';
+          document.getElementById('profile-role').textContent = userData.role || 'user';
+          document.getElementById('profile-status').textContent = userData.status || 'active';
+          document.getElementById('profile-last-login').textContent = userData.last_login_at ? formatTanggalWaktu(userData.last_login_at) : '—';
+          document.getElementById('profile-expiry').textContent = userData.coin_expiry_at ? formatTanggal(userData.coin_expiry_at) : '—';
+        } catch (e) {
+          // Diamkan
+        }
+      }
+
+      // ============================================================
+      // LOGOUT
+      // ============================================================
+      const btnLogout = document.getElementById('btn-logout');
+      if (btnLogout) {
+        btnLogout.addEventListener('click', async function() {
           try {
             await sb.auth.signOut();
-            currentUser = null;
-            showPage('login');
-          } catch (err) {
-            toast(t('toast_error_prefix') + (err.message || 'Logout gagal'), 'error');
+            window.location.hash = '#login';
+          } catch (e) {
+            toast(e.message || getLangText('err_generic'), 'error');
           }
         });
       }
 
-      const profileBack = document.getElementById('btn-profile-back');
-      if (profileBack) profileBack.addEventListener('click', () => showPage('dashboard'));
+      // Load awal jika langsung ke halaman tertentu
+      if (getRoute() === 'history') loadHistory();
+      if (getRoute() === 'profile') loadProfile();
+      if (getRoute() === 'convert') updateConvertSummary();
 
-      // Terms back
-      const termsBack = document.getElementById('btn-terms-back');
-      if (termsBack) termsBack.addEventListener('click', () => {
-        if (currentUser) showPage('dashboard');
-        else showPage('login');
-      });
-
-      // Terms links in login
-      document.querySelectorAll('a[href="#terms"]').forEach(a => {
-        a.addEventListener('click', (e) => {
-          e.preventDefault();
-          showPage('terms');
-        });
-      });
-    }
-
-    function updateConvertBalance() {
-      const el = document.getElementById('convert-balance');
-      if (el && currentUser) el.textContent = currentUser.coin_balance ?? 0;
-    }
-
-    function updateConvertSummary() {
-      const inputCoins = document.getElementById('input-coins');
-      const summaryEl = document.getElementById('convert-summary');
-      if (!inputCoins || !summaryEl) return;
-      const coins = parseInt(inputCoins.value, 10);
-      if (!coins || isNaN(coins) || coins < 5000) {
-        summaryEl.textContent = t('convert_summary');
-        return;
-      }
-      const feePercent = 5;
-      const coinRate = 10000;
-      const rupiah = Math.floor((coins / coinRate) * 1000 * (1 - feePercent / 100));
-      summaryEl.innerHTML = `${coins} 🟡 → <strong>Rp ${rupiah.toLocaleString('id-ID')}</strong> (potongan ${feePercent}%)`;
-    }
-
-    // ============================================================
-    // INIT
-    // ============================================================
-    function initApp() {
-      // Check Supabase library
-      if (typeof window.supabase === 'undefined') {
-        showLoginError(t('toast_lib_fail'));
-        // Still show login page
-        showPage('login');
-        return;
-      }
-
-      try {
-        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      } catch (err) {
-        showLoginError('Gagal inisialisasi Supabase: ' + (err.message || ''));
-        showPage('login');
-        return;
-      }
-
-      // Apply language first
-      applyLanguage();
-      bindEvents();
-
-      // Auth state listener
-      try {
-        sb.auth.onAuthStateChange((event, session) => {
-          if (event === 'SIGNED_IN') {
-            checkAuth();
-          } else if (event === 'SIGNED_OUT') {
-            currentUser = null;
-            showPage('login');
-          }
-        });
-      } catch (e) {
-        console.warn('onAuthStateChange error:', e);
-      }
-
-      // Hash routing
+      // Perbarui summary saat halaman convert ditampilkan
       window.addEventListener('hashchange', () => {
-        const route = getRoute();
-        showPage(route);
-        if (route === 'history') loadHistory();
-        if (route === 'profile') loadProfile();
-        if (route === 'convert') updateConvertBalance();
-        if (route === 'watch') resetWatchButtons();
+        if (getRoute() === 'convert') {
+          updateConvertSummary();
+          loadDashboard(); // update saldo
+        }
       });
 
-      // Initial route
-      const initialRoute = getRoute();
-      showPage(initialRoute);
-
-      // Check auth
-      checkAuth();
-    }
-
-    // Run after DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', initApp);
+    });
   </script>
 </body>
 </html>
